@@ -81,18 +81,29 @@ $('#muteBtn').addEventListener('click', () => {
 $('#muteBtn').textContent = save.muted ? '🔇' : '🔊';
 
 /* ---------------- 选弹页 ---------------- */
+let langFilter = 'all';
+function applyLangFilter() {
+  $$('#setgrid .setcard').forEach(el => { el.style.display = (langFilter === 'all' || el.dataset.lang === langFilter) ? '' : 'none'; });
+}
+$$('#langSeg button').forEach(b => b.addEventListener('click', () => {
+  $$('#langSeg button').forEach(x => x.classList.remove('active')); b.classList.add('active');
+  langFilter = b.dataset.lang; sfx.click(); applyLangFilter();
+}));
 async function renderSets() {
   const grid = $('#setgrid'); grid.innerHTML = '';
+  let cardIdx = 0;
   for (const cfg of SETS) {
     const data = await loadSet(cfg);
     const chase = chaseOf(data);
     const owned = ownedInSet(data);
     const el = document.createElement('article');
     el.className = 'setcard';
+    el.dataset.lang = data.lang;
+    el.style.animationDelay = `${Math.min(cardIdx++ * 45, 540)}ms`;
     el.innerHTML = `
       <div class="setbanner" style="background:${cfg.theme}">
         ${data.logo ? `<img class="logoimg" src="${logoSrc(data)}" alt="${data.name}" loading="lazy">` : `<h3 style="position:relative;z-index:1">${data.name}</h3>`}
-        <img class="chase" src="${imgUrl(chase)}" alt="${chase.n}" loading="lazy">
+        <img class="chase" src="${imgUrl(chase)}" alt="${chase.n}" loading="lazy" onerror="this.style.opacity=0">
       </div>
       <div class="setbody">
         <h3>${data.name} <span style="color:var(--dim2);font-size:12px">${LANG_LABEL[data.lang] || data.lang} · ${data.total} 张</span></h3>
@@ -108,6 +119,7 @@ async function renderSets() {
     el.querySelector('[data-act="ten"]').addEventListener('click', () => startTen(cfg));
     grid.appendChild(el);
   }
+  applyLangFilter();
   const s = save.stats;
   $('#heroStats').innerHTML = s.packs
     ? `已开 <b>${s.packs}</b> 包 · 累计 <b>${s.cards}</b> 张 · 高稀有演出 <b>${s.l3 + s.l4}</b> 次 · 最佳战绩在「战绩」页`
@@ -165,6 +177,7 @@ function showStage() {
   $$('.view').forEach(v => v.classList.remove('active'));
   $('#view-open').classList.add('active'); window.scrollTo({ top: 0 });
   $('#stage').style.display = 'block'; $('#setgridWrap').style.display = 'none';
+  if (session?.cfg) $('#stage').style.setProperty('--amb', session.cfg.theme);
 }
 function exitStage() {
   $('#stage').style.display = 'none'; $('#setgridWrap').style.display = 'block';
@@ -180,7 +193,7 @@ function renderTear() {
     <div class="packwrap" id="packEl">
       <div class="packtop"><img src="${imgUrl(chase, true)}" alt=""></div>
       <div class="pack">
-        <img class="packart" src="${imgUrl(chase, true)}" alt="${chase.n}">
+        <img class="packart" src="${imgUrl(chase, true)}" alt="${chase.n}" onerror="this.style.opacity=0">
         <div class="packshade"></div><div class="packtear"></div>
         ${data.logo ? `<img class="packlogo" src="${logoSrc(data)}" alt="">` : ''}
         <div class="packname">${data.name}</div>
@@ -246,6 +259,7 @@ function flipCurrent() {
   const entry = session.pack[session.idx];
   const card3d = $('#card3d'); const stage = $('#cardStage');
   stage.classList.remove(`leak-${entry.level}`);
+  stage.classList.add('pop'); setTimeout(() => stage.classList.remove('pop'), 860);
   card3d.classList.add(entry.level >= 4 ? 'slowflip' : 'flipping');
   card3d.style.setProperty('--flip', '180deg');
   card3d.classList.add(`glow-${entry.level}`);
@@ -294,7 +308,7 @@ function renderSummary() {
       <h2>${ten ? '十连开 · 总结算' : best.level >= 4 ? '🎉 神抽！' : best.level === 3 ? '✨ 出货了！' : '本包结算'}</h2>
       <p>${ten ? `共 ${pack.length} 张` : `${data.name}`} · 参考价合计 <b>€${total.toFixed(2)}</b> · 新卡 <b>${news}</b> 张${ten && sorted.some(e => e.level >= 4) ? ' · <b>含 SAR/HR！</b>' : ''}</p>
     </div>
-    <div class="bestpull"><span class="besttag">最佳 · ${dispTier(best.card)} · ${fmtPrice(best.card)}</span><img src="${imgUrl(best.card, true)}" alt="${best.card.n}"></div>
+    <div class="bestpull" style="--bc:${TIERS[best.tier].color}"><span class="besttag">最佳 · ${dispTier(best.card)} · ${fmtPrice(best.card)}</span><img src="${imgUrl(best.card, true)}" alt="${best.card.n}"></div>
     <p style="text-align:center;color:var(--dim);font-size:13px">${best.card.n}</p>
     <div class="resultgrid">${sorted.map((e, i) => `
       <figure data-id="${e.card.id}" style="animation-delay:${Math.min(i * 30, 600)}ms">
