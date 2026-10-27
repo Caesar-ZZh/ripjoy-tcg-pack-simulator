@@ -22,7 +22,8 @@ setMuted(!!save.muted);
 const DATA = {}; const POOLS = {}; const CARDMAP = {};
 async function loadSet(cfg) {
   if (DATA[cfg.key]) return DATA[cfg.key];
-  const res = await fetch(cfg.file); const data = await res.json();
+  const embedded = (typeof window !== 'undefined' && window.__RIPJOY_EMBED__) ? window.__RIPJOY_EMBED__[cfg.file] : null;
+  const data = embedded || await (await fetch(cfg.file)).json();
   DATA[cfg.key] = data; POOLS[cfg.key] = buildPools(data);
   for (const c of data.cards) CARDMAP[c.id] = { card: c, setKey: cfg.key, setName: data.name };
   return data;
