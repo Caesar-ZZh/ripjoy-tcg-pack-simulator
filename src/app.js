@@ -92,7 +92,7 @@ function collect(entry) {
   return isNew;
 }
 function finishPackToHistory(cfg, pack) {
-  const best = [...pack].sort((a, b) => (b.card.p || 0) - (a.card.p || 0))[0];
+  const best = [...pack].sort((a, b) => (b.level || 0) - (a.level || 0) || (b.card.p || 0) - (a.card.p || 0))[0];
   save.stats.packs++;
   save.history.unshift({ ts: Date.now(), setKey: cfg.key, setName: DATA[cfg.key].name, n: pack.length, bestId: best.card.id, bestName: best.card.n, bestPrice: best.card.p, bestTier: tierOf(best.card) });
   save.history = save.history.slice(0, 30); persist();
