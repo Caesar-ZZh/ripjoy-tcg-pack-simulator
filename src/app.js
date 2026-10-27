@@ -227,12 +227,14 @@ function flipCurrent() {
       vibrate(entry.level >= 4 ? VIB.l4 : entry.level === 3 ? VIB.l3 : VIB.l2);
       if (entry.level >= 4) flash();
       const banner = $('#banner');
-      banner.textContent = entry.tier === 'HR' ? '✦ HYPER RARE · 金卡 ✦' : entry.tier === 'SAR' ? '✦ SAR · 特别插画稀有 ✦' : `${entry.tier} · ${TIERS[entry.tier].cn}`;
-      banner.style.background = `linear-gradient(92deg, ${TIERS[entry.tier].color}, #fff2)`;
-      banner.style.backgroundColor = TIERS[entry.tier].color;
-      banner.classList.add('pop');
+      if (banner) {
+        banner.textContent = entry.tier === 'HR' ? '✦ HYPER RARE · 金卡 ✦' : entry.tier === 'SAR' ? '✦ SAR · 特别插画稀有 ✦' : `${entry.tier} · ${TIERS[entry.tier].cn}`;
+        banner.style.background = `linear-gradient(92deg, ${TIERS[entry.tier].color}, #fff2)`;
+        banner.style.backgroundColor = TIERS[entry.tier].color;
+        banner.classList.add('pop');
+      }
     } else if (entry.level === 1) { sfx.reveal(1); }
-    $('#nextBtn').textContent = session.idx === session.pack.length - 1 ? '看结算' : '下一张';
+    const nb = $('#nextBtn'); if (nb) nb.textContent = session.idx === session.pack.length - 1 ? '看结算' : '下一张';
   }, entry.level >= 4 ? 520 : 330);
   const t = TIERS[entry.tier];
   $('#cardInfo').innerHTML = `
