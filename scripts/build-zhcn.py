@@ -15,7 +15,7 @@ PAGE = '太晶盛聚（TCG）'
 BILLS = 'http://billsarchive.com/terastal-gathering-cn.html'
 RARITY_MAP = {'C': 'Common', 'U': 'Uncommon', 'R': 'Rare', 'RR': 'Double Rare',
               'SR': 'Ultra Rare', 'SAR': 'Special Illustration Rare', 'UR': 'Hyper Rare',
-              'AR': 'Illustration Rare', 'CHR': 'Illustration Rare'}
+              'AR': 'Illustration Rare', 'CHR': 'Illustration Rare', 'ACE': 'ACE SPEC Rare'}
 HIGH = {'RR', 'SR', 'SAR', 'UR', 'AR'}
 
 def get(url, referer=None):
@@ -88,7 +88,7 @@ out_cards, rar_count = [], {}
 for c in sorted(cards, key=lambda x: x['num']):
     r = RARITY_MAP.get(c['rk'], 'Common'); rar_count[r] = rar_count.get(r, 0) + 1
     out_cards.append({'id': f"{SET_ID}-{c['num']:03d}", 'n': c['n'], 'no': f"{c['num']:03d}",
-                      'r': r, 'img': results[c['num']][0], 'p': None, 'cur': 'EUR', 'ill': None})
+                      'r': r, 'rk': c['rk'], 'img': results[c['num']][0], 'p': None, 'cur': 'EUR', 'ill': None})
 missing = [c['n'] + '#' + c['no'] for c in out_cards if not c['img']]
 print('missing images:', len(missing), missing[:20])
 out = {'id': SET_ID, 'lang': 'zh-cn', 'name': '太晶盛聚', 'logo': None, 'symbol': None,

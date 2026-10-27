@@ -16,6 +16,10 @@ const SETS = [
   { key: 'SV10tw', file: 'data/zh-tw-SV10.json', theme: 'linear-gradient(150deg,#3b0764,#7e22ce 55%,#d8b4fe)', desc: '繁体中文版（台版）· 5 张包 · 数据暂缺 AR/SAR', chaseNote: '火箭队的超梦 ex RR' },
 ];
 const LANG_LABEL = { en: '英文版', ja: '日版', 'zh-cn': '简体中文版', 'zh-tw': '繁体中文版' };
+// 带 rk 的卡（简中弹）按其原始稀有度字母展示：SR 就是 SR，不套用英文 UR 口径
+const CN_RARITY_CN = { C: '普通', U: '非普通', R: '稀有闪', RR: '双重稀有', ACE: 'ACE SPEC', SR: '超级稀有', SAR: '特别插画稀有', UR: '金卡' };
+const dispTier = (c) => c.rk || tierOf(c);
+const dispTierLabel = (c) => c.rk ? `${c.rk} · ${CN_RARITY_CN[c.rk] || ''}` : TIERS[tierOf(c)].label;
 const packOf = (data) => data.pack || (data.lang === 'ja' ? 7 : 10);
 const $ = (s, el = document) => el.querySelector(s);
 const $$ = (s, el = document) => [...el.querySelectorAll(s)];
@@ -105,7 +109,7 @@ function collect(entry) {
 function finishPackToHistory(cfg, pack) {
   const best = [...pack].sort((a, b) => (b.level || 0) - (a.level || 0) || (b.card.p || 0) - (a.card.p || 0))[0];
   save.stats.packs++;
-  save.history.unshift({ ts: Date.now(), setKey: cfg.key, setName: DATA[cfg.key].name, n: pack.length, bestId: best.card.id, bestName: best.card.n, bestPrice: best.card.p, bestTier: tierOf(best.card) });
+  save.history.unshift({ ts: Date.now(), setKey: cfg.key, setName: DATA[cfg.key].name, n: pack.length, bestId: best.card.id, bestName: best.card.n, bestPrice: best.card.p, bestTier: dispTier(best.card) });
   save.history = save.history.slice(0, 30); persist();
 }
 
@@ -238,7 +242,7 @@ function flipCurrent() {
       if (entry.level >= 4) flash();
       const banner = $('#banner');
       if (banner) {
-        banner.textContent = entry.tier === 'HR' ? '✦ HYPER RARE · 金卡 ✦' : entry.tier === 'SAR' ? '✦ SAR · 特别插画稀有 ✦' : `${entry.tier} · ${TIERS[entry.tier].cn}`;
+        banner.textContent = entry.card.rk === 'UR' ? '✦ UR · 金卡 ✦' : entry.tier === 'HR' ? '✦ HYPER RARE · 金卡 ✦' : entry.tier === 'SAR' ? '✦ SAR · 特别插画稀有 ✦' : `${dispTier(entry.card)} · ${entry.card.rk ? (CN_RARITY_CN[entry.card.rk] || '') : TIERS[entry.tier].cn}`;
         banner.style.background = `linear-gradient(92deg, ${TIERS[entry.tier].color}, #fff2)`;
         banner.style.backgroundColor = TIERS[entry.tier].color;
         banner.classList.add('pop');
@@ -248,8 +252,8 @@ function flipCurrent() {
   }, entry.level >= 4 ? 520 : 330);
   const t = TIERS[entry.tier];
   $('#cardInfo').innerHTML = `
-    <div class="cname">${entry.card.n}<span class="tierbadge" style="background:${t.color}">${entry.tier}</span>${entry.reverse ? '<span class="revtag">反闪</span>' : ''}${entry.isNew ? '<span class="newtag">NEW</span>' : ''}</div>
-    <div class="cmeta">No.${entry.card.no} · ${t.label} · 参考价 <b style="color:var(--gold)">${fmtPrice(entry.card)}</b>${entry.card.ill ? ` · 画师 ${entry.card.ill}` : ''} · 点卡片看大图，点「下一张」继续</div>`;
+    <div class="cname">${entry.card.n}<span class="tierbadge" style="background:${t.color}">${dispTier(entry.card)}</span>${entry.reverse ? '<span class="revtag">反闪</span>' : ''}${entry.isNew ? '<span class="newtag">NEW</span>' : ''}</div>
+    <div class="cmeta">No.${entry.card.no} · ${dispTierLabel(entry.card)} · 参考价 <b style="color:var(--gold)">${fmtPrice(entry.card)}</b>${entry.card.ill ? ` · 画师 ${entry.card.ill}` : ''} · 点卡片看大图，点「下一张」继续</div>`;
   $('#cardInfo').addEventListener('click', () => openDetail(entry.card));
   renderTray();
 }
@@ -273,12 +277,12 @@ function renderSummary() {
       <h2>${ten ? '十连开 · 总结算' : best.level >= 4 ? '🎉 神抽！' : best.level === 3 ? '✨ 出货了！' : '本包结算'}</h2>
       <p>${ten ? `共 ${pack.length} 张` : `${data.name}`} · 参考价合计 <b>€${total.toFixed(2)}</b> · 新卡 <b>${news}</b> 张${ten && sorted.some(e => e.level >= 4) ? ' · <b>含 SAR/HR！</b>' : ''}</p>
     </div>
-    <div class="bestpull"><span class="besttag">最佳 · ${best.tier} · ${fmtPrice(best.card)}</span><img src="${imgUrl(best.card, true)}" alt="${best.card.n}"></div>
+    <div class="bestpull"><span class="besttag">最佳 · ${dispTier(best.card)} · ${fmtPrice(best.card)}</span><img src="${imgUrl(best.card, true)}" alt="${best.card.n}"></div>
     <p style="text-align:center;color:var(--dim);font-size:13px">${best.card.n}</p>
     <div class="resultgrid">${sorted.map((e, i) => `
       <figure data-id="${e.card.id}" style="animation-delay:${Math.min(i * 30, 600)}ms">
         <img src="${imgUrl(e.card)}" alt="${e.card.n}" loading="lazy">
-        <figcaption><span class="rdot" style="background:${TIERS[e.tier].color}"></span><b>${e.card.n}</b><br>${e.tier} · ${fmtPrice(e.card)}${e.isNew ? ' · NEW' : ''}</figcaption>
+        <figcaption><span class="rdot" style="background:${TIERS[e.tier].color}"></span><b>${e.card.n}</b><br>${dispTier(e.card)} · ${fmtPrice(e.card)}${e.isNew ? ' · NEW' : ''}</figcaption>
       </figure>`).join('')}
     </div>
     <div class="stagebtns" style="margin:22px auto 0">
@@ -310,7 +314,7 @@ function renderCollection() {
     <div class="statcard"><div class="v">${owned.filter(x => TIERS[tierOf(x.card)].level >= 3).length}</div><div class="k">AR 以上藏品</div></div>`;
   $('#collGrid').innerHTML = filtered.length ? filtered.map(x => {
     const t = tierOf(x.card);
-    return `<figure data-id="${x.card.id}"><span class="countbadge">×${x.n}</span><img src="${imgUrl(x.card)}" alt="${x.card.n}" loading="lazy"><figcaption><span class="rdot" style="background:${TIERS[t].color}"></span><b>${x.card.n}</b><br>${t} · ${fmtPrice(x.card)}</figcaption></figure>`;
+    return `<figure data-id="${x.card.id}"><span class="countbadge">×${x.n}</span><img src="${imgUrl(x.card)}" alt="${x.card.n}" loading="lazy"><figcaption><span class="rdot" style="background:${TIERS[t].color}"></span><b>${x.card.n}</b><br>${dispTier(x.card)} · ${fmtPrice(x.card)}</figcaption></figure>`;
   }).join('') : `<div class="empty" style="grid-column:1/-1">这里还没有卡<br>去撕一包，把第一张 SAR 带回来</div>`;
   $$('#collGrid figure').forEach(f => f.addEventListener('click', () => openDetail(CARDMAP[f.dataset.id].card)));
 }
@@ -325,7 +329,7 @@ function renderStats() {
     <div class="statcard"><div class="v">${s.cards}</div><div class="k">累计卡片</div></div>
     <div class="statcard"><div class="v">${s.l4}</div><div class="k">SAR / 金卡次数</div></div>
     <div class="statcard"><div class="v">${s.l3}</div><div class="k">AR / UR 次数</div></div>`;
-  $('#bestPulls').innerHTML = best.length ? best.map(x => `<div class="historyitem"><img src="${imgUrl(x.card)}" alt=""><div class="hmeta"><b>${x.card.n}</b> · ${tierOf(x.card)}<br>${x.setName} · 参考价 <span style="color:var(--gold)">€${(x.card.p || 0).toFixed(2)}</span></div></div>`).join('') : '<div class="empty">还没有藏品</div>';
+  $('#bestPulls').innerHTML = best.length ? best.map(x => `<div class="historyitem"><img src="${imgUrl(x.card)}" alt=""><div class="hmeta"><b>${x.card.n}</b> · ${dispTier(x.card)}<br>${x.setName} · 参考价 <span style="color:var(--gold)">€${(x.card.p || 0).toFixed(2)}</span></div></div>`).join('') : '<div class="empty">还没有藏品</div>';
   $('#historyList').innerHTML = save.history.length ? save.history.map(h => `<div class="historyitem"><img src="${h.bestId && CARDMAP[h.bestId] ? imgUrl(CARDMAP[h.bestId].card) : ''}" alt=""><div class="hmeta"><b>${h.bestName}</b> · ${h.bestTier}<br>${h.setName} · ${h.n} 张 · ${new Date(h.ts).toLocaleString('zh-CN', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</div></div>`).join('') : '<div class="empty">暂无开包记录</div>';
 }
 $('#resetBtn').addEventListener('click', () => {
@@ -344,8 +348,8 @@ function openDetail(card) {
       <div class="foil ${tierOf(card) === 'HR' ? 'gold' : t.level >= 1 ? 'holo' : ''}"></div></div>
     </div>
     <div class="modalinfo">
-      <div class="mname">${card.n}<span class="tierbadge" style="background:${t.color}">${tierOf(card)}</span></div>
-      <div class="mmeta">No.${card.no} · ${info?.setName || ''} · ${t.label}<br>参考价 <b style="color:var(--gold)">${fmtPrice(card)}</b>${card.ill ? ` · 画师 ${card.ill}` : ''}${cnt ? ` · 已拥有 ×${cnt}` : ''}<br><span style="font-size:12px">拖动卡片查看全息光泽</span></div>
+      <div class="mname">${card.n}<span class="tierbadge" style="background:${t.color}">${dispTier(card)}</span></div>
+      <div class="mmeta">No.${card.no} · ${info?.setName || ''} · ${dispTierLabel(card)}<br>参考价 <b style="color:var(--gold)">${fmtPrice(card)}</b>${card.ill ? ` · 画师 ${card.ill}` : ''}${cnt ? ` · 已拥有 ×${cnt}` : ''}<br><span style="font-size:12px">拖动卡片查看全息光泽</span></div>
       <button class="btn modalclose" id="modalClose">关 闭</button>
     </div>`;
   $('#modal').classList.add('open');
