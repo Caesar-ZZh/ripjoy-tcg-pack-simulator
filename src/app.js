@@ -3,34 +3,34 @@ import { Particles, fxForLevel } from './particles.js';
 import { sfx, vibrate, VIB, addTilt, setMuted } from './fx.js';
 
 const SETS = [
-  { key: 'taijing', file: 'data/zh-cn-CSV9.5C.json', theme: 'linear-gradient(150deg,#5e1a6e,#b83fd0 55%,#ff8ad8)', desc: '简体中文版 · 伊布全家太晶盛聚 · 含简中专属异画', chaseNote: '仙子伊布 ex SAR（简中专属异画）' },
-  { key: 'CSV9C', file: 'data/zh-cn-CSV9C.json', theme: 'linear-gradient(150deg,#40205e,#7a4fd0 55%,#f2a8e0)', desc: '简体中文版 · 晶璃星辉 · 太乐巴戈斯集结', chaseNote: '太乐巴戈斯 ex SAR' },
-  { key: 'CSV8C', file: 'data/zh-cn-CSV8C.json', theme: 'linear-gradient(150deg,#0d2e3d,#14607a 55%,#4fd8c8)', desc: '简体中文版 · 诡幻璀璨 · 桃歹郎一族', chaseNote: '桃歹郎 ex SAR' },
-  { key: 'CSV7C', file: 'data/zh-cn-CSV7C.json', theme: 'linear-gradient(150deg,#27364d,#4a6a96 55%,#ffb37a)', desc: '简体中文版 · 利刃猛醒 · 猛雷鼓咆哮', chaseNote: '猛雷鼓 ex SAR' },
-  { key: '151C', file: 'data/zh-cn-151C.json', theme: 'linear-gradient(150deg,#7a1620,#d03a2f 55%,#ffd75e)', desc: '简体中文版 · 初代 151 情怀 · 旅望惊聚全集', chaseNote: '喷火龙 ex SAR' },
-  { key: '151en', file: 'data/en-sv03.5.json', theme: 'linear-gradient(150deg,#8f1f16,#e2483d 55%,#ff8a5c)', desc: '初代 151 情怀弹 · 喷火龙 SAR 大追', chaseNote: '喷火龙 ex SAR' },
-  { key: 'sv08.5', file: 'data/en-sv08.5.json', theme: 'linear-gradient(150deg,#6e1a4d,#d03f8a 55%,#ffb3d9)', desc: '伊布盛宴 · 月亮伊布 ex SAR 天价追卡', chaseNote: '月亮伊布 ex SAR' },
-  { key: 'sv08', file: 'data/en-sv08.json', theme: 'linear-gradient(150deg,#8a6410,#e8a812 55%,#ffd75e)', desc: '电光四射 · 皮卡丘 SAR 天价追卡', chaseNote: '皮卡丘 ex SAR' },
-  { key: 'sv09', file: 'data/en-sv09.json', theme: 'linear-gradient(150deg,#0f5e46,#12a37a 55%,#5ce8b8)', desc: '旅途伙伴 · 训练家的宝可梦集结', chaseNote: '莉莉艾的皮皮 ex SAR' },
-  { key: 'sv10', file: 'data/en-sv10.json', theme: 'linear-gradient(150deg,#33135e,#7a4fd0 55%,#c05cff)', desc: '火箭队归来 · 坂木的超梦 ex SAR', chaseNote: '火箭队的超梦 ex SAR' },
-  { key: 'me01', file: 'data/en-me01.json', theme: 'linear-gradient(150deg,#14424e,#1f8aa5 55%,#6fe3ff)', desc: 'MEGA 新时代开启 · 超级进化归来', chaseNote: '超级路卡利欧 ex 金卡' },
-  { key: 'sv05', file: 'data/en-sv05.json', theme: 'linear-gradient(150deg,#4e3414,#a5761f 55%,#ffd75e)', desc: '时空之力 · 古代与未来悖谬集结', chaseNote: '铁斑叶 ex SAR' },
-  { key: 'sv10.5b', file: 'data/en-sv10.5b.json', theme: 'linear-gradient(150deg,#0b1030,#2743a6 55%,#6fb7ff)', desc: '合众黑雷 · BWR 黑白稀有登场', chaseNote: '捷克罗姆 ex BWR' },
-  { key: 'sv10.5w', file: 'data/en-sv10.5w.json', theme: 'linear-gradient(150deg,#571d10,#c2492a 55%,#ffb37a)', desc: '合众白焰 · BWR 黑白稀有登场', chaseNote: '莱希拉姆 ex BWR' },
-  { key: 'me02', file: 'data/en-me02.json', theme: 'linear-gradient(150deg,#2b0f2e,#8f2470 55%,#ff7a5c)', desc: 'MEGA 第二弹 · 幻影火焰', chaseNote: '超级喷火龙X ex 金卡' },
-  { key: 'me02.5', file: 'data/en-me02.5.json', theme: 'linear-gradient(150deg,#123524,#1f7a4d 55%,#7ae2a8)', desc: 'MEGA 大弹 295 张 · 群雄昇腾', chaseNote: '超级快龙 ex 金卡' },
-  { key: 'sv04.5', file: 'data/en-sv04.5.json', theme: 'linear-gradient(150deg,#243b6b,#4a7fd4 55%,#bcd7ff)', desc: '帕底亚之光 · 闪色宝可梦大集合', chaseNote: '闪色超梦 ex' },
-  { key: 'sv06.5', file: 'data/en-sv06.5.json', theme: 'linear-gradient(150deg,#160f2e,#3d2a7a 55%,#8a7ae0)', desc: '黑夜漫游者 · 桃歹郎 ex SAR', chaseNote: '桃歹郎 ex SAR' },
-  { key: 'sv06', file: 'data/en-sv06.json', theme: 'linear-gradient(150deg,#0e4632,#15935f 55%,#6fe8ae)', desc: '变幻假面 · 厄诡椪与忍蛙', chaseNote: '甲贺忍蛙 ex SAR' },
-  { key: 'sv07', file: 'data/en-sv07.json', theme: 'linear-gradient(150deg,#3a2a6e,#7a5cd0 55%,#c9a8ff)', desc: '星晶奇迹 · 太乐巴戈斯 ex', chaseNote: '太乐巴戈斯 ex SAR' },
-  { key: 'sv04', file: 'data/en-sv04.json', theme: 'linear-gradient(150deg,#40260f,#96601f 55%,#ffc46b)', desc: '悖论裂缝 · 古代未来交锋', chaseNote: '铁武者 ex SAR' },
-  { key: 'sv01', file: 'data/en-sv01.json', theme: 'linear-gradient(150deg,#5e1220,#b02a3d 55%,#ff8a7a)', desc: '朱紫起点 · 帕底亚启程', chaseNote: '沙奈朵 ex SAR' },
-  { key: 'sv02', file: 'data/en-sv02.json', theme: 'linear-gradient(150deg,#6e5410,#c29a1f 55%,#ffe98a)', desc: '帕底亚进化 · 奇树 SAR 大追', chaseNote: '奇树 SAR' },
-  { key: 'sv03', file: 'data/en-sv03.json', theme: 'linear-gradient(150deg,#1c1c26,#3d3d55 55%,#ff7847)', desc: '黯焰支配者 · 喷火龙 ex', chaseNote: '喷火龙 ex 金卡' },
-  { key: '151ja', file: 'data/ja-sv2a.json', theme: 'linear-gradient(150deg,#123a75,#2f6fd0 55%,#5eb1ff)', desc: '日版原版 151 · 7 张包 · 镜面闪', chaseNote: 'リザードンex SAR' },
-  { key: 'SV9a', file: 'data/ja-SV9a.json', theme: 'linear-gradient(150deg,#6e2a10,#d05a1f 55%,#ffb37a)', desc: '日版热风竞技场 · 5 张包', chaseNote: 'シロナのガブリアスex SAR' },
-  { key: 'SV9tw', file: 'data/zh-tw-SV9.json', theme: 'linear-gradient(150deg,#7c2d12,#d97a2b 55%,#ffc98a)', desc: '繁体中文版（台版）· 5 张包 · 数据暂缺 AR/SAR', chaseNote: '莉莉艾的皮皮 ex RR' },
-  { key: 'SV10tw', file: 'data/zh-tw-SV10.json', theme: 'linear-gradient(150deg,#3b0764,#7e22ce 55%,#d8b4fe)', desc: '繁体中文版（台版）· 5 张包 · 数据暂缺 AR/SAR', chaseNote: '火箭队的超梦 ex RR' },
+  { key: 'taijing', file: 'data/zh-cn-CSV9.5C.json', theme: 'linear-gradient(150deg,#5e1a6e,#b83fd0 55%,#ff8ad8)', desc: '简体中文版 · 伊布全家太晶盛聚 · 含简中专属异画', chaseNote: '仙子伊布 ex SAR（简中专属异画）', sname: '太晶盛聚', lang: 'zh-cn', total: 259, pack: 5 },
+  { key: 'CSV9C', file: 'data/zh-cn-CSV9C.json', theme: 'linear-gradient(150deg,#40205e,#7a4fd0 55%,#f2a8e0)', desc: '简体中文版 · 晶璃星辉 · 太乐巴戈斯集结', chaseNote: '太乐巴戈斯 ex SAR', sname: '星彩晶璃', lang: 'zh-cn', total: 266, pack: 5 },
+  { key: 'CSV8C', file: 'data/zh-cn-CSV8C.json', theme: 'linear-gradient(150deg,#0d2e3d,#14607a 55%,#4fd8c8)', desc: '简体中文版 · 诡幻璀璨 · 桃歹郎一族', chaseNote: '桃歹郎 ex SAR', sname: '璀璨诡幻', lang: 'zh-cn', total: 264, pack: 5 },
+  { key: 'CSV7C', file: 'data/zh-cn-CSV7C.json', theme: 'linear-gradient(150deg,#27364d,#4a6a96 55%,#ffb37a)', desc: '简体中文版 · 利刃猛醒 · 猛雷鼓咆哮', chaseNote: '猛雷鼓 ex SAR', sname: '利刃猛醒', lang: 'zh-cn', total: 259, pack: 5 },
+  { key: '151C', file: 'data/zh-cn-151C.json', theme: 'linear-gradient(150deg,#7a1620,#d03a2f 55%,#ffd75e)', desc: '简体中文版 · 初代 151 情怀 · 旅望惊聚全集', chaseNote: '喷火龙 ex SAR', sname: '收集啦151', lang: 'zh-cn', total: 192, pack: 5 },
+  { key: '151en', file: 'data/en-sv03.5.json', theme: 'linear-gradient(150deg,#8f1f16,#e2483d 55%,#ff8a5c)', desc: '初代 151 情怀弹 · 喷火龙 SAR 大追', chaseNote: '喷火龙 ex SAR', sname: '151', lang: 'en', total: 207, pack: 10 },
+  { key: 'sv08.5', file: 'data/en-sv08.5.json', theme: 'linear-gradient(150deg,#6e1a4d,#d03f8a 55%,#ffb3d9)', desc: '伊布盛宴 · 月亮伊布 ex SAR 天价追卡', chaseNote: '月亮伊布 ex SAR', sname: 'Prismatic Evolutions', lang: 'en', total: 180, pack: 10 },
+  { key: 'sv08', file: 'data/en-sv08.json', theme: 'linear-gradient(150deg,#8a6410,#e8a812 55%,#ffd75e)', desc: '电光四射 · 皮卡丘 SAR 天价追卡', chaseNote: '皮卡丘 ex SAR', sname: 'Surging Sparks', lang: 'en', total: 252, pack: 10 },
+  { key: 'sv09', file: 'data/en-sv09.json', theme: 'linear-gradient(150deg,#0f5e46,#12a37a 55%,#5ce8b8)', desc: '旅途伙伴 · 训练家的宝可梦集结', chaseNote: '莉莉艾的皮皮 ex SAR', sname: 'Journey Together', lang: 'en', total: 190, pack: 10 },
+  { key: 'sv10', file: 'data/en-sv10.json', theme: 'linear-gradient(150deg,#33135e,#7a4fd0 55%,#c05cff)', desc: '火箭队归来 · 坂木的超梦 ex SAR', chaseNote: '火箭队的超梦 ex SAR', sname: 'Destined Rivals', lang: 'en', total: 244, pack: 10 },
+  { key: 'me01', file: 'data/en-me01.json', theme: 'linear-gradient(150deg,#14424e,#1f8aa5 55%,#6fe3ff)', desc: 'MEGA 新时代开启 · 超级进化归来', chaseNote: '超级路卡利欧 ex 金卡', sname: 'Mega Evolution', lang: 'en', total: 188, pack: 10 },
+  { key: 'sv05', file: 'data/en-sv05.json', theme: 'linear-gradient(150deg,#4e3414,#a5761f 55%,#ffd75e)', desc: '时空之力 · 古代与未来悖谬集结', chaseNote: '铁斑叶 ex SAR', sname: 'Temporal Forces', lang: 'en', total: 218, pack: 10 },
+  { key: 'sv10.5b', file: 'data/en-sv10.5b.json', theme: 'linear-gradient(150deg,#0b1030,#2743a6 55%,#6fb7ff)', desc: '合众黑雷 · BWR 黑白稀有登场', chaseNote: '捷克罗姆 ex BWR', sname: 'Black Bolt', lang: 'en', total: 172, pack: 10 },
+  { key: 'sv10.5w', file: 'data/en-sv10.5w.json', theme: 'linear-gradient(150deg,#571d10,#c2492a 55%,#ffb37a)', desc: '合众白焰 · BWR 黑白稀有登场', chaseNote: '莱希拉姆 ex BWR', sname: 'White Flare', lang: 'en', total: 173, pack: 10 },
+  { key: 'me02', file: 'data/en-me02.json', theme: 'linear-gradient(150deg,#2b0f2e,#8f2470 55%,#ff7a5c)', desc: 'MEGA 第二弹 · 幻影火焰', chaseNote: '超级喷火龙X ex 金卡', sname: 'Phantasmal Flames', lang: 'en', total: 130, pack: 10 },
+  { key: 'me02.5', file: 'data/en-me02.5.json', theme: 'linear-gradient(150deg,#123524,#1f7a4d 55%,#7ae2a8)', desc: 'MEGA 大弹 295 张 · 群雄昇腾', chaseNote: '超级快龙 ex 金卡', sname: 'Ascended Heroes', lang: 'en', total: 295, pack: 10 },
+  { key: 'sv04.5', file: 'data/en-sv04.5.json', theme: 'linear-gradient(150deg,#243b6b,#4a7fd4 55%,#bcd7ff)', desc: '帕底亚之光 · 闪色宝可梦大集合', chaseNote: '闪色超梦 ex', sname: 'Paldean Fates', lang: 'en', total: 245, pack: 10 },
+  { key: 'sv06.5', file: 'data/en-sv06.5.json', theme: 'linear-gradient(150deg,#160f2e,#3d2a7a 55%,#8a7ae0)', desc: '黑夜漫游者 · 桃歹郎 ex SAR', chaseNote: '桃歹郎 ex SAR', sname: 'Shrouded Fable', lang: 'en', total: 99, pack: 10 },
+  { key: 'sv06', file: 'data/en-sv06.json', theme: 'linear-gradient(150deg,#0e4632,#15935f 55%,#6fe8ae)', desc: '变幻假面 · 厄诡椪与忍蛙', chaseNote: '甲贺忍蛙 ex SAR', sname: 'Twilight Masquerade', lang: 'en', total: 226, pack: 10 },
+  { key: 'sv07', file: 'data/en-sv07.json', theme: 'linear-gradient(150deg,#3a2a6e,#7a5cd0 55%,#c9a8ff)', desc: '星晶奇迹 · 太乐巴戈斯 ex', chaseNote: '太乐巴戈斯 ex SAR', sname: 'Stellar Crown', lang: 'en', total: 175, pack: 10 },
+  { key: 'sv04', file: 'data/en-sv04.json', theme: 'linear-gradient(150deg,#40260f,#96601f 55%,#ffc46b)', desc: '悖论裂缝 · 古代未来交锋', chaseNote: '铁武者 ex SAR', sname: 'Paradox Rift', lang: 'en', total: 266, pack: 10 },
+  { key: 'sv01', file: 'data/en-sv01.json', theme: 'linear-gradient(150deg,#5e1220,#b02a3d 55%,#ff8a7a)', desc: '朱紫起点 · 帕底亚启程', chaseNote: '沙奈朵 ex SAR', sname: 'Scarlet & Violet', lang: 'en', total: 258, pack: 10 },
+  { key: 'sv02', file: 'data/en-sv02.json', theme: 'linear-gradient(150deg,#6e5410,#c29a1f 55%,#ffe98a)', desc: '帕底亚进化 · 奇树 SAR 大追', chaseNote: '奇树 SAR', sname: 'Paldea Evolved', lang: 'en', total: 279, pack: 10 },
+  { key: 'sv03', file: 'data/en-sv03.json', theme: 'linear-gradient(150deg,#1c1c26,#3d3d55 55%,#ff7847)', desc: '黯焰支配者 · 喷火龙 ex', chaseNote: '喷火龙 ex 金卡', sname: 'Obsidian Flames', lang: 'en', total: 230, pack: 10 },
+  { key: '151ja', file: 'data/ja-sv2a.json', theme: 'linear-gradient(150deg,#123a75,#2f6fd0 55%,#5eb1ff)', desc: '日版原版 151 · 7 张包 · 镜面闪', chaseNote: 'リザードンex SAR', sname: 'ポケモンカード151', lang: 'ja', total: 210, pack: 7 },
+  { key: 'SV9a', file: 'data/ja-SV9a.json', theme: 'linear-gradient(150deg,#6e2a10,#d05a1f 55%,#ffb37a)', desc: '日版热风竞技场 · 5 张包', chaseNote: 'シロナのガブリアスex SAR', sname: '熱風のアリーナ', lang: 'ja', total: 92, pack: 5 },
+  { key: 'SV9tw', file: 'data/zh-tw-SV9.json', theme: 'linear-gradient(150deg,#7c2d12,#d97a2b 55%,#ffc98a)', desc: '繁体中文版（台版）· 5 张包 · 数据暂缺 AR/SAR', chaseNote: '莉莉艾的皮皮 ex RR', sname: '對戰搭檔', lang: 'zh-tw', total: 100, pack: 5 },
+  { key: 'SV10tw', file: 'data/zh-tw-SV10.json', theme: 'linear-gradient(150deg,#3b0764,#7e22ce 55%,#d8b4fe)', desc: '繁体中文版（台版）· 5 张包 · 数据暂缺 AR/SAR', chaseNote: '火箭队的超梦 ex RR', sname: '火箭隊的榮耀', lang: 'zh-tw', total: 98, pack: 5 },
 ];
 const LANG_LABEL = { en: '英文版', ja: '日版', 'zh-cn': '简体中文版', 'zh-tw': '繁体中文版' };
 // 带 rk 的卡（简中弹）按其原始稀有度字母展示：SR 就是 SR，不套用英文 UR 口径
@@ -49,14 +49,18 @@ const persist = () => { try { localStorage.setItem(SAVE_KEY, JSON.stringify(save
 setMuted(!!save.muted);
 
 /* ---------------- 数据 ---------------- */
-const DATA = {}; const POOLS = {}; const CARDMAP = {};
-async function loadSet(cfg) {
-  if (DATA[cfg.key]) return DATA[cfg.key];
-  const embedded = (typeof window !== 'undefined' && window.__RIPJOY_EMBED__) ? window.__RIPJOY_EMBED__[cfg.file] : null;
-  const data = embedded || await (await fetch(cfg.file)).json();
-  DATA[cfg.key] = data; POOLS[cfg.key] = buildPools(data);
-  for (const c of data.cards) CARDMAP[c.id] = { card: c, setKey: cfg.key, setName: data.name };
-  return data;
+const DATA = {}; const POOLS = {}; const CARDMAP = {}; const LOADP = {};
+function loadSet(cfg) {
+  if (DATA[cfg.key]) return Promise.resolve(DATA[cfg.key]);
+  if (LOADP[cfg.key]) return LOADP[cfg.key];
+  LOADP[cfg.key] = (async () => {
+    const embedded = (typeof window !== 'undefined' && window.__RIPJOY_EMBED__) ? window.__RIPJOY_EMBED__[cfg.file] : null;
+    const data = embedded || await (await fetch(cfg.file)).json();
+    DATA[cfg.key] = data; POOLS[cfg.key] = buildPools(data);
+    for (const c of data.cards) CARDMAP[c.id] = { card: c, setKey: cfg.key, setName: data.name };
+    return data;
+  })().catch(e => { delete LOADP[cfg.key]; throw e; });
+  return LOADP[cfg.key];
 }
 const logoSrc = (data) => !data.logo ? null : (data.logo.startsWith('data:') ? data.logo : `${data.logo}.png`);
 const chaseOf = (data) => [...data.cards].filter(c => ['SAR', 'HR', 'BWR'].includes(tierOf(c))).sort((a, b) => (b.p || 0) - (a.p || 0))[0]
@@ -69,9 +73,18 @@ function showView(name) {
   $$('.view').forEach(v => v.classList.toggle('active', v.id === `view-${name}`));
   $$('nav button').forEach(b => b.classList.toggle('active', b.dataset.view === name));
   window.scrollTo({ top: 0 });
-  if (name === 'collection') renderCollection();
-  if (name === 'stats') renderStats();
+  if (name === 'collection') { renderCollection(); ensureMetaLoaded(renderCollection); }
+  if (name === 'stats') { renderStats(); ensureMetaLoaded(renderStats); }
   if (name === 'open') renderSets();
+}
+let metaLoading = false;
+function ensureMetaLoaded(again) {
+  // 收藏册/战绩依赖 CARDMAP：若存档里有尚未加载弹系的卡，补齐后重渲染
+  if (metaLoading) return;
+  const missing = Object.keys(save.collection).some(id => !CARDMAP[id]);
+  if (!missing) return;
+  metaLoading = true;
+  Promise.all(SETS.map(c => loadSet(c).catch(() => {}))).then(() => { metaLoading = false; again(); });
 }
 $$('nav button').forEach(b => b.addEventListener('click', () => { sfx.click(); showView(b.dataset.view); }));
 $('#muteBtn').addEventListener('click', () => {
@@ -89,27 +102,25 @@ $$('#langSeg button').forEach(b => b.addEventListener('click', () => {
   $$('#langSeg button').forEach(x => x.classList.remove('active')); b.classList.add('active');
   langFilter = b.dataset.lang; sfx.click(); applyLangFilter();
 }));
-async function renderSets() {
+function renderSets() {
   const grid = $('#setgrid'); grid.innerHTML = '';
   let cardIdx = 0;
   for (const cfg of SETS) {
-    const data = await loadSet(cfg);
-    const chase = chaseOf(data);
-    const owned = ownedInSet(data);
     const el = document.createElement('article');
     el.className = 'setcard';
-    el.dataset.lang = data.lang;
+    el.dataset.lang = cfg.lang;
+    el.dataset.key = cfg.key;
     el.style.animationDelay = `${Math.min(cardIdx++ * 45, 540)}ms`;
     el.innerHTML = `
       <div class="setbanner" style="background:${cfg.theme}">
-        ${data.logo ? `<img class="logoimg" src="${logoSrc(data)}" alt="${data.name}" loading="lazy">` : `<h3 style="position:relative;z-index:1">${data.name}</h3>`}
-        <img class="chase" src="${imgUrl(chase)}" alt="${chase.n}" loading="lazy" onerror="this.style.opacity=0">
+        <h3 style="position:relative;z-index:1" data-fill="bname">${cfg.sname}</h3>
+        <span class="bannerload" data-fill="bload">卡池载入中…</span>
       </div>
       <div class="setbody">
-        <h3>${data.name} <span style="color:var(--dim2);font-size:12px">${LANG_LABEL[data.lang] || data.lang} · ${data.total} 张</span></h3>
-        <p class="setmeta">${cfg.desc}<br>大追：<span class="chase-name">${chase.n}</span> 参考价 <b style="color:var(--gold)">${fmtPrice(chase)}</b> · 每包 ${packOf(data)} 张</p>
-        <div class="progressline"><i style="width:${(owned / data.cards.length) * 100}%"></i></div>
-        <p class="setmeta">图鉴收集 ${owned} / ${data.cards.length}</p>
+        <h3>${cfg.sname} <span style="color:var(--dim2);font-size:12px">${LANG_LABEL[cfg.lang] || cfg.lang} · ${cfg.total} 张</span></h3>
+        <p class="setmeta">${cfg.desc}<br><span data-fill="chase">大追：<span class="chase-name">${cfg.chaseNote}</span></span> · 每包 ${cfg.pack} 张</p>
+        <div class="progressline"><i data-fill="bar" style="width:0%"></i></div>
+        <p class="setmeta" data-fill="prog">图鉴收集 … / ${cfg.total}</p>
         <div class="setbtns">
           <button class="btn" data-act="one">撕一包</button>
           <button class="btn ghost" data-act="ten">十连开</button>
@@ -121,21 +132,71 @@ async function renderSets() {
     el.querySelector('[data-act="gal"]').addEventListener('click', () => openGallery(cfg.key));
     el.querySelector('.setbanner').addEventListener('click', () => openGallery(cfg.key));
     grid.appendChild(el);
+    if (DATA[cfg.key]) fillSetCard(el, cfg);
   }
   applyLangFilter();
   const s = save.stats;
   $('#heroStats').innerHTML = s.packs
     ? `已开 <b>${s.packs}</b> 包 · 累计 <b>${s.cards}</b> 张 · 高稀有演出 <b>${s.l3 + s.l4}</b> 次 · 最佳战绩在「战绩」页`
     : `首包保底 <b>AR 以上</b> · 先撕一包，30 秒看到高稀有演出`;
+  prefetchSets();
+}
+function fillSetCard(el, cfg) {
+  const data = DATA[cfg.key]; if (!data || !el.isConnected) return;
+  const chase = chaseOf(data);
+  const owned = ownedInSet(data);
+  const banner = el.querySelector('.setbanner');
+  const bname = el.querySelector('[data-fill="bname"]');
+  if (data.logo && bname) { const im = document.createElement('img'); im.className = 'logoimg'; im.src = logoSrc(data); im.alt = data.name; im.loading = 'lazy'; bname.replaceWith(im); }
+  const bload = el.querySelector('[data-fill="bload"]'); if (bload) bload.remove();
+  if (chase && !banner.querySelector('img.chase')) {
+    const ci = document.createElement('img'); ci.className = 'chase'; ci.src = imgUrl(chase); ci.alt = chase.n; ci.loading = 'lazy'; ci.onerror = () => { ci.style.opacity = 0; };
+    banner.appendChild(ci);
+  }
+  const chaseEl = el.querySelector('[data-fill="chase"]');
+  if (chaseEl && chase) chaseEl.innerHTML = `大追：<span class="chase-name">${chase.n}</span> 参考价 <b style="color:var(--gold)">${fmtPrice(chase)}</b>`;
+  const bar = el.querySelector('[data-fill="bar"]'); if (bar) bar.style.width = `${(owned / data.cards.length) * 100}%`;
+  const prog = el.querySelector('[data-fill="prog"]'); if (prog) prog.textContent = `图鉴收集 ${owned} / ${data.cards.length}`;
+}
+let prefetching = false;
+async function prefetchSets() {
+  if (prefetching) return; prefetching = true;
+  const queue = [...SETS.filter(c => !c.file.includes('zh-cn')), ...SETS.filter(c => c.file.includes('zh-cn'))];
+  let qi = 0;
+  const worker = async () => {
+    while (qi < queue.length) {
+      const cfg = queue[qi++];
+      if (DATA[cfg.key]) continue;
+      try {
+        await loadSet(cfg);
+        const el = document.querySelector(`.setcard[data-key="${cfg.key}"]`);
+        if (el) fillSetCard(el, cfg);
+      } catch {
+        const el = document.querySelector(`.setcard[data-key="${cfg.key}"]`);
+        const bload = el?.querySelector('[data-fill="bload"]');
+        if (bload) { bload.textContent = '载入失败，点此重试'; bload.style.cursor = 'pointer'; bload.onclick = () => { bload.textContent = '卡池载入中…'; loadSet(cfg).then(() => fillSetCard(el, cfg)).catch(() => {}); }; }
+      }
+    }
+  };
+  await Promise.all([worker(), worker(), worker(), worker()]);
+  prefetching = false;
 }
 
 /* ---------------- 本弹图鉴墙 ---------------- */
 let galKey = null, galTier = 'all', galOwnedOnly = false;
-function openGallery(key) {
+async function openGallery(key) {
   galKey = key; sfx.click();
   $$('.view').forEach(v => v.classList.toggle('active', v.id === 'view-gallery'));
   $$('nav button').forEach(b => b.classList.remove('active'));
   window.scrollTo({ top: 0 });
+  if (!DATA[key]) {
+    const cfg = SETS.find(c => c.key === key);
+    $('#galTitle').textContent = cfg?.sname || '';
+    $('#galCount').textContent = '加载中…';
+    $('#galGrid').innerHTML = '<p class="empty">正在加载本弹卡池…</p>';
+    try { await loadSet(cfg); } catch { $('#galGrid').innerHTML = '<p class="empty">加载失败，返回选弹后重试</p>'; return; }
+    if (galKey !== key) return;
+  }
   renderGallery();
 }
 function renderGallery() {
@@ -180,7 +241,20 @@ function finishPackToHistory(cfg, pack) {
   save.history = save.history.slice(0, 30); persist();
 }
 
-function startPack(cfg, isRetry) {
+async function ensureStageData(cfg) {
+  if (DATA[cfg.key]) return true;
+  session = { cfg, phase: 'loading' };
+  showStage();
+  $('#stageTitle').textContent = cfg.sname;
+  $('#stageBody').innerHTML = `<div class="empty" style="padding-top:70px">正在加载「${cfg.sname}」卡池…<br><span style="font-size:12.5px">首次打开需下载该弹数据，之后秒开</span></div>`;
+  try { await loadSet(cfg); } catch {
+    if (session?.phase === 'loading') $('#stageBody').innerHTML = `<div class="empty" style="padding-top:70px">卡池加载失败，网络不太稳<br><span style="font-size:12.5px">点左上角「← 选弹」返回，稍后再试</span></div>`;
+    return false;
+  }
+  return !!session && session.phase === 'loading';
+}
+async function startPack(cfg, isRetry) {
+  if (!DATA[cfg.key] && !(await ensureStageData(cfg))) return;
   const data = DATA[cfg.key];
   const forceTop = !save.firstPackDone;
   const pack = openPack(data, POOLS[cfg.key], { forceTop });
@@ -193,7 +267,8 @@ function startPack(cfg, isRetry) {
   renderTear();
 }
 
-function startTen(cfg) {
+async function startTen(cfg) {
+  if (!DATA[cfg.key] && !(await ensureStageData(cfg))) return;
   const data = DATA[cfg.key];
   const packs = [];
   for (let i = 0; i < 10; i++) {
