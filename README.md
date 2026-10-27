@@ -9,11 +9,11 @@
 GitHub Pages（部署后）：https://caesar-zzh.github.io/ripjoy-tcg-pack-simulator/
 本地运行：`npm run dev` 后打开 http://localhost:4173 （零构建、零依赖，静态站）
 
-**完全离线版**：`dist/ripjoy-offline.html`（约 14MB）——代码、卡池与全部 913 张卡图（webp data URI）都内嵌在单个文件里，在任何拦截外部图片的应用内预览器/离线环境打开都能显示卡图。构建方式：`python3 scripts/fetch-images.py && node scripts/build-offline.mjs`（图片中间产物 data/images-embedded.json 可由脚本重新生成，未入库）。
+**完全离线版**：`dist/ripjoy-offline.html`（约 65MB）——在单文件版基础上，再把英文核心 4 弹的全部卡图以 webp data URI 内嵌（简中 5 弹卡图本就内嵌在卡池数据里），在任何拦截外部图片的应用内预览器/离线环境打开都能显示卡图。构建方式：`python3 scripts/fetch-images.py && node scripts/build-offline.mjs`（图片中间产物 data/images-embedded.json 可由脚本重新生成，未入库）。
 
 ## 功能
 
-- **11 个真实弹系**（2026-10-27 扩充）：简中「太晶盛聚」（259 张，真实简中卡面）、英文 151 / Surging Sparks / Destined Rivals / Prismatic Evolutions / Journey Together / Temporal Forces / MEGA、日版 151（7 张包）、繁中两弹（5 张包）——共 2,100+ 张真实卡，含画师与 Cardmarket 参考价（简中弹暂无参考价）。日版 MEGA 两弹因 TCGdex 暂未收录卡图（卡名/稀有度数据已有）未上架，待其补图后加回
+- **28 个真实弹系**（2026-10-27 二次扩充）：简中 5 弹（太晶盛聚／星彩晶璃／璀璨诡幻／利刃猛醒／收集啦151，真实简中卡面全部内嵌）、英文 19 弹（151、Prismatic Evolutions、Surging Sparks、Journey Together、Destined Rivals、Temporal Forces、MEGA 两弹、Black Bolt、White Flare、Phantasmal Flames、Ascended Heroes、Paldean Fates、Shrouded Fable、Twilight Masquerade、Stellar Crown、Paradox Rift、SV 前三弹）、日版 2 弹（151 为 7 张包、热风竞技场为 5 张包）、繁中 2 弹（5 张包）——共 5,700+ 张真实卡，含画师与 Cardmarket 参考价（中文弹暂无参考价）。暂未上架：日版 MEGA（TCGdex 全系无卡图）、日版火箭队与繁中变幻假面（秘密卡卡图缺失过多）、太晶庆典ex（TCGdex 稀有度数据大面积缺失）
 - **卡槽概率模型**：普通/非普通/反闪/稀有四类卡槽，权重全公示（见战绩页与 `docs/PRD.md`）；新用户首包保底 AR 以上
 - **分级演出（L0–L4）**：卡背漏光预告 → 3D 翻卡全息扫光 → RR 紫色星尘 → AR/UR 彩虹粒子雨 → SAR/金卡全屏金粉双爆 + 冲击波 + 闪光 + 震动
 - **自研 Canvas 粒子引擎**（零依赖）+ **WebAudio 合成音效**（无音频素材）+ 3D 倾斜全息卡面查看

@@ -9,10 +9,13 @@ export const TIERS = {
   AR:  { key: 'AR',  label: 'Illustration Rare', cn: '插画稀有', color: '#ff9d5c', level: 3 },
   SAR: { key: 'SAR', label: 'Special Illustration Rare', cn: '特别插画稀有', color: '#ff5c8a', level: 4 },
   HR:  { key: 'HR',  label: 'Hyper Rare', cn: '金卡',  color: '#ffe98a', level: 4 },
+  BWR: { key: 'BWR', label: 'Black White Rare', cn: '黑白稀有', color: '#e8e8f2', level: 4 },
 };
 
 export function tierOf(card) {
   const r = (card.r || '').toLowerCase();
+  if (r.includes('black white')) return 'BWR';
+  if (r.includes('shiny')) return r.includes('ultra') ? 'UR' : 'AR';
   if (r.includes('special')) return 'SAR';
   if (r.includes('hyper')) return 'HR';
   if (r.includes('illustration')) return 'AR';
@@ -62,18 +65,18 @@ function drawReverse(pools, used) {
   const kind = weighted(REVERSE_TABLE);
   if (kind === 'AR') { const c = pickUnique(pools, ['AR'], used); if (c) return { card: c, reverse: false }; }
   if (kind === 'UR') { const c = pickUnique(pools, ['UR'], used); if (c) return { card: c, reverse: false }; }
-  if (kind === 'TOP') { const c = pickUnique(pools, ['SAR', 'HR'], used); if (c) return { card: c, reverse: false }; }
+  if (kind === 'TOP') { const c = pickUnique(pools, ['SAR', 'HR', 'BWR'], used); if (c) return { card: c, reverse: false }; }
   const c = pickUnique(pools, ['C', 'U', 'R'], used);
   return { card: c, reverse: true };
 }
 
 function drawRare(pools, used, forceTop = false) {
   if (forceTop) {
-    const c = pickUnique(pools, ['SAR', 'HR', 'AR'], used);
+    const c = pickUnique(pools, ['SAR', 'HR', 'BWR', 'AR'], used);
     if (c) return { card: c, reverse: false };
   }
   const kind = weighted(RARE_TABLE);
-  const map = { R: ['R'], RR: ['RR'], ACEUR: ['ACE', 'UR'], AR: ['AR'], SAR: ['SAR'], HR: ['HR'] };
+  const map = { R: ['R'], RR: ['RR'], ACEUR: ['ACE', 'UR'], AR: ['AR'], SAR: ['SAR', 'BWR'], HR: ['HR', 'BWR'] };
   const c = pickUnique(pools, map[kind] || ['R'], used) || pickUnique(pools, ['R', 'RR'], used);
   return { card: c, reverse: false };
 }
