@@ -39,7 +39,7 @@
 | Destined Rivals（sv10） | EN | 244 | 火箭队主题、2025 热门弹 | 10 张 |
 | ポケモンカード151（sv2a） | JA | 210 | 日版原汁原味、镜面闪工艺 | 7 张 |
 
-v1.5 规划：Prismatic Evolutions、黒炎/白火（Black Bolt / White Flare）、Mega Evolution 系列；并支持按系列筛选全部 TCGdex 弹系（运行时拉取模式）。
+v1.5 规划：黒炎/白火（Black Bolt / White Flare）；并支持按系列筛选全部 TCGdex 弹系（运行时拉取模式）。（2026-10-27 变更：已提前扩充至 11 弹——新增简中太晶盛聚、Prismatic Evolutions、Journey Together、Temporal Forces、MEGA EN 版、繁中两弹，并支持 5 张包规格。日版 MEGA 两弹因 TCGdex 暂无卡图未上架。）
 
 ## 5. 概率模型（核心）
 

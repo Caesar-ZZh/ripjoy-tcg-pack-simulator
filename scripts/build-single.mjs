@@ -1,5 +1,5 @@
 // 构建单文件版 dist/ripjoy-standalone.html：内联 CSS/JS 与全部卡池数据，可离线打开（卡图仍走 TCGdex CDN）
-import { readFile, writeFile, mkdir } from 'node:fs/promises';
+import { readFile, writeFile, mkdir, readdir } from 'node:fs/promises';
 const root = new URL('../', import.meta.url);
 const read = async (p) => readFile(new URL(p, root), 'utf8');
 
@@ -12,7 +12,7 @@ const css = await read('src/styles.css');
 const jsParts = [];
 for (const f of ['src/engine.js', 'src/particles.js', 'src/fx.js', 'src/app.js']) jsParts.push(strip(await read(f)));
 const embed = {};
-for (const f of ['data/en-sv03.5.json', 'data/en-sv08.json', 'data/en-sv10.json', 'data/ja-sv2a.json']) {
+for (const f of (await readdir(new URL('data/', root))).filter(x => x.endsWith('.json') && x !== 'images-embedded.json').sort().map(x => 'data/' + x)) {
   embed[f] = JSON.parse(await read(f));
 }
 let html = await read('index.html');

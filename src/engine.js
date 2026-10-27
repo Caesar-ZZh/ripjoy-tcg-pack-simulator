@@ -18,6 +18,7 @@ export function tierOf(card) {
   if (r.includes('illustration')) return 'AR';
   if (r.includes('ace')) return 'ACE';
   if (r.includes('double')) return 'RR';
+  if (r === 'secret rare') return 'UR';
   if (r.includes('ultra')) return 'UR';
   if (r === 'rare' || r.includes('rare')) return 'R';
   if (r.includes('uncommon')) return 'U';
@@ -77,14 +78,14 @@ function drawRare(pools, used, forceTop = false) {
   return { card: c, reverse: false };
 }
 
-/** 生成一包。profile: 'en10' | 'ja7'。forceTop = 首包保底 */
+/** 生成一包。包规格由 setData.pack 决定：10 = 4C+3U+2反+1稀；7 = 3C+2U+1反+1稀；5 = 2C+1U+1反+1稀。forceTop = 首包保底 */
 export function openPack(setData, pools, { forceTop = false } = {}) {
   const used = new Set();
   const cards = [];
-  const ja = setData.lang === 'ja';
-  const commons = ja ? 3 : 4;
-  const uncommons = ja ? 2 : 3;
-  const reverses = ja ? 1 : 2;
+  const size = setData.pack || (setData.lang === 'ja' ? 7 : 10);
+  const commons = size === 10 ? 4 : size === 7 ? 3 : 2;
+  const uncommons = size === 10 ? 3 : size === 7 ? 2 : 1;
+  const reverses = size === 10 ? 2 : 1;
   for (let i = 0; i < commons; i++) cards.push({ card: pickUnique(pools, ['C'], used), reverse: false, slot: 'common' });
   for (let i = 0; i < uncommons; i++) cards.push({ card: pickUnique(pools, ['U'], used), reverse: false, slot: 'uncommon' });
   for (let i = 0; i < reverses; i++) { const d = drawReverse(pools, used); cards.push({ ...d, slot: 'reverse' }); }
@@ -94,4 +95,4 @@ export function openPack(setData, pools, { forceTop = false } = {}) {
 }
 
 export const fmtPrice = (c) => (c && c.p != null) ? `€${Number(c.p).toFixed(2)}` : '—';
-export const imgUrl = (c, hi = false) => (typeof window !== 'undefined' && window.__RIPJOY_IMGS__ && window.__RIPJOY_IMGS__[c.id]) || `${c.img}/${hi ? 'high' : 'low'}.png`;
+export const imgUrl = (c, hi = false) => (typeof window !== 'undefined' && window.__RIPJOY_IMGS__ && window.__RIPJOY_IMGS__[c.id]) || (c.img && c.img.startsWith('data:') ? c.img : `${c.img}/${hi ? 'high' : 'low'}.png`);

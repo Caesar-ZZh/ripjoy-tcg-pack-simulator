@@ -3,11 +3,20 @@ import { Particles, fxForLevel } from './particles.js';
 import { sfx, vibrate, VIB, addTilt, setMuted } from './fx.js';
 
 const SETS = [
+  { key: 'taijing', file: 'data/zh-cn-CSV9.5C.json', theme: 'linear-gradient(150deg,#5e1a6e,#b83fd0 55%,#ff8ad8)', desc: '简体中文版 · 伊布全家太晶盛聚 · 含简中专属异画', chaseNote: '仙子伊布 ex SAR（简中专属异画）' },
   { key: '151en', file: 'data/en-sv03.5.json', theme: 'linear-gradient(150deg,#8f1f16,#e2483d 55%,#ff8a5c)', desc: '初代 151 情怀弹 · 喷火龙 SAR 大追', chaseNote: '喷火龙 ex SAR' },
+  { key: 'sv08.5', file: 'data/en-sv08.5.json', theme: 'linear-gradient(150deg,#6e1a4d,#d03f8a 55%,#ffb3d9)', desc: '伊布盛宴 · 月亮伊布 ex SAR 天价追卡', chaseNote: '月亮伊布 ex SAR' },
   { key: 'sv08', file: 'data/en-sv08.json', theme: 'linear-gradient(150deg,#8a6410,#e8a812 55%,#ffd75e)', desc: '电光四射 · 皮卡丘 SAR 天价追卡', chaseNote: '皮卡丘 ex SAR' },
+  { key: 'sv09', file: 'data/en-sv09.json', theme: 'linear-gradient(150deg,#0f5e46,#12a37a 55%,#5ce8b8)', desc: '旅途伙伴 · 训练家的宝可梦集结', chaseNote: '莉莉艾的皮皮 ex SAR' },
   { key: 'sv10', file: 'data/en-sv10.json', theme: 'linear-gradient(150deg,#33135e,#7a4fd0 55%,#c05cff)', desc: '火箭队归来 · 坂木的超梦 ex SAR', chaseNote: '火箭队的超梦 ex SAR' },
+  { key: 'me01', file: 'data/en-me01.json', theme: 'linear-gradient(150deg,#14424e,#1f8aa5 55%,#6fe3ff)', desc: 'MEGA 新时代开启 · 超级进化归来', chaseNote: '超级路卡利欧 ex 金卡' },
+  { key: 'sv05', file: 'data/en-sv05.json', theme: 'linear-gradient(150deg,#4e3414,#a5761f 55%,#ffd75e)', desc: '时空之力 · 古代与未来悖谬集结', chaseNote: '铁斑叶 ex SAR' },
   { key: '151ja', file: 'data/ja-sv2a.json', theme: 'linear-gradient(150deg,#123a75,#2f6fd0 55%,#5eb1ff)', desc: '日版原版 151 · 7 张包 · 镜面闪', chaseNote: 'リザードンex SAR' },
+  { key: 'SV9tw', file: 'data/zh-tw-SV9.json', theme: 'linear-gradient(150deg,#7c2d12,#d97a2b 55%,#ffc98a)', desc: '繁体中文版（台版）· 5 张包 · 数据暂缺 AR/SAR', chaseNote: '莉莉艾的皮皮 ex RR' },
+  { key: 'SV10tw', file: 'data/zh-tw-SV10.json', theme: 'linear-gradient(150deg,#3b0764,#7e22ce 55%,#d8b4fe)', desc: '繁体中文版（台版）· 5 张包 · 数据暂缺 AR/SAR', chaseNote: '火箭队的超梦 ex RR' },
 ];
+const LANG_LABEL = { en: '英文版', ja: '日版', 'zh-cn': '简体中文版', 'zh-tw': '繁体中文版' };
+const packOf = (data) => data.pack || (data.lang === 'ja' ? 7 : 10);
 const $ = (s, el = document) => el.querySelector(s);
 const $$ = (s, el = document) => [...el.querySelectorAll(s)];
 
@@ -65,8 +74,8 @@ async function renderSets() {
         <img class="chase" src="${imgUrl(chase)}" alt="${chase.n}" loading="lazy">
       </div>
       <div class="setbody">
-        <h3>${data.name} <span style="color:var(--dim2);font-size:12px">${data.lang === 'ja' ? '日版' : '英文版'} · ${data.total} 张</span></h3>
-        <p class="setmeta">${cfg.desc}<br>大追：<span class="chase-name">${chase.n}</span> 参考价 <b style="color:var(--gold)">${fmtPrice(chase)}</b> · 每包 ${data.lang === 'ja' ? 7 : 10} 张</p>
+        <h3>${data.name} <span style="color:var(--dim2);font-size:12px">${LANG_LABEL[data.lang] || data.lang} · ${data.total} 张</span></h3>
+        <p class="setmeta">${cfg.desc}<br>大追：<span class="chase-name">${chase.n}</span> 参考价 <b style="color:var(--gold)">${fmtPrice(chase)}</b> · 每包 ${packOf(data)} 张</p>
         <div class="progressline"><i style="width:${(owned / data.cards.length) * 100}%"></i></div>
         <p class="setmeta">图鉴收集 ${owned} / ${data.cards.length}</p>
         <div class="setbtns">
@@ -154,7 +163,7 @@ function renderTear() {
         <div class="packshade"></div><div class="packtear"></div>
         ${data.logo ? `<img class="packlogo" src="${logoSrc(data)}" alt="">` : ''}
         <div class="packname">${data.name}</div>
-        <div class="packsub">${data.lang === 'ja' ? '7 CARDS PER PACK' : '10 CARDS PER PACK'} · RipJoy</div>
+        <div class="packsub">${packOf(data)} CARDS PER PACK · RipJoy</div>
       </div>
     </div>
     <p class="stagehint">点一下卡包，<b>撕开它</b><br><span style="font-size:12.5px">翻卡前留意卡背的光晕——颜色越暖，下一张越有货</span></p>

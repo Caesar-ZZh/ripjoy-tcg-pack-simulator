@@ -13,7 +13,7 @@ GitHub Pages（部署后）：https://caesar-zzh.github.io/ripjoy-tcg-pack-simul
 
 ## 功能
 
-- **4 个真实弹系**：Pokémon 151（EN）、Surging Sparks、Destined Rivals、ポケモンカード151（日版，7 张包）——共 913 张真实卡，含画师与 Cardmarket 参考价
+- **11 个真实弹系**（2026-10-27 扩充）：简中「太晶盛聚」（259 张，真实简中卡面）、英文 151 / Surging Sparks / Destined Rivals / Prismatic Evolutions / Journey Together / Temporal Forces / MEGA、日版 151（7 张包）、繁中两弹（5 张包）——共 2,100+ 张真实卡，含画师与 Cardmarket 参考价（简中弹暂无参考价）。日版 MEGA 两弹因 TCGdex 暂未收录卡图（卡名/稀有度数据已有）未上架，待其补图后加回
 - **卡槽概率模型**：普通/非普通/反闪/稀有四类卡槽，权重全公示（见战绩页与 `docs/PRD.md`）；新用户首包保底 AR 以上
 - **分级演出（L0–L4）**：卡背漏光预告 → 3D 翻卡全息扫光 → RR 紫色星尘 → AR/UR 彩虹粒子雨 → SAR/金卡全屏金粉双爆 + 冲击波 + 闪光 + 震动
 - **自研 Canvas 粒子引擎**（零依赖）+ **WebAudio 合成音效**（无音频素材）+ 3D 倾斜全息卡面查看

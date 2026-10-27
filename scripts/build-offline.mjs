@@ -1,6 +1,6 @@
 // 构建完全离线版 dist/ripjoy-offline.html：代码 + 卡池数据 + 全部卡图（data URI）内嵌。
 // 需先运行 scripts/fetch-images.py 生成 data/images-embedded.json。
-import { readFile, writeFile, mkdir } from 'node:fs/promises';
+import { readFile, writeFile, mkdir, readdir } from 'node:fs/promises';
 const root = new URL('../', import.meta.url);
 const read = async (p) => readFile(new URL(p, root), 'utf8');
 const strip = (src) => src.replace(/^import .*$/gm, '').replace(/^export (const|let|function|class) /gm, '$1 ').replace(/^export \{.*\};?$/gm, '');
@@ -10,7 +10,7 @@ const jsParts = [];
 for (const f of ['src/engine.js', 'src/particles.js', 'src/fx.js', 'src/app.js']) jsParts.push(strip(await read(f)));
 const imgs = JSON.parse(await read('data/images-embedded.json'));
 const embed = {};
-for (const f of ['data/en-sv03.5.json', 'data/en-sv08.json', 'data/en-sv10.json', 'data/ja-sv2a.json']) {
+for (const f of (await readdir(new URL('data/', root))).filter(x => x.endsWith('.json') && x !== 'images-embedded.json').sort().map(x => 'data/' + x)) {
   const d = JSON.parse(await read(f));
   if (imgs.logos[d.id]) d.logo = imgs.logos[d.id];
   embed[f] = d;

@@ -27,8 +27,10 @@ def transcode(raw, width, quality):
 def raw_uri(raw): return 'data:image/webp;base64,' + base64.b64encode(raw).decode()
 
 cards = {}; logos = {}; meta = {}
+# 离线版只内嵌核心 4 弹的图（其余弹图走 CDN；太晶盛聚的图已内嵌在其数据 JSON 中）
+EMBED_SETS = {'data/en-sv03.5.json', 'data/en-sv08.json', 'data/en-sv10.json', 'data/ja-sv2a.json'}
 for f in sorted(glob.glob('data/*.json')):
-    if 'images' in f: continue
+    if 'images' in f or f not in EMBED_SETS: continue
     d = json.load(open(f)); meta[d['id']] = d
     for c in d['cards']: cards[c['id']] = (c['img'], tier_lv(c['r']))
     if d.get('logo'): logos[d['id']] = d['logo']

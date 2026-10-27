@@ -34,7 +34,8 @@ for (const setId of sets) {
   });
   const good = cards.filter(Boolean);
   const rar = {}; good.forEach(c => rar[c.r] = (rar[c.r] || 0) + 1);
-  const out = { id: setId, lang, name: set.name, logo: set.logo || null, symbol: set.symbol || null, total: set.cardCount.total, official: set.cardCount.official, rarities: rar, cards: good };
+  const pack = lang === 'ja' ? (setId === 'sv2a' ? 7 : 5) : lang.startsWith('zh') ? 5 : 10;
+  const out = { id: setId, lang, name: set.name, logo: set.logo || null, symbol: set.symbol || null, total: set.cardCount.total, official: set.cardCount.official, pack, rarities: rar, cards: good };
   await mkdir(new URL('../data/', import.meta.url), { recursive: true });
   await writeFile(new URL(`../data/${lang}-${setId}.json`, import.meta.url), JSON.stringify(out));
   console.log(setId, set.name, good.length, rar);
