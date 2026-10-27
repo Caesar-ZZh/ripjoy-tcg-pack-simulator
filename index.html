@@ -52,6 +52,27 @@
     </div>
   </section>
 
+  <!-- 本弹图鉴墙 -->
+  <section class="view" id="view-gallery">
+    <div class="stagehead">
+      <button class="back" id="galBack">← 选弹</button>
+      <h2 id="galTitle"></h2>
+      <span class="oddslink" id="galCount"></span>
+    </div>
+    <div class="toolbar">
+      <div class="seg" id="galSeg">
+        <button data-tier="all" class="active">全部</button>
+        <button data-tier="TOP">AR+</button>
+        <button data-tier="SAR">SAR</button>
+        <button data-tier="UR">UR/金</button>
+        <button data-tier="RR">RR</button>
+        <button data-tier="R">R 以下</button>
+      </div>
+      <label class="galonly"><input type="checkbox" id="galOwnedOnly"> 只看已拥有</label>
+    </div>
+    <div class="resultgrid" id="galGrid"></div>
+  </section>
+
   <!-- 收藏册 -->
   <section class="view" id="view-collection">
     <div class="statgrid" id="collSummary"></div>

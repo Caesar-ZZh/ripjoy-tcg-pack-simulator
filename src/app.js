@@ -113,10 +113,13 @@ async function renderSets() {
         <div class="setbtns">
           <button class="btn" data-act="one">撕一包</button>
           <button class="btn ghost" data-act="ten">十连开</button>
+          <button class="btn ghost" data-act="gal" style="flex:0 0 72px">图鉴墙</button>
         </div>
       </div>`;
     el.querySelector('[data-act="one"]').addEventListener('click', () => startPack(cfg, false));
     el.querySelector('[data-act="ten"]').addEventListener('click', () => startTen(cfg));
+    el.querySelector('[data-act="gal"]').addEventListener('click', () => openGallery(cfg.key));
+    el.querySelector('.setbanner').addEventListener('click', () => openGallery(cfg.key));
     grid.appendChild(el);
   }
   applyLangFilter();
@@ -125,6 +128,41 @@ async function renderSets() {
     ? `已开 <b>${s.packs}</b> 包 · 累计 <b>${s.cards}</b> 张 · 高稀有演出 <b>${s.l3 + s.l4}</b> 次 · 最佳战绩在「战绩」页`
     : `首包保底 <b>AR 以上</b> · 先撕一包，30 秒看到高稀有演出`;
 }
+
+/* ---------------- 本弹图鉴墙 ---------------- */
+let galKey = null, galTier = 'all', galOwnedOnly = false;
+function openGallery(key) {
+  galKey = key; sfx.click();
+  $$('.view').forEach(v => v.classList.toggle('active', v.id === 'view-gallery'));
+  $$('nav button').forEach(b => b.classList.remove('active'));
+  window.scrollTo({ top: 0 });
+  renderGallery();
+}
+function renderGallery() {
+  const data = DATA[galKey]; if (!data) return;
+  $('#galTitle').textContent = data.name;
+  $('#galCount').textContent = `已收集 ${ownedInSet(data)} / ${data.cards.length}`;
+  const lv = c => TIERS[tierOf(c)].level;
+  let cards = [...data.cards].sort((a, b) => lv(b) - lv(a) || (b.p || 0) - (a.p || 0) || String(a.no).localeCompare(String(b.no), undefined, { numeric: true }));
+  if (galTier === 'TOP') cards = cards.filter(c => lv(c) >= 3);
+  else if (galTier === 'SAR') cards = cards.filter(c => ['SAR', 'HR', 'BWR'].includes(tierOf(c)));
+  else if (galTier === 'UR') cards = cards.filter(c => ['UR', 'ACE'].includes(tierOf(c)));
+  else if (galTier === 'RR') cards = cards.filter(c => tierOf(c) === 'RR');
+  else if (galTier === 'R') cards = cards.filter(c => lv(c) <= 1);
+  if (galOwnedOnly) cards = cards.filter(c => save.collection[c.id]);
+  $('#galGrid').innerHTML = cards.length ? cards.map((c, i) => {
+    const own = save.collection[c.id];
+    return `<figure data-id="${c.id}" class="${own ? '' : 'notowned'}" style="animation-delay:${Math.min(i * 16, 480)}ms">
+      <img src="${imgUrl(c)}" alt="${c.n}" loading="lazy" onerror="this.style.opacity=0">
+      ${own ? `<span class="countbadge">×${own.n}</span>` : ''}
+      <figcaption><span class="rdot" style="background:${TIERS[tierOf(c)].color}"></span><b>${c.n}</b><br>${dispTier(c)} · ${fmtPrice(c)}${own ? '' : ' · 未拥有'}</figcaption>
+    </figure>`;
+  }).join('') : '<p class="empty">这个筛选下还没有卡<br>换个筛选，或先去开几包</p>';
+  $$('#galGrid figure').forEach(f => f.addEventListener('click', () => openDetail(CARDMAP[f.dataset.id].card)));
+}
+$('#galBack').addEventListener('click', () => showView('open'));
+$$('#galSeg button').forEach(b => b.addEventListener('click', () => { $$('#galSeg button').forEach(x => x.classList.remove('active')); b.classList.add('active'); galTier = b.dataset.tier; renderGallery(); }));
+$('#galOwnedOnly').addEventListener('change', (e) => { galOwnedOnly = e.target.checked; renderGallery(); });
 
 /* ---------------- 开包会话 ---------------- */
 let session = null;
@@ -157,20 +195,70 @@ function startPack(cfg, isRetry) {
 
 function startTen(cfg) {
   const data = DATA[cfg.key];
-  const all = [];
+  const packs = [];
   for (let i = 0; i < 10; i++) {
     const pack = openPack(data, POOLS[cfg.key], { forceTop: false });
     pack.forEach(e => { e.isNew = collect(e); e.tier = tierOf(e.card); e.level = TIERS[e.tier].level; });
-    finishPackToHistory(cfg, pack); all.push(...pack);
+    finishPackToHistory(cfg, pack); packs.push(pack);
   }
-  session = { cfg, pack: all, idx: 0, revealed: true, phase: 'summary', ten: true };
-  showStage(); renderSummary();
+  session = { cfg, pack: packs[0], idx: 0, revealed: false, phase: 'tear', tenPacks: packs, packNo: 1 };
+  showStage();
+  $('#stageTitle').textContent = data.name;
+  renderTear();
+}
+function summaryForCurrent() {
+  if (!session) return;
+  session.phase = 'summary';
+  if (session.tenPacks) renderPackSummary(); else renderSummary();
+}
+function grandSummary() {
+  const all = session.tenPacks.flat();
+  session.pack = all; session.ten = true; session.phase = 'summary';
+  renderSummary();
   const hasTop = all.some(e => e.level >= 4);
   const hasL3 = all.some(e => e.level === 3);
   if (hasTop || hasL3) {
     const cx = innerWidth / 2, cy = innerHeight * 0.36;
     setTimeout(() => { fxForLevel(particles, hasTop ? 4 : 3, cx, cy); sfx.reveal(hasTop ? 4 : 3); vibrate(hasTop ? VIB.l4 : VIB.l3); if (hasTop) flash(); }, 250);
   }
+}
+function nextPackOrGrand() {
+  if (session.packNo < 10) {
+    session.packNo++;
+    session.pack = session.tenPacks[session.packNo - 1];
+    session.idx = 0; session.revealed = false; session.phase = 'tear';
+    renderTear(); window.scrollTo({ top: 0 });
+  } else grandSummary();
+}
+function renderPackSummary() {
+  const { cfg, pack, packNo } = session; const data = DATA[cfg.key];
+  const sorted = [...pack].sort((a, b) => b.level - a.level || (b.card.p || 0) - (a.card.p || 0));
+  const best = sorted[0];
+  const total = pack.reduce((s, e) => s + (e.card.p || 0), 0);
+  const news = pack.filter(e => e.isNew).length;
+  const st = $('#stageBody');
+  st.innerHTML = `
+    <div class="summaryhead">
+      <h2>十连 · 第 ${packNo} / 10 包${best.level >= 4 ? ' · 🎉 神抽！' : best.level === 3 ? ' · ✨ 出货！' : ''}</h2>
+      <p>${data.name} · 本包参考价合计 <b>€${total.toFixed(2)}</b> · 新卡 <b>${news}</b> 张</p>
+    </div>
+    <div class="bestpull" style="--bc:${TIERS[best.tier].color}"><span class="besttag">本包最佳 · ${dispTier(best.card)} · ${fmtPrice(best.card)}</span><img src="${imgUrl(best.card, true)}" alt="${best.card.n}"></div>
+    <p style="text-align:center;color:var(--dim);font-size:13px">${best.card.n}</p>
+    <div class="resultgrid">${sorted.map((e, i) => `
+      <figure data-id="${e.card.id}" style="animation-delay:${Math.min(i * 30, 600)}ms">
+        <img src="${imgUrl(e.card)}" alt="${e.card.n}" loading="lazy">
+        <figcaption><span class="rdot" style="background:${TIERS[e.tier].color}"></span><b>${e.card.n}</b><br>${dispTier(e.card)} · ${fmtPrice(e.card)}${e.isNew ? ' · NEW' : ''}</figcaption>
+      </figure>`).join('')}
+    </div>
+    <div class="stagebtns" style="margin:22px auto 0">
+      <button class="btn" id="nextPackBtn">${packNo < 10 ? `下一包 · 第 ${packNo + 1} / 10 包` : '看总汇算 🎉'}</button>
+      <button class="btn ghost" id="toBinderBtn2">收藏册</button>
+    </div>
+    ${packNo < 10 ? '<p style="text-align:center;margin-top:14px"><button class="skipall" id="skipRestBtn">跳过剩余包，直接看总汇算 →</button></p>' : ''}`;
+  $$('#stageBody figure').forEach(f => f.addEventListener('click', () => openDetail(CARDMAP[f.dataset.id].card)));
+  $('#nextPackBtn').addEventListener('click', nextPackOrGrand);
+  $('#toBinderBtn2').addEventListener('click', () => { exitStageSilent(); showView('collection'); });
+  const sk = $('#skipRestBtn'); if (sk) sk.addEventListener('click', grandSummary);
 }
 
 function showStage() {
@@ -200,8 +288,8 @@ function renderTear() {
         <div class="packsub">${packOf(data)} CARDS PER PACK · RipJoy</div>
       </div>
     </div>
-    <p class="stagehint">点一下卡包，<b>撕开它</b><br><span style="font-size:12.5px">翻卡前留意卡背的光晕——颜色越暖，下一张越有货</span></p>
-    <div class="stagebtns"><button class="btn" id="tearBtn">✂️ 撕 开</button></div>`;
+    <p class="stagehint">${session.tenPacks ? `<b>十连 · 第 ${session.packNo} / 10 包</b><br>` : ''}点一下卡包，<b>撕开它</b><br><span style="font-size:12.5px">翻卡前留意卡背的光晕——颜色越暖，下一张越有货</span></p>
+    <div class="stagebtns"><button class="btn" id="tearBtn">✂️ 撕 开</button>${session.tenPacks ? '<button class="btn ghost" id="skipTearBtn" style="flex:0 0 108px">直接翻卡</button>' : ''}</div>`;
   const tear = () => {
     if (!session || session.phase !== 'tear') return;
     session.phase = 'tearing';
@@ -210,6 +298,8 @@ function renderTear() {
   };
   $('#packEl').addEventListener('click', tear);
   $('#tearBtn').addEventListener('click', tear);
+  const sk = $('#skipTearBtn');
+  if (sk) sk.addEventListener('click', () => { if (session?.phase === 'tear') { session.phase = 'reveal'; renderReveal(); } });
 }
 
 /* ---------------- 逐张揭晓 ---------------- */
@@ -219,7 +309,7 @@ function renderReveal() {
   const st = $('#stageBody');
   const dots = pack.map((e, i) => `<i class="${i < idx ? 'done' : i === idx ? (e.level >= 3 ? 'hot' : 'now') : ''}"></i>`).join('');
   st.innerHTML = `
-    <div class="revealmeta"><div class="dots">${dots}</div><span class="revealcount">${idx + 1} / ${pack.length}</span></div>
+    <div class="revealmeta">${session.tenPacks ? `<span class="packbadge">第 ${session.packNo} / 10 包</span>` : ''}<div class="dots">${dots}</div><span class="revealcount">${idx + 1} / ${pack.length}</span></div>
     <div class="cardstage leak-${entry.level}" id="cardStage">
       <div class="glowrap"></div>
       <div class="card3d" id="card3d" style="--flip:0deg">
@@ -243,7 +333,7 @@ function renderReveal() {
   const doFlip = () => flipCurrent();
   card3d.addEventListener('click', () => { session.revealed ? advance() : doFlip(); });
   $('#nextBtn').addEventListener('click', () => { session.revealed ? advance() : doFlip(); });
-  $('#skipBtn').addEventListener('click', () => { session.phase = 'summary'; renderSummary(); });
+  $('#skipBtn').addEventListener('click', () => { summaryForCurrent(); });
   // 预加载下一张高清图
   if (next) { const im = new Image(); im.src = imgUrl(next.card, true); }
 }
@@ -290,7 +380,7 @@ function flipCurrent() {
 }
 function advance() {
   if (!session) return;
-  if (session.idx >= session.pack.length - 1) { session.phase = 'summary'; renderSummary(); return; }
+  if (session.idx >= session.pack.length - 1) { summaryForCurrent(); return; }
   session.idx++; renderReveal();
 }
 function flash() { const f = $('#flash'); f.classList.add('on'); setTimeout(() => f.classList.remove('on'), 260); }
