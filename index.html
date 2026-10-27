@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>开包有喜 RipJoy · 宝可梦 TCG 开包模拟器</title>
+<meta name="description" content="真实卡池、真实稀有度、社区校准概率的宝可梦 TCG 开包模拟器：撕包、翻卡、AR/SAR 全屏演出、收藏图鉴。">
+<link rel="stylesheet" href="src/styles.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='44' fill='%23e2483d'/><path d='M6 50a44 44 0 0 0 88 0z' fill='%23f4f6fb'/><rect x='6' y='46' width='88' height='8' fill='%23111'/><circle cx='50' cy='50' r='13' fill='%23fff' stroke='%23111' stroke-width='6'/></svg>">
+</head>
+<body>
+<canvas id="particles"></canvas>
+<div id="flash"></div>
+
+<header>
+  <div class="hwrap">
+    <div class="logo">开包有喜 <b>RipJoy</b><small>POKÉMON TCG PACK SIM</small></div>
+    <nav>
+      <button data-view="open" class="active">开包</button>
+      <button data-view="collection">收藏册</button>
+      <button data-view="stats">战绩</button>
+    </nav>
+    <button class="iconbtn" id="muteBtn" title="音效开关">🔊</button>
+  </div>
+</header>
+
+<main>
+  <!-- 开包 -->
+  <section class="view active" id="view-open">
+    <div id="setgridWrap">
+      <div class="hero">
+        <h1>下一包，<span class="grad">就出金。</span></h1>
+        <p>真实弹系卡池 · 真实稀有度与参考价 · 社区校准概率。撕包、蓄势、翻卡——高稀有有专属全屏演出。</p>
+        <div class="chips"><span class="chip" id="heroStats">加载卡池中…</span><span class="chip">首包保底 <b>AR+</b></span><span class="chip">概率 <b>全公示</b></span></div>
+      </div>
+      <div class="setgrid" id="setgrid"></div>
+    </div>
+    <div id="stage" style="display:none">
+      <div class="stagehead">
+        <button class="back" id="backBtn">← 选弹</button>
+        <h2 id="stageTitle"></h2>
+        <button class="oddslink" id="oddsLink">概率公示 →</button>
+      </div>
+      <div class="stage" id="stageBody"></div>
+    </div>
+  </section>
+
+  <!-- 收藏册 -->
+  <section class="view" id="view-collection">
+    <div class="statgrid" id="collSummary"></div>
+    <div class="toolbar">
+      <select id="collSetSel"></select>
+      <div class="seg" id="collSeg">
+        <button data-tier="all" class="active">全部</button>
+        <button data-tier="TOP">AR+</button>
+        <button data-tier="SAR">SAR</button>
+        <button data-tier="UR">UR</button>
+        <button data-tier="RR">RR</button>
+      </div>
+    </div>
+    <div class="resultgrid" id="collGrid"></div>
+  </section>
+
+  <!-- 战绩 / 概率 -->
+  <section class="view" id="view-stats">
+    <div class="statgrid" id="statGrid"></div>
+    <h3 style="margin:6px 0 10px">🏆 最佳藏品</h3>
+    <div id="bestPulls" style="margin-bottom:20px"></div>
+    <h3 style="margin:6px 0 10px">概率公示（每包）</h3>
+    <table class="odds">
+      <tr><th>卡槽</th><th>内容</th><th>说明</th></tr>
+      <tr><td>普通槽 ×4（日版 ×3）</td><td>Common</td><td>弹内随机，不重复优先</td></tr>
+      <tr><td>非普通槽 ×3（日版 ×2）</td><td>Uncommon</td><td>同上</td></tr>
+      <tr><td>反闪槽 ×2（日版 ×1）</td><td>83% 反闪 C/U/R · 12% AR · 4% UR · 1% SAR/HR</td><td>反闪带镜面箔纹</td></tr>
+      <tr><td>稀有槽 ×1（最后一张）</td><td>62.4% R · 21% RR · 7% ACE/UR · 7.5% AR · 1.6% SAR · 0.5% 金卡</td><td>张张保底 R 以上</td></tr>
+    </table>
+    <p class="note">口径：官方从未公布完整出率。本模型参照 TCGplayer 大样本开箱统计与社区开包模拟器（PokéRip 等）的校准值做「可玩性校准」，SAR 单包综合概率约 3–5%（蒙特卡洛实测），高于真实零售（约 1% 量级），目的是让模拟在合理包数内体验到高稀有演出；卡池、稀有度、参考价均为真实数据（TCGdex / Cardmarket 趋势价）。新用户首包稀有槽保底 AR 以上（一次性）。</p>
+    <h3 style="margin:20px 0 10px">开包历史</h3>
+    <div id="historyList"></div>
+    <button class="btn ghost" id="resetBtn" style="width:100%;flex:none;margin-top:14px">清空全部存档</button>
+  </section>
+</main>
+
+<footer>
+  RipJoy 开包有喜 · 非官方粉丝作品，与 Nintendo / Creatures Inc. / GAME FREAK inc. / The Pokémon Company 无关，不售卖、不涉及真实货币抽卡。<br>
+  卡图与数据：TCGdex 开放数据库；参考价：Cardmarket 趋势价（欧元），仅供娱乐参考。理性看待实体卡开包：期望值为负，收藏请量力。
+</footer>
+
+<div class="modal" id="modal"><div class="modalcard" id="modalBody"></div></div>
+
+<script type="module" src="src/app.js"></script>
+</body>
+</html>

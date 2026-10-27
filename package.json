@@ -1,0 +1,11 @@
+{
+  "name": "ripjoy-tcg-pack-simulator",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "开包有喜 RipJoy — 真实卡池/稀有度/参考价的宝可梦 TCG 开包模拟器",
+  "scripts": {
+    "dev": "python3 -m http.server 4173",
+    "fetch-data": "node scripts/fetch-set.mjs en sv03.5 sv08 sv10 && node scripts/fetch-set.mjs ja sv2a"
+  }
+}
