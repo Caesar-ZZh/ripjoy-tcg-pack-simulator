@@ -9,6 +9,8 @@
 GitHub Pages（部署后）：https://caesar-zzh.github.io/ripjoy-tcg-pack-simulator/
 本地运行：`npm run dev` 后打开 http://localhost:4173 （零构建、零依赖，静态站）
 
+**完全离线版**：`dist/ripjoy-offline.html`（约 14MB）——代码、卡池与全部 913 张卡图（webp data URI）都内嵌在单个文件里，在任何拦截外部图片的应用内预览器/离线环境打开都能显示卡图。构建方式：`python3 scripts/fetch-images.py && node scripts/build-offline.mjs`（图片中间产物 data/images-embedded.json 可由脚本重新生成，未入库）。
+
 ## 功能
 
 - **4 个真实弹系**：Pokémon 151（EN）、Surging Sparks、Destined Rivals、ポケモンカード151（日版，7 张包）——共 913 张真实卡，含画师与 Cardmarket 参考价

@@ -28,6 +28,7 @@ async function loadSet(cfg) {
   for (const c of data.cards) CARDMAP[c.id] = { card: c, setKey: cfg.key, setName: data.name };
   return data;
 }
+const logoSrc = (data) => !data.logo ? null : (data.logo.startsWith('data:') ? data.logo : `${data.logo}.png`);
 const chaseOf = (data) => [...data.cards].filter(c => ['SAR', 'HR'].includes(tierOf(c))).sort((a, b) => (b.p || 0) - (a.p || 0))[0]
   || [...data.cards].sort((a, b) => (b.p || 0) - (a.p || 0))[0];
 const ownedInSet = (data) => data.cards.filter(c => save.collection[c.id]).length;
@@ -60,7 +61,7 @@ async function renderSets() {
     el.className = 'setcard';
     el.innerHTML = `
       <div class="setbanner" style="background:${cfg.theme}">
-        ${data.logo ? `<img class="logoimg" src="${data.logo}.png" alt="${data.name}" loading="lazy">` : `<h3 style="position:relative;z-index:1">${data.name}</h3>`}
+        ${data.logo ? `<img class="logoimg" src="${logoSrc(data)}" alt="${data.name}" loading="lazy">` : `<h3 style="position:relative;z-index:1">${data.name}</h3>`}
         <img class="chase" src="${imgUrl(chase)}" alt="${chase.n}" loading="lazy">
       </div>
       <div class="setbody">
@@ -151,7 +152,7 @@ function renderTear() {
       <div class="pack">
         <img class="packart" src="${imgUrl(chase, true)}" alt="${chase.n}">
         <div class="packshade"></div><div class="packtear"></div>
-        ${data.logo ? `<img class="packlogo" src="${data.logo}.png" alt="">` : ''}
+        ${data.logo ? `<img class="packlogo" src="${logoSrc(data)}" alt="">` : ''}
         <div class="packname">${data.name}</div>
         <div class="packsub">${data.lang === 'ja' ? '7 CARDS PER PACK' : '10 CARDS PER PACK'} · RipJoy</div>
       </div>
