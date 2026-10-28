@@ -38,7 +38,8 @@ main{max-width:1060px;margin:0 auto;padding:18px 16px calc(28px + var(--safe-b))
 .chip{font-size:12px;color:var(--dim);border:1px solid var(--line);padding:5px 11px;border-radius:99px;background:rgba(255,255,255,.03)}
 .chip b{color:var(--gold);font-weight:700}
 .setgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
-.setcard{background:linear-gradient(160deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;transition:transform .25s,box-shadow .25s}
+.setcard{background:linear-gradient(160deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;transition:transform .25s,box-shadow .25s;content-visibility:auto;contain-intrinsic-size:auto 300px}
+.resultgrid figure{content-visibility:auto;contain-intrinsic-size:auto 230px}
 .setcard:active{transform:scale(.985)}
 .setbanner{height:128px;position:relative;display:flex;align-items:center;padding:16px;gap:14px;overflow:hidden}
 .setbanner::after{content:"";position:absolute;inset:0;background:linear-gradient(100deg,rgba(0,0,0,.25),transparent 55%)}

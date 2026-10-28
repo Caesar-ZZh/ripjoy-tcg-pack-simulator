@@ -1,13 +1,13 @@
-import { TIERS, tierOf, buildPools, openPack, fmtPrice, imgUrl } from './engine.js';
+import { TIERS, tierOf, buildPools, openPack, fmtPrice, imgUrl, thumbUrl } from './engine.js';
 import { Particles, fxForLevel } from './particles.js';
 import { sfx, vibrate, VIB, addTilt, setMuted } from './fx.js';
 
 const SETS = [
-  { key: 'taijing', file: 'data/zh-cn-CSV9.5C.json', theme: 'linear-gradient(150deg,#5e1a6e,#b83fd0 55%,#ff8ad8)', desc: '简体中文版 · 伊布全家太晶盛聚 · 含简中专属异画', chaseNote: '仙子伊布 ex SAR（简中专属异画）', sname: '太晶盛聚', lang: 'zh-cn', total: 259, pack: 5 },
-  { key: 'CSV9C', file: 'data/zh-cn-CSV9C.json', theme: 'linear-gradient(150deg,#40205e,#7a4fd0 55%,#f2a8e0)', desc: '简体中文版 · 晶璃星辉 · 太乐巴戈斯集结', chaseNote: '太乐巴戈斯 ex SAR', sname: '星彩晶璃', lang: 'zh-cn', total: 266, pack: 5 },
-  { key: 'CSV8C', file: 'data/zh-cn-CSV8C.json', theme: 'linear-gradient(150deg,#0d2e3d,#14607a 55%,#4fd8c8)', desc: '简体中文版 · 诡幻璀璨 · 桃歹郎一族', chaseNote: '桃歹郎 ex SAR', sname: '璀璨诡幻', lang: 'zh-cn', total: 264, pack: 5 },
-  { key: 'CSV7C', file: 'data/zh-cn-CSV7C.json', theme: 'linear-gradient(150deg,#27364d,#4a6a96 55%,#ffb37a)', desc: '简体中文版 · 利刃猛醒 · 猛雷鼓咆哮', chaseNote: '猛雷鼓 ex SAR', sname: '利刃猛醒', lang: 'zh-cn', total: 259, pack: 5 },
-  { key: '151C', file: 'data/zh-cn-151C.json', theme: 'linear-gradient(150deg,#7a1620,#d03a2f 55%,#ffd75e)', desc: '简体中文版 · 初代 151 情怀 · 旅望惊聚全集', chaseNote: '喷火龙 ex SAR', sname: '收集啦151', lang: 'zh-cn', total: 192, pack: 5 },
+  { key: 'taijing', file: 'data/zh-cn-CSV9.5C.json', theme: 'linear-gradient(150deg,#5e1a6e,#b83fd0 55%,#ff8ad8)', desc: '简体中文版 · 伊布全家太晶盛聚 · 含简中专属异画', chaseNote: '仙子伊布 ex SAR（简中专属异画）', sname: '太晶盛聚', lang: 'zh-cn', total: 259, pack: 5, parts: 2 },
+  { key: 'CSV9C', file: 'data/zh-cn-CSV9C.json', theme: 'linear-gradient(150deg,#40205e,#7a4fd0 55%,#f2a8e0)', desc: '简体中文版 · 晶璃星辉 · 太乐巴戈斯集结', chaseNote: '太乐巴戈斯 ex SAR', sname: '星彩晶璃', lang: 'zh-cn', total: 266, pack: 5, parts: 2 },
+  { key: 'CSV8C', file: 'data/zh-cn-CSV8C.json', theme: 'linear-gradient(150deg,#0d2e3d,#14607a 55%,#4fd8c8)', desc: '简体中文版 · 诡幻璀璨 · 桃歹郎一族', chaseNote: '桃歹郎 ex SAR', sname: '璀璨诡幻', lang: 'zh-cn', total: 264, pack: 5, parts: 2 },
+  { key: 'CSV7C', file: 'data/zh-cn-CSV7C.json', theme: 'linear-gradient(150deg,#27364d,#4a6a96 55%,#ffb37a)', desc: '简体中文版 · 利刃猛醒 · 猛雷鼓咆哮', chaseNote: '猛雷鼓 ex SAR', sname: '利刃猛醒', lang: 'zh-cn', total: 259, pack: 5, parts: 2 },
+  { key: '151C', file: 'data/zh-cn-151C.json', theme: 'linear-gradient(150deg,#7a1620,#d03a2f 55%,#ffd75e)', desc: '简体中文版 · 初代 151 情怀 · 旅望惊聚全集', chaseNote: '喷火龙 ex SAR', sname: '收集啦151', lang: 'zh-cn', total: 192, pack: 5, parts: 2 },
   { key: '151en', file: 'data/en-sv03.5.json', theme: 'linear-gradient(150deg,#8f1f16,#e2483d 55%,#ff8a5c)', desc: '初代 151 情怀弹 · 喷火龙 SAR 大追', chaseNote: '喷火龙 ex SAR', sname: '151', lang: 'en', total: 207, pack: 10 },
   { key: 'sv08.5', file: 'data/en-sv08.5.json', theme: 'linear-gradient(150deg,#6e1a4d,#d03f8a 55%,#ffb3d9)', desc: '伊布盛宴 · 月亮伊布 ex SAR 天价追卡', chaseNote: '月亮伊布 ex SAR', sname: 'Prismatic Evolutions', lang: 'en', total: 180, pack: 10 },
   { key: 'sv08', file: 'data/en-sv08.json', theme: 'linear-gradient(150deg,#8a6410,#e8a812 55%,#ffd75e)', desc: '电光四射 · 皮卡丘 SAR 天价追卡', chaseNote: '皮卡丘 ex SAR', sname: 'Surging Sparks', lang: 'en', total: 252, pack: 10 },
@@ -55,7 +55,13 @@ function loadSet(cfg) {
   if (LOADP[cfg.key]) return LOADP[cfg.key];
   LOADP[cfg.key] = (async () => {
     const embedded = (typeof window !== 'undefined' && window.__RIPJOY_EMBED__) ? window.__RIPJOY_EMBED__[cfg.file] : null;
-    const data = embedded || await (await fetch(cfg.file)).json();
+    let data = embedded;
+    if (!data && cfg.parts) {
+      // 简中弹全高清数据拆双分片（单片 <5MB），并行拉取后合并
+      const [d1, d2] = await Promise.all([fetch(cfg.file).then(r => r.json()), fetch(cfg.file.replace('.json', '.p2.json')).then(r => r.json())]);
+      data = { ...d1, cards: [...d1.cards, ...d2.cards] };
+    }
+    if (!data) data = await (await fetch(cfg.file)).json();
     DATA[cfg.key] = data; POOLS[cfg.key] = buildPools(data);
     for (const c of data.cards) CARDMAP[c.id] = { card: c, setKey: cfg.key, setName: data.name };
     return data;
@@ -66,7 +72,7 @@ const logoSrc = (data) => !data.logo ? null : (data.logo.startsWith('data:') ? d
 const HIDONE = {};
 function loadHi(cfg) {
   // 简中弹高清包：主数据只带缩略图，高稀有卡的高清图单独一个文件，进开包/图鉴时按需加载
-  if (HIDONE[cfg.key] || !cfg.file.includes('zh-cn')) return;
+  if (HIDONE[cfg.key] || !cfg.file.includes('zh-cn') || cfg.parts) return; // 分片弹数据本身即全高清
   if (typeof window !== 'undefined' && window.__RIPJOY_EMBED__) return; // 单文件版内嵌的即是高清原图
   HIDONE[cfg.key] = true;
   fetch(cfg.file.replace('.json', '.hi.json')).then(r => r.ok ? r.json() : null).then(m => {
@@ -95,13 +101,24 @@ function showView(name) {
   if (name === 'open') renderSets();
 }
 let metaLoading = false;
+const IDP = { taijing: ['CSV9.5C'], CSV9C: ['CSV9C'], CSV8C: ['CSV8C'], CSV7C: ['CSV7C'], '151C': ['151C-惊', '151C-旅', '151C-望', '151C-聚'], '151en': ['sv03.5'], 'sv08.5': ['sv08.5'], sv08: ['sv08'], sv09: ['sv09'], sv10: ['sv10'], me01: ['me01'], sv05: ['sv05'], 'sv10.5b': ['sv10.5b'], 'sv10.5w': ['sv10.5w'], me02: ['me02'], 'me02.5': ['me02.5'], 'sv04.5': ['sv04.5'], 'sv06.5': ['sv06.5'], sv06: ['sv06'], sv07: ['sv07'], sv04: ['sv04'], sv01: ['sv01'], sv02: ['sv02'], sv03: ['sv03'], '151ja': ['SV2a'], SV9a: ['SV9a'], SV9tw: ['SV9'], SV10tw: ['SV10'] };
+function setOfCardId(id) {
+  let best = null, bestLen = -1;
+  for (const cfg of SETS) for (const p of (IDP[cfg.key] || [])) if (id.startsWith(p + '-') && p.length > bestLen) { best = cfg; bestLen = p.length; }
+  return best;
+}
 function ensureMetaLoaded(again) {
-  // 收藏册/战绩依赖 CARDMAP：若存档里有尚未加载弹系的卡，补齐后重渲染
+  // 收藏册/战绩依赖 CARDMAP：按卡号前缀只补载真正缺的弹系，不再全量加载
   if (metaLoading) return;
-  const missing = Object.keys(save.collection).some(id => !CARDMAP[id]);
-  if (!missing) return;
+  const need = new Map();
+  for (const id of Object.keys(save.collection)) {
+    if (CARDMAP[id]) continue;
+    const cfg = setOfCardId(id);
+    if (cfg && !DATA[cfg.key]) need.set(cfg.key, cfg);
+  }
+  if (!need.size) return;
   metaLoading = true;
-  Promise.all(SETS.map(c => loadSet(c).catch(() => {}))).then(() => { metaLoading = false; again(); });
+  Promise.all([...need.values()].map(c => loadSet(c).catch(() => {}))).then(() => { metaLoading = false; again(); });
 }
 $$('nav button').forEach(b => b.addEventListener('click', () => { sfx.click(); showView(b.dataset.view); }));
 $('#muteBtn').addEventListener('click', () => {
@@ -167,7 +184,7 @@ function fillSetCard(el, cfg) {
   if (data.logo && bname) { const im = document.createElement('img'); im.className = 'logoimg'; im.src = logoSrc(data); im.alt = data.name; im.loading = 'lazy'; bname.replaceWith(im); }
   const bload = el.querySelector('[data-fill="bload"]'); if (bload) bload.remove();
   if (chase && !banner.querySelector('img.chase')) {
-    const ci = document.createElement('img'); ci.className = 'chase'; ci.src = imgUrl(chase); ci.alt = chase.n; ci.loading = 'lazy'; ci.onerror = () => { ci.style.opacity = 0; };
+    const ci = document.createElement('img'); ci.className = 'chase'; ci.src = thumbUrl(chase); ci.alt = chase.n; ci.loading = 'lazy'; ci.onerror = () => { ci.style.opacity = 0; };
     banner.appendChild(ci);
   }
   const chaseEl = el.querySelector('[data-fill="chase"]');
@@ -182,6 +199,8 @@ async function prefetchSets() {
   let qi = 0;
   const worker = async () => {
     while (qi < queue.length) {
+      // 开包进行中时让行网络与 CPU，等回到选弹页再继续预取
+      while (session && session.phase !== 'loading') await new Promise(r => setTimeout(r, 900));
       const cfg = queue[qi++];
       if (DATA[cfg.key]) continue;
       try {
@@ -232,7 +251,7 @@ function renderGallery() {
   $('#galGrid').innerHTML = cards.length ? cards.map((c, i) => {
     const own = save.collection[c.id];
     return `<figure data-id="${c.id}" class="${own ? '' : 'notowned'}" style="animation-delay:${Math.min(i * 16, 480)}ms">
-      <img src="${imgUrl(c)}" alt="${c.n}" loading="lazy" onerror="this.style.opacity=0">
+      <img src="${imgUrl(c)}" alt="${c.n}" loading="lazy" decoding="async" onerror="this.style.opacity=0">
       ${own ? `<span class="countbadge">×${own.n}</span>` : ''}
       <figcaption><span class="rdot" style="background:${TIERS[tierOf(c)].color}"></span><b>${c.n}</b><br>${dispTier(c)} · ${fmtPrice(c)}${own ? '' : ' · 未拥有'}</figcaption>
     </figure>`;
@@ -343,7 +362,7 @@ function renderPackSummary() {
     <p style="text-align:center;color:var(--dim);font-size:13px">${best.card.n}</p>
     <div class="resultgrid">${sorted.map((e, i) => `
       <figure data-id="${e.card.id}" style="animation-delay:${Math.min(i * 30, 600)}ms">
-        <img src="${imgUrl(e.card)}" alt="${e.card.n}" loading="lazy">
+        <img src="${imgUrl(e.card)}" alt="${e.card.n}" loading="lazy" decoding="async">
         <figcaption><span class="rdot" style="background:${TIERS[e.tier].color}"></span><b>${e.card.n}</b><br>${dispTier(e.card)} · ${fmtPrice(e.card)}${e.isNew ? ' · NEW' : ''}</figcaption>
       </figure>`).join('')}
     </div>
@@ -387,6 +406,8 @@ function renderTear() {
     </div>
     <p class="stagehint">${session.tenPacks ? `<b>十连 · 第 ${session.packNo} / 10 包</b><br>` : ''}点一下卡包，<b>撕开它</b><br><span style="font-size:12.5px">翻卡前留意卡背的光晕——颜色越暖，下一张越有货</span></p>
     <div class="stagebtns"><button class="btn" id="tearBtn">✂️ 撕 开</button>${session.tenPacks ? '<button class="btn ghost" id="skipTearBtn" style="flex:0 0 108px">直接翻卡</button>' : ''}</div>`;
+  // 撕包阶段把整包高清图预加载完，翻卡时零等待
+  if (session.pack) for (const e of session.pack) { const im = new Image(); im.src = imgUrl(e.card, true); }
   const tear = () => {
     if (!session || session.phase !== 'tear') return;
     session.phase = 'tearing';
@@ -431,14 +452,12 @@ function renderReveal() {
   card3d.addEventListener('click', () => { session.revealed ? advance() : doFlip(); });
   $('#nextBtn').addEventListener('click', () => { session.revealed ? advance() : doFlip(); });
   $('#skipBtn').addEventListener('click', () => { summaryForCurrent(); });
-  // 预加载下一张高清图
-  if (next) { const im = new Image(); im.src = imgUrl(next.card, true); }
 }
 function renderTray() {
   const tray = $('#tray'); if (!tray || !session) return;
   const shown = session.pack.slice(0, session.idx + (session.revealed ? 1 : 0));
   const bestP = Math.max(...session.pack.map(e => e.card.p || 0));
-  tray.innerHTML = shown.map(e => `<img src="${imgUrl(e.card)}" class="${(e.card.p || 0) === bestP && e.level >= 2 ? 'best' : ''}" alt="${e.card.n}">`).join('');
+  tray.innerHTML = shown.map(e => `<img src="${thumbUrl(e.card)}" class="${(e.card.p || 0) === bestP && e.level >= 2 ? 'best' : ''}" alt="${e.card.n}">`).join('');
 }
 function flipCurrent() {
   if (!session || session.revealed || session.phase !== 'reveal') return;
@@ -499,7 +518,7 @@ function renderSummary() {
     <p style="text-align:center;color:var(--dim);font-size:13px">${best.card.n}</p>
     <div class="resultgrid">${sorted.map((e, i) => `
       <figure data-id="${e.card.id}" style="animation-delay:${Math.min(i * 30, 600)}ms">
-        <img src="${imgUrl(e.card)}" alt="${e.card.n}" loading="lazy">
+        <img src="${imgUrl(e.card)}" alt="${e.card.n}" loading="lazy" decoding="async">
         <figcaption><span class="rdot" style="background:${TIERS[e.tier].color}"></span><b>${e.card.n}</b><br>${dispTier(e.card)} · ${fmtPrice(e.card)}${e.isNew ? ' · NEW' : ''}</figcaption>
       </figure>`).join('')}
     </div>
@@ -532,7 +551,7 @@ function renderCollection() {
     <div class="statcard"><div class="v">${owned.filter(x => TIERS[tierOf(x.card)].level >= 3).length}</div><div class="k">AR 以上藏品</div></div>`;
   $('#collGrid').innerHTML = filtered.length ? filtered.map(x => {
     const t = tierOf(x.card);
-    return `<figure data-id="${x.card.id}"><span class="countbadge">×${x.n}</span><img src="${imgUrl(x.card)}" alt="${x.card.n}" loading="lazy"><figcaption><span class="rdot" style="background:${TIERS[t].color}"></span><b>${x.card.n}</b><br>${dispTier(x.card)} · ${fmtPrice(x.card)}</figcaption></figure>`;
+    return `<figure data-id="${x.card.id}"><span class="countbadge">×${x.n}</span><img src="${imgUrl(x.card)}" alt="${x.card.n}" loading="lazy" decoding="async"><figcaption><span class="rdot" style="background:${TIERS[t].color}"></span><b>${x.card.n}</b><br>${dispTier(x.card)} · ${fmtPrice(x.card)}</figcaption></figure>`;
   }).join('') : `<div class="empty" style="grid-column:1/-1">这里还没有卡<br>去撕一包，把第一张 SAR 带回来</div>`;
   $$('#collGrid figure').forEach(f => f.addEventListener('click', () => openDetail(CARDMAP[f.dataset.id].card)));
 }
@@ -547,8 +566,8 @@ function renderStats() {
     <div class="statcard"><div class="v">${s.cards}</div><div class="k">累计卡片</div></div>
     <div class="statcard"><div class="v">${s.l4}</div><div class="k">SAR / 金卡次数</div></div>
     <div class="statcard"><div class="v">${s.l3}</div><div class="k">AR / UR 次数</div></div>`;
-  $('#bestPulls').innerHTML = best.length ? best.map(x => `<div class="historyitem"><img src="${imgUrl(x.card)}" alt=""><div class="hmeta"><b>${x.card.n}</b> · ${dispTier(x.card)}<br>${x.setName} · 参考价 <span style="color:var(--gold)">${fmtPrice(x.card)}</span></div></div>`).join('') : '<div class="empty">还没有藏品</div>';
-  $('#historyList').innerHTML = save.history.length ? save.history.map(h => `<div class="historyitem"><img src="${h.bestId && CARDMAP[h.bestId] ? imgUrl(CARDMAP[h.bestId].card) : ''}" alt=""><div class="hmeta"><b>${h.bestName}</b> · ${h.bestTier}<br>${h.setName} · ${h.n} 张 · ${new Date(h.ts).toLocaleString('zh-CN', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</div></div>`).join('') : '<div class="empty">暂无开包记录</div>';
+  $('#bestPulls').innerHTML = best.length ? best.map(x => `<div class="historyitem"><img src="${thumbUrl(x.card)}" alt=""><div class="hmeta"><b>${x.card.n}</b> · ${dispTier(x.card)}<br>${x.setName} · 参考价 <span style="color:var(--gold)">${fmtPrice(x.card)}</span></div></div>`).join('') : '<div class="empty">还没有藏品</div>';
+  $('#historyList').innerHTML = save.history.length ? save.history.map(h => `<div class="historyitem"><img src="${h.bestId && CARDMAP[h.bestId] ? thumbUrl(CARDMAP[h.bestId].card) : ''}" alt=""><div class="hmeta"><b>${h.bestName}</b> · ${h.bestTier}<br>${h.setName} · ${h.n} 张 · ${new Date(h.ts).toLocaleString('zh-CN', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</div></div>`).join('') : '<div class="empty">暂无开包记录</div>';
 }
 $('#resetBtn').addEventListener('click', () => {
   if (!confirm('清空收藏、战绩与历史？此操作不可恢复。')) return;

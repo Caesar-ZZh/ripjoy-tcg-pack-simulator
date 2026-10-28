@@ -6,7 +6,7 @@ os.chdir(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
 
 app = open('src/app.js', encoding='utf-8').read()
 sets = []
-for m in re.finditer(r"\{ key: '([^']+)', file: '([^']+)'.*?sname: '([^']+)', lang: '([^']+)', total: (\d+), pack: (\d+) \}", app):
+for m in re.finditer(r"\{ key: '([^']+)', file: '([^']+)'.*?sname: '([^']+)', lang: '([^']+)', total: (\d+), pack: (\d+)[, }]", app):
     sets.append(dict(key=m.group(1), file=m.group(2), sname=m.group(3), lang=m.group(4), total=int(m.group(5)), pack=int(m.group(6))))
 print(f"SETS entries: {len(sets)}")
 
@@ -37,6 +37,9 @@ for s in sets:
     if not os.path.exists(live):
         problems.append(f"{s['key']}: 数据文件缺失 {live}"); continue
     d = json.load(open(live))
+    p2p = live.replace('.json', '.p2.json')
+    if 'zh-cn' in path and os.path.exists(p2p):
+        d = {**d, 'cards': d['cards'] + json.load(open(p2p))['cards']}
     cards = d['cards']
     tag = f"{s['key']}({s['sname']})"
     if len(cards) != s['total']: problems.append(f"{tag}: 卡数 {len(cards)} != 配置 total {s['total']}")
@@ -61,7 +64,9 @@ for s in sets:
     for c in cards: dupno.setdefault(str(c.get('no')), []).append(c['id'])
     dups = {k: v for k, v in dupno.items() if len(v) > 1}
     if dups: notes.append(f"{tag}: 同编号多条目 {list(dups.items())[:3]}")
-    if 'zh-cn' in path:
+    if 'zh-cn' in path and os.path.exists('pushroot/' + path.replace('.json', '.p2.json')):
+        pass  # 分片全高清模式：无高清包，跳过覆盖检查
+    elif 'zh-cn' in path:
         hi_path = 'pushroot/' + path.replace('.json', '.hi.json')
         if not os.path.exists(hi_path): problems.append(f"{tag}: 高清包缺失")
         else:

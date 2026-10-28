@@ -98,4 +98,6 @@ export function openPack(setData, pools, { forceTop = false } = {}) {
 }
 
 export const fmtPrice = (c) => (c && c.p != null) ? `€${Number(c.p).toFixed(2)}` : '—';
-export const imgUrl = (c, hi = false) => (hi && c.hiImg) || (typeof window !== 'undefined' && window.__RIPJOY_IMGS__ && window.__RIPJOY_IMGS__[c.id]) || (c.img && c.img.startsWith('data:') ? c.img : `${c.img}/${hi ? 'high' : 'low'}.png`);
+// 全高清口径：CDN 卡图一律取 high.png；thumbUrl 仅供托盘/历史等微缩装饰图省流量
+export const imgUrl = (c, hi = false) => (hi && c.hiImg) || (typeof window !== 'undefined' && window.__RIPJOY_IMGS__ && window.__RIPJOY_IMGS__[c.id]) || (c.img && c.img.startsWith('data:') ? c.img : `${c.img}/high.png`);
+export const thumbUrl = (c) => (typeof window !== 'undefined' && window.__RIPJOY_IMGS__ && window.__RIPJOY_IMGS__[c.id]) || (c.img && c.img.startsWith('data:') ? c.img : `${c.img}/low.png`);
