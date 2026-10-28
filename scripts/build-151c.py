@@ -5,7 +5,7 @@ import json, re, io, base64, hashlib, html as ihtml, urllib.request, urllib.pars
 from collections import Counter
 from PIL import Image
 
-RARITY_MAP = {'C': 'Common', 'U': 'Uncommon', 'R': 'Rare', 'RR': 'Double Rare', 'RRR': 'Double Rare',
+RARITY_MAP = {'C': 'Common', 'U': 'Uncommon', 'R': 'Rare', 'RR': 'Double Rare', 'RRR': 'Double Rare', 'S': 'Shiny rare', 'SSR': 'Shiny Ultra Rare',
               'SR': 'Ultra Rare', 'SAR': 'Special Illustration Rare', 'UR': 'Hyper Rare',
               'AR': 'Illustration Rare', 'ACE': 'ACE SPEC Rare'}
 HIGH = {'RR', 'RRR', 'SR', 'SAR', 'UR', 'AR'}

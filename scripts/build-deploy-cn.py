@@ -7,7 +7,7 @@
 import json, io, base64, os
 from PIL import Image
 
-HIGH = {'RR', 'RRR', 'SR', 'SAR', 'UR', 'AR', 'ACE'}
+HIGH = {'RR', 'RRR', 'SR', 'SAR', 'UR', 'AR', 'ACE', 'SSR'}
 os.makedirs('pushroot/data', exist_ok=True)
 
 def dec(uri):

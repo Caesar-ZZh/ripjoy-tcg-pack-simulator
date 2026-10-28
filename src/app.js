@@ -34,7 +34,7 @@ const SETS = [
 ];
 const LANG_LABEL = { en: '英文版', ja: '日版', 'zh-cn': '简体中文版', 'zh-tw': '繁体中文版' };
 // 带 rk 的卡（简中弹）按其原始稀有度字母展示：SR 就是 SR，不套用英文 UR 口径
-const CN_RARITY_CN = { C: '普通', U: '非普通', R: '稀有闪', RR: '双重稀有', ACE: 'ACE SPEC', SR: '超级稀有', SAR: '特别插画稀有', UR: '金卡' };
+const CN_RARITY_CN = { C: '普通', U: '非普通', R: '稀有闪', RR: '双重稀有', ACE: 'ACE SPEC', SR: '超级稀有', SAR: '特别插画稀有', UR: '金卡', S: '闪色', SSR: '闪色超级稀有' };
 const dispTier = (c) => c.rk || tierOf(c);
 const dispTierLabel = (c) => c.rk ? `${c.rk} · ${CN_RARITY_CN[c.rk] || ''}` : TIERS[tierOf(c)].label;
 const packOf = (data) => data.pack || (data.lang === 'ja' ? 7 : 10);
@@ -292,7 +292,9 @@ async function startTen(cfg) {
   const data = DATA[cfg.key];
   const packs = [];
   for (let i = 0; i < 10; i++) {
-    const pack = openPack(data, POOLS[cfg.key], { forceTop: false });
+    const forceTop = i === 0 && !save.firstPackDone; // 首包保底也适用于人生第一次十连
+    const pack = openPack(data, POOLS[cfg.key], { forceTop });
+    if (forceTop) save.firstPackDone = true;
     pack.forEach(e => { e.isNew = collect(e); e.tier = tierOf(e.card); e.level = TIERS[e.tier].level; });
     finishPackToHistory(cfg, pack); packs.push(pack);
   }
@@ -335,7 +337,7 @@ function renderPackSummary() {
   st.innerHTML = `
     <div class="summaryhead">
       <h2>十连 · 第 ${packNo} / 10 包${best.level >= 4 ? ' · 🎉 神抽！' : best.level === 3 ? ' · ✨ 出货！' : ''}</h2>
-      <p>${data.name} · 本包参考价合计 <b>€${total.toFixed(2)}</b> · 新卡 <b>${news}</b> 张</p>
+      <p>${data.name} · 本包参考价合计 <b>${pack.some(e => e.card.p != null) ? `€${total.toFixed(2)}` : '—'}</b> · 新卡 <b>${news}</b> 张</p>
     </div>
     <div class="bestpull" style="--bc:${TIERS[best.tier].color}"><span class="besttag">本包最佳 · ${dispTier(best.card)} · ${fmtPrice(best.card)}</span><img src="${imgUrl(best.card, true)}" alt="${best.card.n}"></div>
     <p style="text-align:center;color:var(--dim);font-size:13px">${best.card.n}</p>
@@ -491,7 +493,7 @@ function renderSummary() {
   st.innerHTML = `
     <div class="summaryhead">
       <h2>${ten ? '十连开 · 总结算' : best.level >= 4 ? '🎉 神抽！' : best.level === 3 ? '✨ 出货了！' : '本包结算'}</h2>
-      <p>${ten ? `共 ${pack.length} 张` : `${data.name}`} · 参考价合计 <b>€${total.toFixed(2)}</b> · 新卡 <b>${news}</b> 张${ten && sorted.some(e => e.level >= 4) ? ' · <b>含 SAR/HR！</b>' : ''}</p>
+      <p>${ten ? `共 ${pack.length} 张` : `${data.name}`} · 参考价合计 <b>${pack.some(e => e.card.p != null) ? `€${total.toFixed(2)}` : '—'}</b> · 新卡 <b>${news}</b> 张${ten && sorted.some(e => e.level >= 4) ? ' · <b>含 SAR/HR！</b>' : ''}</p>
     </div>
     <div class="bestpull" style="--bc:${TIERS[best.tier].color}"><span class="besttag">最佳 · ${dispTier(best.card)} · ${fmtPrice(best.card)}</span><img src="${imgUrl(best.card, true)}" alt="${best.card.n}"></div>
     <p style="text-align:center;color:var(--dim);font-size:13px">${best.card.n}</p>
@@ -545,7 +547,7 @@ function renderStats() {
     <div class="statcard"><div class="v">${s.cards}</div><div class="k">累计卡片</div></div>
     <div class="statcard"><div class="v">${s.l4}</div><div class="k">SAR / 金卡次数</div></div>
     <div class="statcard"><div class="v">${s.l3}</div><div class="k">AR / UR 次数</div></div>`;
-  $('#bestPulls').innerHTML = best.length ? best.map(x => `<div class="historyitem"><img src="${imgUrl(x.card)}" alt=""><div class="hmeta"><b>${x.card.n}</b> · ${dispTier(x.card)}<br>${x.setName} · 参考价 <span style="color:var(--gold)">€${(x.card.p || 0).toFixed(2)}</span></div></div>`).join('') : '<div class="empty">还没有藏品</div>';
+  $('#bestPulls').innerHTML = best.length ? best.map(x => `<div class="historyitem"><img src="${imgUrl(x.card)}" alt=""><div class="hmeta"><b>${x.card.n}</b> · ${dispTier(x.card)}<br>${x.setName} · 参考价 <span style="color:var(--gold)">${fmtPrice(x.card)}</span></div></div>`).join('') : '<div class="empty">还没有藏品</div>';
   $('#historyList').innerHTML = save.history.length ? save.history.map(h => `<div class="historyitem"><img src="${h.bestId && CARDMAP[h.bestId] ? imgUrl(CARDMAP[h.bestId].card) : ''}" alt=""><div class="hmeta"><b>${h.bestName}</b> · ${h.bestTier}<br>${h.setName} · ${h.n} 张 · ${new Date(h.ts).toLocaleString('zh-CN', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</div></div>`).join('') : '<div class="empty">暂无开包记录</div>';
 }
 $('#resetBtn').addEventListener('click', () => {
@@ -576,7 +578,5 @@ function closeDetail() { $('#modal').classList.remove('open'); }
 $('#modal').addEventListener('click', (e) => { if (e.target.id === 'modal') closeDetail(); });
 
 /* ---------------- 启动 ---------------- */
-(async () => {
-  await Promise.all(SETS.map(loadSet));
-  renderSets();
-})();
+// 立即渲染骨架卡并后台预取——切勿等全部数据下完，否则慢网下首页长时间空白
+renderSets();
