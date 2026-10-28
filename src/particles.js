@@ -107,16 +107,16 @@ export class Particles {
       const { ctx } = this;
       ctx.clearRect(0, 0, innerWidth, innerHeight);
       // 氛围浮尘补充
-      if (this.ambEl && now - (this.ambLast || 0) > 260) {
+      if (this.ambEl && now - (this.ambLast || 0) > 220) {
         this.ambLast = now;
         const r = this.ambEl.getBoundingClientRect();
-        if (r.width && this.list.filter(p => p.shape === 'mote').length < 22) {
+        if (r.width && this.list.filter(p => p.shape === 'mote').length < 26) {
           this.spawn({
             x: r.left + Math.random() * r.width, y: r.top + r.height * (0.25 + Math.random() * 0.75),
             vx: (Math.random() - 0.5) * 8, vy: -5 - Math.random() * 11,
-            size: 0.8 + Math.random() * 1.9, color: Math.random() < 0.4 ? '#ffd75e' : '#cfe0ff',
+            size: 1.1 + Math.random() * 2.3, color: Math.random() < 0.4 ? '#ffd75e' : '#cfe0ff',
             life: 4.5 + Math.random() * 3, t: 0, gravity: 0, drag: 1, shape: 'mote',
-            rot: 0, vr: 0, alpha: 0.13 + Math.random() * 0.2, sway: 0.6 + Math.random() * 0.9, phase: Math.random() * 6.28,
+            rot: 0, vr: 0, alpha: 0.2 + Math.random() * 0.26, sway: 0.6 + Math.random() * 0.9, phase: Math.random() * 6.28,
           });
         }
       }
