@@ -33,6 +33,8 @@ const SETS = [
   { key: 'SV10tw', file: 'data/zh-tw-SV10.json', theme: 'linear-gradient(150deg,#3b0764,#7e22ce 55%,#d8b4fe)', desc: '繁体中文版（台版）· 5 张包 · 数据暂缺 AR/SAR', chaseNote: '火箭队的超梦 ex RR', sname: '火箭隊的榮耀', lang: 'zh-tw', total: 98, pack: 5 },
 ];
 const LANG_LABEL = { en: '英文版', ja: '日版', 'zh-cn': '简体中文版', 'zh-tw': '繁体中文版' };
+// 真实卡包包装图（Bulbagarden Archives 官方图）：有图的弹撕包时随机用一种包装；无图的弹用追卡卡面设计
+const PACKART = { '151C': ['151C-1.webp', '151C-2.webp', '151C-3.webp'], '151en': ['151en-1.webp'], '151ja': ['151ja-1.webp', '151ja-2.webp'], SV10tw: ['SV10tw-1.webp'], SV9a: ['SV9a-1.webp'], SV9tw: ['SV9tw-1.webp'], me01: ['me01-1.webp', 'me01-2.webp', 'me01-3.webp'], me02: ['me02-1.webp', 'me02-2.webp', 'me02-3.webp'], 'me02.5': ['me02.5-1.webp'], sv01: ['sv01-1.webp', 'sv01-2.webp', 'sv01-3.webp'], sv02: ['sv02-1.webp', 'sv02-2.webp', 'sv02-3.webp'], sv03: ['sv03-1.webp', 'sv03-2.webp', 'sv03-3.webp'], sv04: ['sv04-1.webp', 'sv04-2.webp', 'sv04-3.webp'], 'sv04.5': ['sv04.5-1.webp', 'sv04.5-2.webp', 'sv04.5-3.webp'], sv05: ['sv05-1.webp', 'sv05-2.webp', 'sv05-3.webp'], sv06: ['sv06-1.webp', 'sv06-2.webp'], 'sv06.5': ['sv06.5-1.webp', 'sv06.5-2.webp', 'sv06.5-3.webp'], sv07: ['sv07-1.webp', 'sv07-2.webp', 'sv07-3.webp'], sv08: ['sv08-1.webp', 'sv08-2.webp', 'sv08-3.webp'], 'sv08.5': ['sv08.5-1.webp', 'sv08.5-2.webp', 'sv08.5-3.webp'], sv09: ['sv09-1.webp', 'sv09-2.webp', 'sv09-3.webp'], sv10: ['sv10-1.webp', 'sv10-2.webp', 'sv10-3.webp'], 'sv10.5b': ['sv10.5b-1.webp'], 'sv10.5w': ['sv10.5w-1.webp'], taijing: ['taijing-1.webp'] };
 // 带 rk 的卡（简中弹）按其原始稀有度字母展示：SR 就是 SR，不套用英文 UR 口径
 const CN_RARITY_CN = { C: '普通', U: '非普通', R: '稀有闪', RR: '双重稀有', ACE: 'ACE SPEC', SR: '超级稀有', SAR: '特别插画稀有', UR: '金卡', S: '闪色', SSR: '闪色超级稀有' };
 const dispTier = (c) => c.rk || tierOf(c);
@@ -392,12 +394,16 @@ $('#oddsLink').addEventListener('click', () => showView('stats'));
 
 function renderTear() {
   const { cfg } = session; const data = DATA[cfg.key]; const chase = chaseOf(data);
+  const arts = PACKART[cfg.key];
+  const artFile = arts ? arts[Math.floor(Math.random() * arts.length)] : null;
+  const art = artFile ? ((window.__PACKART_IMG || {})[artFile] || `assets/packs/${artFile}`) : null;
+  const packImg = art || imgUrl(chase, true);
   const st = $('#stageBody');
   st.innerHTML = `
     <div class="packwrap" id="packEl">
-      <div class="packtop"><img src="${imgUrl(chase, true)}" alt=""></div>
-      <div class="pack">
-        <img class="packart" src="${imgUrl(chase, true)}" alt="${chase.n}" onerror="this.style.opacity=0">
+      <div class="packtop"><img src="${packImg}" alt=""></div>
+      <div class="pack${art ? ' realpack' : ''}">
+        <img class="packart" src="${packImg}" alt="${chase.n}" onerror="this.style.opacity=0">
         <div class="packshade"></div><div class="packtear"></div>
         ${data.logo ? `<img class="packlogo" src="${logoSrc(data)}" alt="">` : ''}
         <div class="packname">${data.name}</div>
@@ -406,6 +412,11 @@ function renderTear() {
     </div>
     <p class="stagehint">${session.tenPacks ? `<b>十连 · 第 ${session.packNo} / 10 包</b><br>` : ''}点一下卡包，<b>撕开它</b><br><span style="font-size:12.5px">翻卡前留意卡背的光晕——颜色越暖，下一张越有货</span></p>
     <div class="stagebtns"><button class="btn" id="tearBtn">✂️ 撕 开</button>${session.tenPacks ? '<button class="btn ghost" id="skipTearBtn" style="flex:0 0 108px">直接翻卡</button>' : ''}</div>`;
+  // 包装图加载失败（如单文件版无附带资源）时回退到追卡卡面设计
+  if (art) {
+    const pa = st.querySelector('.packart');
+    pa.addEventListener('error', () => { pa.src = imgUrl(chase, true); st.querySelector('.packtop img').src = imgUrl(chase, true); st.querySelector('.pack').classList.remove('realpack'); }, { once: true });
+  }
   // 撕包阶段把整包高清图预加载完，翻卡时零等待
   if (session.pack) for (const e of session.pack) { const im = new Image(); im.src = imgUrl(e.card, true); }
   const tear = () => {

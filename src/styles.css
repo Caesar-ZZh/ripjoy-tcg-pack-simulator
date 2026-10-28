@@ -73,6 +73,10 @@ main{max-width:1060px;margin:0 auto;padding:18px 16px calc(28px + var(--safe-b))
 .pack .packtear{position:absolute;top:0;left:0;right:0;height:26px;background:repeating-linear-gradient(90deg,rgba(255,255,255,.35) 0 7px,rgba(255,255,255,.05) 7px 14px);border-bottom:2px dashed rgba(255,255,255,.5)}
 .pack .packname{position:absolute;bottom:9%;left:0;right:0;text-align:center;font-weight:800;font-size:15px;text-shadow:0 2px 8px rgba(0,0,0,.8);padding:0 10px}
 .pack .packsub{position:absolute;bottom:4.5%;left:0;right:0;text-align:center;font-size:10.5px;color:rgba(255,255,255,.85);letter-spacing:1.6px}
+.packwrap:has(.realpack){aspect-ratio:55/100}
+.pack.realpack .packlogo,.pack.realpack .packname,.pack.realpack .packsub{display:none}
+.pack.realpack .packshade{background:linear-gradient(180deg,rgba(0,0,0,.16),transparent 30%,transparent 82%,rgba(0,0,0,.14))}
+.pack.realpack .packtear{opacity:.5}
 .packwrap.tearing .pack{animation:packShake .45s ease-in-out}
 .packtop{position:absolute;left:0;right:0;top:0;height:15%;z-index:3;transform-origin:top center;border-radius:12px 12px 0 0;overflow:hidden;opacity:0}
 .packwrap.tearing .packtop{opacity:1;animation:tearOff .65s .3s cubic-bezier(.3,.7,.3,1) forwards}
