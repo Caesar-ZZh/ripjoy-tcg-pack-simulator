@@ -63,6 +63,23 @@ function loadSet(cfg) {
   return LOADP[cfg.key];
 }
 const logoSrc = (data) => !data.logo ? null : (data.logo.startsWith('data:') ? data.logo : `${data.logo}.png`);
+const HIDONE = {};
+function loadHi(cfg) {
+  // 简中弹高清包：主数据只带缩略图，高稀有卡的高清图单独一个文件，进开包/图鉴时按需加载
+  if (HIDONE[cfg.key] || !cfg.file.includes('zh-cn')) return;
+  if (typeof window !== 'undefined' && window.__RIPJOY_EMBED__) return; // 单文件版内嵌的即是高清原图
+  HIDONE[cfg.key] = true;
+  fetch(cfg.file.replace('.json', '.hi.json')).then(r => r.ok ? r.json() : null).then(m => {
+    if (!m || !DATA[cfg.key]) return;
+    for (const c of DATA[cfg.key].cards) if (m[c.id]) c.hiImg = m[c.id];
+    if (session?.phase === 'reveal' && session.cfg?.key === cfg.key) {
+      const cur = session.pack[session.idx].card;
+      const f = document.querySelector('#card3d .face.front img');
+      if (f && cur.hiImg) f.src = cur.hiImg;
+    }
+    if (galKey === cfg.key && $('#view-gallery').classList.contains('active')) renderGallery();
+  }).catch(() => { delete HIDONE[cfg.key]; });
+}
 const chaseOf = (data) => [...data.cards].filter(c => ['SAR', 'HR', 'BWR'].includes(tierOf(c))).sort((a, b) => (b.p || 0) - (a.p || 0))[0]
   || [...data.cards].sort((a, b) => (b.p || 0) - (a.p || 0))[0];
 const ownedInSet = (data) => data.cards.filter(c => save.collection[c.id]).length;
@@ -197,6 +214,7 @@ async function openGallery(key) {
     try { await loadSet(cfg); } catch { $('#galGrid').innerHTML = '<p class="empty">加载失败，返回选弹后重试</p>'; return; }
     if (galKey !== key) return;
   }
+  loadHi(SETS.find(c => c.key === key));
   renderGallery();
 }
 function renderGallery() {
@@ -255,6 +273,7 @@ async function ensureStageData(cfg) {
 }
 async function startPack(cfg, isRetry) {
   if (!DATA[cfg.key] && !(await ensureStageData(cfg))) return;
+  loadHi(cfg);
   const data = DATA[cfg.key];
   const forceTop = !save.firstPackDone;
   const pack = openPack(data, POOLS[cfg.key], { forceTop });
@@ -269,6 +288,7 @@ async function startPack(cfg, isRetry) {
 
 async function startTen(cfg) {
   if (!DATA[cfg.key] && !(await ensureStageData(cfg))) return;
+  loadHi(cfg);
   const data = DATA[cfg.key];
   const packs = [];
   for (let i = 0; i < 10; i++) {

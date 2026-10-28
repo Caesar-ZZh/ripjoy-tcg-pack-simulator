@@ -98,4 +98,4 @@ export function openPack(setData, pools, { forceTop = false } = {}) {
 }
 
 export const fmtPrice = (c) => (c && c.p != null) ? `€${Number(c.p).toFixed(2)}` : '—';
-export const imgUrl = (c, hi = false) => (typeof window !== 'undefined' && window.__RIPJOY_IMGS__ && window.__RIPJOY_IMGS__[c.id]) || (c.img && c.img.startsWith('data:') ? c.img : `${c.img}/${hi ? 'high' : 'low'}.png`);
+export const imgUrl = (c, hi = false) => (hi && c.hiImg) || (typeof window !== 'undefined' && window.__RIPJOY_IMGS__ && window.__RIPJOY_IMGS__[c.id]) || (c.img && c.img.startsWith('data:') ? c.img : `${c.img}/${hi ? 'high' : 'low'}.png`);
