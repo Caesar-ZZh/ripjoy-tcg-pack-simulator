@@ -13,9 +13,15 @@ APPLY = '--apply' in sys.argv
 THRESH = 0.085
 
 def get(url, referer=None):
-    req = urllib.request.Request(url, headers={'User-Agent': 'RipJoy/1.3 (personal project)'})
-    if referer: req.add_header('Referer', referer)
-    with urllib.request.urlopen(req, timeout=30) as r: return r.read()
+    import subprocess, time
+    cmd = ['curl', '-sS', '--retry', '3', '--max-time', '60', '-A', 'RipJoy/1.3 (personal project)']
+    if referer: cmd += ['-H', f'Referer: {referer}']
+    cmd += [url]
+    for i in range(3):
+        r = subprocess.run(cmd, capture_output=True)
+        if r.returncode == 0 and r.stdout: return r.stdout
+        time.sleep(2 * (i + 1))
+    raise IOError(f'curl failed for {url}')
 
 bh = get(BILLS).decode('utf-8', 'ignore')
 blocks = re.findall(r'data-cat="([a-z]+)" data-name="([^"]*)" data-cn="([^"]*)" data-code="([^"]*)"[^>]*>.*?src="(https://bills-archive[^"]+)"', bh)
@@ -41,7 +47,7 @@ def clusters_of(urls):
 
 def to_uri(raw, hi):
     im = Image.open(io.BytesIO(raw)).convert('RGB')
-    w, q = (400, 64) if hi else (260, 54)
+    w, q = (640, 88)
     if im.width > w: im = im.resize((w, round(im.height * w / im.width)), Image.LANCZOS)
     buf = io.BytesIO(); im.save(buf, 'WEBP', quality=q)
     return 'data:image/webp;base64,' + base64.b64encode(buf.getvalue()).decode()

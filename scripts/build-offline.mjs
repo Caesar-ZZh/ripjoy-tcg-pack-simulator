@@ -9,7 +9,7 @@ const css = await read('src/styles.css');
 let packartJs = '';
 for (const f of (await readdir(new URL('src/', root))).filter(x => /^packart-\d+\.js$/.test(x)).sort()) packartJs += await read('src/' + f) + '\n';
 const jsParts = [];
-for (const f of ['src/engine.js', 'src/particles.js', 'src/fx.js', 'src/app.js']) jsParts.push(strip(await read(f)));
+for (const f of ['src/engine.js', 'src/particles.js', 'src/fx.js', 'src/cardbacks.js', 'src/app.js']) jsParts.push(strip(await read(f)));
 const imgs = JSON.parse(await read('data/images-embedded.json'));
 const embed = {};
 for (const f of (await readdir(new URL('data/', root))).filter(x => x.endsWith('.json') && x !== 'images-embedded.json').sort().map(x => 'data/' + x)) {

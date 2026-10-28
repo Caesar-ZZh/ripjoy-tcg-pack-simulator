@@ -15,13 +15,19 @@ RARITY_MAP = {'C': 'Common', 'U': 'Uncommon', 'R': 'Rare', 'RR': 'Double Rare', 
 HIGH = {'RR', 'RRR', 'SR', 'SAR', 'UR', 'AR'}
 
 def get(url, referer=None):
-    req = urllib.request.Request(url, headers={'User-Agent': 'RipJoy/1.3 (personal project)'})
-    if referer: req.add_header('Referer', referer)
-    with urllib.request.urlopen(req, timeout=30) as r: return r.read()
+    import subprocess, time
+    cmd = ['curl', '-sS', '--retry', '3', '--max-time', '60', '-A', 'RipJoy/1.3 (personal project)']
+    if referer: cmd += ['-H', f'Referer: {referer}']
+    cmd += [url]
+    for i in range(3):
+        r = subprocess.run(cmd, capture_output=True)
+        if r.returncode == 0 and r.stdout: return r.stdout
+        time.sleep(2 * (i + 1))
+    raise IOError(f'curl failed for {url}: {r.stderr.decode()[:200]}')
 
 def to_uri(raw, hi):
     im = Image.open(io.BytesIO(raw)).convert('RGB')
-    w, q = (400, 64) if hi else (260, 54)
+    w, q = (640, 88)
     if im.width > w: im = im.resize((w, round(im.height * w / im.width)), Image.LANCZOS)
     buf = io.BytesIO(); im.save(buf, 'WEBP', quality=q)
     return 'data:image/webp;base64,' + base64.b64encode(buf.getvalue()).decode()
@@ -69,7 +75,7 @@ print(f"[{SET_ID}] bills distinct: {len(seen)} covering {len(bills_by_name)} nam
 name_cursor = {}
 def fetch_img(card):
     hi = card['rk'] in HIGH
-    try: return to_uri(get(poke_url(card['num'], 400 if hi else 300), referer='https://wiki.52poke.com/'), hi), '52poke'
+    try: return to_uri(get(poke_url(card['num'], 640), referer='https://wiki.52poke.com/'), hi), '52poke'
     except Exception: pass
     queue = bills_by_name.get(card['n'], []); idx = name_cursor.get(card['n'], 0)
     if idx < len(queue):
