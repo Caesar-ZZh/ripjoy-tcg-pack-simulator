@@ -33,8 +33,9 @@ function noise(t0, dur, gain = 0.15, freq = 1200) {
   } catch {}
 }
 export const sfx = {
-  tear() { noise(0, 0.28, 0.25, 900); noise(0.08, 0.2, 0.18, 500); tone(180, 0, 0.2, 'sawtooth', 0.04, 60); },
+  tear() { noise(0, 0.28, 0.25, 900); noise(0.08, 0.2, 0.18, 500); tone(180, 0, 0.2, 'sawtooth', 0.04, 60); noise(0.3, 0.14, 0.13, 2600); tone(840, 0.32, 0.1, 'sine', 0.05, 1250); },
   flip() { noise(0, 0.06, 0.08, 2400); tone(520, 0, 0.07, 'triangle', 0.05, 760); },
+  sparkle() { tone(1568, 0, 0.09, 'sine', 0.05); tone(2093, 0.06, 0.12, 'sine', 0.045); },
   reveal(level) {
     tone(660, 0, 0.12); if (level >= 1) tone(880, 0.07, 0.14);
     if (level >= 2) { tone(1108, 0.14, 0.18); noise(0.05, 0.2, 0.06, 3200); }

@@ -35,6 +35,17 @@ const SETS = [
 const LANG_LABEL = { en: '英文版', ja: '日版', 'zh-cn': '简体中文版', 'zh-tw': '繁体中文版' };
 // 真实卡包包装图（Bulbagarden Archives 官方图）：有图的弹撕包时随机用一种包装；无图的弹用追卡卡面设计
 const PACKART = { '151C': ['151C-1.webp', '151C-2.webp', '151C-3.webp'], '151en': ['151en-1.webp'], '151ja': ['151ja-1.webp', '151ja-2.webp'], SV10tw: ['SV10tw-1.webp'], SV9a: ['SV9a-1.webp'], SV9tw: ['SV9tw-1.webp'], me01: ['me01-1.webp', 'me01-2.webp', 'me01-3.webp'], me02: ['me02-1.webp', 'me02-2.webp', 'me02-3.webp'], 'me02.5': ['me02.5-1.webp'], sv01: ['sv01-1.webp', 'sv01-2.webp', 'sv01-3.webp'], sv02: ['sv02-1.webp', 'sv02-2.webp', 'sv02-3.webp'], sv03: ['sv03-1.webp', 'sv03-2.webp', 'sv03-3.webp'], sv04: ['sv04-1.webp', 'sv04-2.webp', 'sv04-3.webp'], 'sv04.5': ['sv04.5-1.webp', 'sv04.5-2.webp', 'sv04.5-3.webp'], sv05: ['sv05-1.webp', 'sv05-2.webp', 'sv05-3.webp'], sv06: ['sv06-1.webp', 'sv06-2.webp'], 'sv06.5': ['sv06.5-1.webp', 'sv06.5-2.webp', 'sv06.5-3.webp'], sv07: ['sv07-1.webp', 'sv07-2.webp', 'sv07-3.webp'], sv08: ['sv08-1.webp', 'sv08-2.webp', 'sv08-3.webp'], 'sv08.5': ['sv08.5-1.webp', 'sv08.5-2.webp', 'sv08.5-3.webp'], sv09: ['sv09-1.webp', 'sv09-2.webp', 'sv09-3.webp'], sv10: ['sv10-1.webp', 'sv10-2.webp', 'sv10-3.webp'], 'sv10.5b': ['sv10.5b-1.webp'], 'sv10.5w': ['sv10.5w-1.webp'], taijing: ['taijing-1.webp'] };
+// 包装图分片懒加载：进撕包页前才拉对应分片，首页零负担；单文件版已全内嵌则直接跳过
+const PACKART_SRC = { taijing: 1, '151C': 1, '151ja': 1, SV9a: 1, SV9tw: 1, SV10tw: 1, sv01: 1, sv02: 1, sv03: 2, sv04: 2, 'sv04.5': 2, sv05: 2, sv06: 2, 'sv06.5': 3, sv07: 3, sv08: 3, 'sv08.5': 3, sv09: 3, sv10: 4, 'sv10.5b': 4, 'sv10.5w': 4, me01: 4, me02: 4, 'me02.5': 4, '151en': 4 };
+const _paLoading = {};
+function ensurePackart(key) {
+  const files = PACKART[key]; if (!files) return Promise.resolve();
+  const have = window.__PACKART_IMG || {};
+  if (files.every(f => have[f])) return Promise.resolve();
+  const part = PACKART_SRC[key]; if (!part) return Promise.resolve();
+  if (!_paLoading[part]) _paLoading[part] = new Promise(res => { const s = document.createElement('script'); s.src = `src/packart-${part}.js`; s.onload = () => res(); s.onerror = () => res(); document.head.appendChild(s); });
+  return _paLoading[part];
+}
 // 带 rk 的卡（简中弹）按其原始稀有度字母展示：SR 就是 SR，不套用英文 UR 口径
 const CN_RARITY_CN = { C: '普通', U: '非普通', R: '稀有闪', RR: '双重稀有', ACE: 'ACE SPEC', SR: '超级稀有', SAR: '特别插画稀有', UR: '金卡', S: '闪色', SSR: '闪色超级稀有' };
 const dispTier = (c) => c.rk || tierOf(c);
@@ -294,6 +305,7 @@ async function ensureStageData(cfg) {
 }
 async function startPack(cfg, isRetry) {
   if (!DATA[cfg.key] && !(await ensureStageData(cfg))) return;
+  await ensurePackart(cfg.key);
   loadHi(cfg);
   const data = DATA[cfg.key];
   const forceTop = !save.firstPackDone;
@@ -309,6 +321,7 @@ async function startPack(cfg, isRetry) {
 
 async function startTen(cfg) {
   if (!DATA[cfg.key] && !(await ensureStageData(cfg))) return;
+  await ensurePackart(cfg.key);
   loadHi(cfg);
   const data = DATA[cfg.key];
   const packs = [];
@@ -386,6 +399,7 @@ function showStage() {
   if (session?.cfg) $('#stage').style.setProperty('--amb', session.cfg.theme);
 }
 function exitStage() {
+  particles.ambientOff();
   $('#stage').style.display = 'none'; $('#setgridWrap').style.display = 'block';
   session = null; renderSets();
 }
@@ -422,13 +436,18 @@ function renderTear() {
   const tear = () => {
     if (!session || session.phase !== 'tear') return;
     session.phase = 'tearing';
-    $('#packEl').classList.add('tearing'); sfx.tear(); vibrate(30);
+    const packEl = $('#packEl');
+    packEl.classList.add('tearing'); sfx.tear(); vibrate(30);
+    const pr = packEl.getBoundingClientRect();
+    particles.ambientOff();
+    particles.shards(pr.left + pr.width / 2, pr.top + pr.height * 0.07);
     setTimeout(() => { session.phase = 'reveal'; renderReveal(); }, 980);
   };
   $('#packEl').addEventListener('click', tear);
   $('#tearBtn').addEventListener('click', tear);
   const sk = $('#skipTearBtn');
-  if (sk) sk.addEventListener('click', () => { if (session?.phase === 'tear') { session.phase = 'reveal'; renderReveal(); } });
+  if (sk) sk.addEventListener('click', () => { if (session?.phase === 'tear') { particles.ambientOff(); session.phase = 'reveal'; renderReveal(); } });
+  particles.ambientOn($('#packEl'));
 }
 
 /* ---------------- 逐张揭晓 ---------------- */
@@ -440,6 +459,7 @@ function renderReveal() {
   st.innerHTML = `
     <div class="revealmeta">${session.tenPacks ? `<span class="packbadge">第 ${session.packNo} / 10 包</span>` : ''}<div class="dots">${dots}</div><span class="revealcount">${idx + 1} / ${pack.length}</span></div>
     <div class="cardstage leak-${entry.level}" id="cardStage">
+      ${entry.level >= 4 ? '<div class="rays" id="raysEl"></div>' : ''}
       <div class="glowrap"></div>
       <div class="card3d" id="card3d" style="--flip:0deg">
         <div class="face backface"><div class="ring"></div><div class="backword">POKÉMON</div><div class="backsub">TRADING CARD GAME</div></div>
@@ -495,7 +515,8 @@ function flipCurrent() {
         banner.style.backgroundColor = TIERS[entry.tier].color;
         banner.classList.add('pop');
       }
-    } else if (entry.level === 1) { sfx.reveal(1); }
+    } else if (entry.level === 1) { fxForLevel(particles, 1, cx, cy); sfx.reveal(1); sfx.sparkle(); }
+    if (entry.level >= 4) { const r = $('#raysEl'); if (r) r.classList.add('on'); }
     const nb = $('#nextBtn'); if (nb) nb.textContent = session.idx === session.pack.length - 1 ? '看结算' : '下一张';
   }, entry.level >= 4 ? 520 : 330);
   const t = TIERS[entry.tier];
@@ -541,7 +562,7 @@ function renderSummary() {
   $('#againBtn').addEventListener('click', () => { ten ? startTen(cfg) : startPack(cfg); });
   $('#toBinderBtn').addEventListener('click', () => { exitStageSilent(); showView('collection'); });
 }
-function exitStageSilent() { $('#stage').style.display = 'none'; $('#setgridWrap').style.display = 'block'; session = null; }
+function exitStageSilent() { particles.ambientOff(); $('#stage').style.display = 'none'; $('#setgridWrap').style.display = 'block'; session = null; }
 
 /* ---------------- 收藏册 ---------------- */
 let collSet = 'all', collTier = 'all';

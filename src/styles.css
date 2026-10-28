@@ -113,6 +113,9 @@ main{max-width:1060px;margin:0 auto;padding:18px 16px calc(28px + var(--safe-b))
 .leak-2 .glowrap{opacity:1;box-shadow:0 0 34px 4px rgba(183,140,255,.75);animation:pulseGlow 1.1s ease-in-out infinite}
 .leak-3 .glowrap{opacity:1;box-shadow:0 0 44px 8px rgba(255,157,92,.8);animation:pulseGlow .9s ease-in-out infinite}
 .leak-4 .glowrap{opacity:1;box-shadow:0 0 58px 14px rgba(255,215,94,.9);animation:pulseGlow .7s ease-in-out infinite}
+.rays{position:absolute;inset:-42%;border-radius:50%;pointer-events:none;opacity:0;z-index:0;background:repeating-conic-gradient(from 0deg,rgba(255,215,94,.17) 0deg 8deg,transparent 8deg 21deg);-webkit-mask-image:radial-gradient(circle,#000 0 40%,transparent 66%);mask-image:radial-gradient(circle,#000 0 40%,transparent 66%);animation:raysSpin 18s linear infinite}
+.rays.on{opacity:1;transition:opacity .6s ease .1s}
+@keyframes raysSpin{to{transform:rotate(1turn)}}
 .glow-1{box-shadow:0 0 26px 2px rgba(94,177,255,.5)}
 .glow-2{box-shadow:0 0 34px 5px rgba(183,140,255,.65)}
 .glow-3{box-shadow:0 0 46px 9px rgba(255,157,92,.75)}

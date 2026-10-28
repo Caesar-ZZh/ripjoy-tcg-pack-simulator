@@ -9,8 +9,8 @@ const strip = (src) => src
   .replace(/^export \{.*\};?$/gm, '');
 
 const css = await read('src/styles.css');
-const packart1 = await read('src/packart-1.js');
-const packart2 = await read('src/packart-2.js');
+let packartJs = '';
+for (const f of (await readdir(new URL('src/', root))).filter(x => /^packart-\d+\.js$/.test(x)).sort()) packartJs += await read('src/' + f) + '\n';
 const jsParts = [];
 for (const f of ['src/engine.js', 'src/particles.js', 'src/fx.js', 'src/app.js']) jsParts.push(strip(await read(f)));
 const embed = {};
@@ -19,11 +19,9 @@ for (const f of (await readdir(new URL('data/', root))).filter(x => x.endsWith('
 }
 let html = await read('index.html');
 html = html.replace(/<link rel="stylesheet" href="src\/styles\.css[^"]*">/, () => `<style>\n${css}\n</style>`);
-html = html.replace('<script src="src/packart-1.js"></script>', () => `<script>${packart1}<\/script>`);
-html = html.replace('<script src="src/packart-2.js"></script>', () => `<script>${packart2}<\/script>`);
 html = html.replace('<script type="module" src="src/app.js"></script>',
-  () => `<script>window.__RIPJOY_EMBED__=${JSON.stringify(embed)};</script>\n<script>\n${jsParts.join('\n')}\n</script>`);
-if (html.includes('src/styles.css') || html.includes('src/packart') || html.includes('src/app.js')) throw new Error('内联不完整：仍有外部资源引用');
+  () => `<script>${packartJs}<\/script>\n<script>window.__RIPJOY_EMBED__=${JSON.stringify(embed)};</script>\n<script>\n${jsParts.join('\n')}\n</script>`);
+if (/<(script|link)[^>]+(src|href)="src\//.test(html)) throw new Error('内联不完整：仍有外部资源引用');
 await mkdir(new URL('dist/', root), { recursive: true });
 await writeFile(new URL('dist/ripjoy-standalone.html', root), html);
 console.log('dist/ripjoy-standalone.html', (html.length / 1024).toFixed(0) + 'KB');
