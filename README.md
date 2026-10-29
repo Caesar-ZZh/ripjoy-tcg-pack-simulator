@@ -4,9 +4,9 @@
 
 选一弹真实卡包，撕开它，逐张翻卡：普通卡快过，AR 彩虹粒子雨，SAR / 金卡全屏接管——金粉爆发、冲击波、合成音效、手机震动，一样不少。
 
-## 案例复盘
+## 产品文档
 
-这个项目为什么这样做（问题 → 决策 → 取舍 → 结果数字）：见 [docs/CASE-STUDY.md](docs/CASE-STUDY.md)；产品文档 [docs/PRD.md](docs/PRD.md)，v2 剖析与规划 [docs/PRD-ANALYSIS-v2.md](docs/PRD-ANALYSIS-v2.md)。
+概率模型、弹系规格与设计取舍：见 [docs/PRD.md](docs/PRD.md)。
 
 ## 在线体验
 
