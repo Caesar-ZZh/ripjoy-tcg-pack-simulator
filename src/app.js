@@ -835,14 +835,17 @@ function renderStats() {
   $('#bestPulls').innerHTML = best.length ? best.map(x => `<div class="historyitem"><img src="${thumbUrl(x.card)}" alt=""><div class="hmeta"><b>${x.card.n}</b> · ${dispTier(x.card)}<br>${x.setName} · 参考价 <span style="color:var(--gold)">${fmtPrice(x.card)}</span></div></div>`).join('') : '<div class="empty">还没有藏品</div>';
   $('#historyList').innerHTML = save.history.length ? save.history.map(h => `<div class="historyitem"><img src="${h.bestId && CARDMAP[h.bestId] ? thumbUrl(CARDMAP[h.bestId].card) : ''}" alt=""><div class="hmeta"><b>${h.bestName}</b> · ${h.bestTier}<br>${h.setName} · ${h.n} 张 · ${new Date(h.ts).toLocaleString('zh-CN', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</div><button class="btn ghost hreport" data-ts="${h.ts}">战报</button></div>`).join('') : '<div class="empty">暂无开包记录</div>';
 }
-$$('#historyList .hreport').forEach(b => b.addEventListener('click', async () => {
+$('#historyList').addEventListener('click', async (e) => {
+  const b = e.target.closest('.hreport'); if (!b) return;
   const h = save.history.find(x => x.ts === +b.dataset.ts); if (!h) return;
-  const m = CARDMAP[h.bestId]; if (!m) return;
-  const cfg = SETS.find(c => c.key === h.setKey);
+  const cfg = SETS.find(c => c.key === h.setKey); if (!cfg) return;
   b.textContent = '生成中…'; b.disabled = true;
-  await showReport(await makeReport({ cfg, best: { card: m.card }, n: h.n, total: null, roi: null, ten: false, ts: h.ts }));
-  b.textContent = '战报'; b.disabled = false;
-}));
+  try {
+    const data = await loadSet(cfg);
+    const card = data.cards.find(c => c.id === h.bestId); if (!card) return;
+    await showReport(await makeReport({ cfg, best: { card }, n: h.n, total: null, roi: null, ten: false, ts: h.ts }));
+  } finally { b.textContent = '战报'; b.disabled = false; }
+});
 $('#resetBtn').addEventListener('click', () => {
   if (!confirm('清空收藏、战绩与历史？此操作不可恢复。')) return;
   localStorage.removeItem(SAVE_KEY); location.reload();
