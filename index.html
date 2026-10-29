@@ -8,7 +8,7 @@
 <meta name="theme-color" content="#070b16">
 <link rel="preconnect" href="https://assets.tcgdex.net" crossorigin>
 <link rel="dns-prefetch" href="https://assets.tcgdex.net">
-<link rel="stylesheet" href="src/styles.css?v=v2ab">
+<link rel="stylesheet" href="src/styles.css?v=v2cd">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='44' fill='%23e2483d'/><path d='M6 50a44 44 0 0 0 88 0z' fill='%23f4f6fb'/><rect x='6' y='46' width='88' height='8' fill='%23111'/><circle cx='50' cy='50' r='13' fill='%23fff' stroke='%23111' stroke-width='6'/></svg>">
 </head>
 <body>
@@ -22,6 +22,7 @@
       <button data-view="open" class="active">开包</button>
       <button data-view="collection">收藏册</button>
       <button data-view="market">行情</button>
+      <button data-view="appraise">卡鉴</button>
       <button data-view="stats">战绩</button>
     </nav>
     <button class="iconbtn" id="muteBtn" title="音效开关">🔊</button>
@@ -105,6 +106,20 @@
     <div id="marketRows"></div>
   </section>
 
+  <!-- 卡鉴 -->
+  <section class="view" id="view-appraise">
+    <h3 style="margin:6px 0 6px">卡鉴 · 估价与评级预检</h3>
+    <p class="note">选一张卡，先看它在本弹的价格分位；再按你手里实卡的状态做四维预检（居中 / 边角 / 边缘 / 表面），得到演示用预估评级区间。这是产品概念演示：识卡与正式评级需要平台的图像识别与评级服务接入。</p>
+    <div class="apgrid">
+      <div class="appick">
+        <select id="apSetSel"></select>
+        <input id="apSearch" type="search" placeholder="按名称或编号搜索本弹卡片">
+        <div class="apresults" id="apResults"></div>
+      </div>
+      <div class="appanel" id="apPanel"><div class="empty">先从左边选一张卡</div></div>
+    </div>
+  </section>
+
   <!-- 战绩 / 概率 -->
   <section class="view" id="view-stats">
     <div class="statgrid" id="statGrid"></div>
@@ -138,6 +153,15 @@
 </footer>
 
 <div class="modal" id="modal"><div class="modalcard" id="modalBody"></div></div>
+
+<div class="modal" id="reportOverlay" hidden><div class="modalcard reportcard">
+  <img id="reportImg" alt="开包战报">
+  <div class="stagebtns" style="margin-top:12px">
+    <a class="btn" id="reportDl" download="ripjoy-report.png">保存图片</a>
+    <button class="btn ghost" id="reportClose">关闭</button>
+  </div>
+  <p class="note" style="text-align:center">手机端也可长按图片保存</p>
+</div></div>
 
 <script type="module" src="src/app.js"></script>
 </body>

@@ -114,6 +114,7 @@ function showView(name) {
   if (name === 'collection') { renderCollection(); ensureMetaLoaded(renderCollection); }
   if (name === 'stats') { renderStats(); ensureMetaLoaded(renderStats); }
   if (name === 'market') renderMarket();
+  if (name === 'appraise') renderAppraise();
   if (name === 'open') { renderSets(); updateAsset(); ensureMetaLoaded(updateAsset); }
 }
 let metaLoading = false;
@@ -560,10 +561,18 @@ function renderSummary() {
     </div>
     <div class="stagebtns" style="margin:22px auto 0">
       <button class="btn" id="againBtn">${ten ? '再来十连' : '再来一包'}</button>
+      <button class="btn ghost" id="reportBtn">生成战报</button>
       <button class="btn ghost" id="toBinderBtn">收藏册</button>
     </div>`;
   $$('#stageBody figure').forEach(f => f.addEventListener('click', () => openDetail(CARDMAP[f.dataset.id].card)));
   $('#againBtn').addEventListener('click', () => { ten ? startTen(cfg) : startPack(cfg); });
+  $('#reportBtn').addEventListener('click', async () => {
+    const btn = $('#reportBtn'); btn.textContent = '生成中…'; btn.disabled = true;
+    const pp = packPrices[cfg.lang];
+    const roi = (pp && pack.some(e => typeof e.card.p === 'number')) ? Math.round(100 * total / (pp * (ten ? 10 : 1))) : null;
+    await showReport(await makeReport({ cfg, best: best, n: pack.length, total: pack.some(e => typeof e.card.p === 'number') ? total : null, roi, ten, ts: Date.now() }));
+    btn.textContent = '生成战报'; btn.disabled = false;
+  });
   $('#toBinderBtn').addEventListener('click', () => { exitStageSilent(); showView('collection'); });
 }
 function exitStageSilent() { particles.ambientOff(); $('#stage').style.display = 'none'; $('#setgridWrap').style.display = 'block'; session = null; }
@@ -692,6 +701,127 @@ function updateAsset() {
   svg.innerHTML = `<polyline points="${pts}" fill="none" stroke="var(--gold)" stroke-width="2" stroke-linejoin="round"/>`;
 }
 
+/* ---------------- 战报分享图（模块 C） ---------------- */
+function loadImgEl(src, cors) { return new Promise((res, rej) => { const i = new Image(); if (cors) i.crossOrigin = 'anonymous'; i.onload = () => res(i); i.onerror = rej; i.src = src; }); }
+async function makeReport({ cfg, best, n, total, roi, ten, ts }) {
+  const W = 1080, H = 1440;
+  const cv = document.createElement('canvas'); cv.width = W; cv.height = H;
+  const x = cv.getContext('2d');
+  const g = x.createLinearGradient(0, 0, 0, H); g.addColorStop(0, '#101a30'); g.addColorStop(1, '#070b16');
+  x.fillStyle = g; x.fillRect(0, 0, W, H);
+  const rg = x.createRadialGradient(W / 2, 300, 40, W / 2, 300, 620);
+  rg.addColorStop(0, 'rgba(255,215,94,.28)'); rg.addColorStop(1, 'rgba(255,215,94,0)');
+  x.fillStyle = rg; x.fillRect(0, 0, W, H);
+  x.textAlign = 'center'; x.fillStyle = '#eef2fb';
+  x.font = '800 66px system-ui, -apple-system, sans-serif';
+  x.fillText(ten ? '十连开战报' : '开包战报', W / 2, 128);
+  x.font = '500 33px system-ui, -apple-system, sans-serif'; x.fillStyle = '#93a1bd';
+  const setName = cfg ? (DATA[cfg.key]?.name || cfg.sname || '') : '';
+  x.fillText(`${setName} · ${new Date(ts).toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' })}`, W / 2, 192);
+  const src = imgUrl(best.card, true);
+  let img = null;
+  try { img = await loadImgEl(src, !src.startsWith('data:')); } catch { try { img = await loadImgEl(src, false); } catch {} }
+  const iw = 590, ih = Math.round(iw * 1.397), ix = (W - iw) / 2, iy = 236;
+  x.save();
+  x.beginPath(); x.roundRect(ix, iy, iw, ih, 26); x.clip();
+  if (img) x.drawImage(img, ix, iy, iw, ih);
+  else { x.fillStyle = '#182440'; x.fillRect(ix, iy, iw, ih); x.fillStyle = '#eef2fb'; x.font = '700 44px system-ui'; x.fillText(best.card.n, W / 2, iy + ih / 2); }
+  x.restore();
+  x.strokeStyle = 'rgba(255,215,94,.65)'; x.lineWidth = 3;
+  x.beginPath(); x.roundRect(ix, iy, iw, ih, 26); x.stroke();
+  let yy = iy + ih + 84;
+  x.fillStyle = '#ffd75e'; x.font = '800 46px system-ui, -apple-system, sans-serif';
+  x.fillText(`最佳 · ${best.card.n}`, W / 2, yy); yy += 58;
+  x.fillStyle = '#eef2fb'; x.font = '600 36px system-ui, -apple-system, sans-serif';
+  const parts = [`${dispTier(best.card)} · ${fmtPrice(best.card)}`, `共 ${n} 张`];
+  if (total != null) parts.push(`总值 €${total.toFixed(2)}`);
+  if (roi != null) parts.push(`回报率 ${roi}%`);
+  x.fillText(parts.join('  ·  '), W / 2, yy);
+  x.fillStyle = '#5f6d88'; x.font = '500 27px system-ui, -apple-system, sans-serif';
+  x.fillText('开包有喜 RipJoy · caesar-zzh.github.io/ripjoy-tcg-pack-simulator', W / 2, H - 84);
+  x.fillText('粉丝非官方作品 · 概率全公示 · 理性开包', W / 2, H - 44);
+  return cv;
+}
+$('#reportClose').addEventListener('click', () => { const ov = $('#reportOverlay'); ov.hidden = true; ov.classList.remove('open'); });
+$('#reportOverlay').addEventListener('click', (e) => { if (e.target.id === 'reportOverlay') { e.target.hidden = true; e.target.classList.remove('open'); } });
+function showReport(cv) {
+  const ov = $('#reportOverlay'); const url = cv.toDataURL('image/png');
+  $('#reportImg').src = url;
+  const dl = $('#reportDl'); dl.href = url;
+  ov.hidden = false; ov.classList.add('open');
+}
+
+/* ---------------- 卡鉴：估价与评级预检（模块 D） ---------------- */
+const AP_DIMS = [
+  { k: 'center', name: '居中', w: 0.30, low: '居中偏移明显：送评前先量四边比例，偏移 >60/40 时评级上限会明显受限。' },
+  { k: 'corner', name: '边角', w: 0.25, low: '边角有白点或磨损：这是最常见的扣分项，裸卡存放请用卡膜 + 卡盒。' },
+  { k: 'edge', name: '边缘', w: 0.20, low: '边缘有磕碰或银边：避免指甲直接捏卡边取卡。' },
+  { k: 'surface', name: '表面', w: 0.25, low: '表面有划痕或指纹：送评前可用超细纤维布轻拭，避免任何液体。' },
+];
+let apCfg = null, apCard = null;
+const apScores = { center: 9, corner: 9, edge: 9, surface: 9 };
+let apBound = false;
+async function renderAppraise() {
+  const sel = $('#apSetSel');
+  if (!apBound) {
+    apBound = true;
+    sel.innerHTML = SETS.map(c => `<option value="${c.key}">${c.sname || c.key}（${LANGNAME[c.lang] || c.lang}）</option>`).join('');
+    apCfg = SETS[0];
+    sel.addEventListener('change', async () => { apCfg = SETS.find(c => c.key === sel.value); apCard = null; renderApPanel(); await loadSet(apCfg); renderApResults(); });
+    $('#apSearch').addEventListener('input', () => renderApResults());
+    await loadSet(apCfg);
+  }
+  renderApResults(); renderApPanel();
+}
+function renderApResults() {
+  const box = $('#apResults'); if (!box || !apCfg) return;
+  const data = DATA[apCfg.key];
+  if (!data) { box.innerHTML = '<div class="empty">加载卡池中…</div>'; return; }
+  const q = ($('#apSearch').value || '').trim().toLowerCase();
+  const list = data.cards.filter(c => !q || c.n.toLowerCase().includes(q) || String(c.no).includes(q)).slice(0, 60);
+  box.innerHTML = list.length ? list.map(c => `<button class="apcard${apCard && apCard.id === c.id ? ' sel' : ''}" data-id="${c.id}"><img src="${thumbUrl(c)}" alt="" loading="lazy"><span>${c.n}</span><small>No.${c.no} · ${dispTier(c)}</small></button>`).join('') : '<div class="empty">本弹没有匹配的卡</div>';
+  box.querySelectorAll('.apcard').forEach(b => b.addEventListener('click', () => { apCard = data.cards.find(c => c.id === b.dataset.id); renderApResults(); renderApPanel(); }));
+}
+function apGrade(score) {
+  if (score >= 9.2) return ['预估 9–10 分区间', '状态极佳，值得正式送评冲高分。'];
+  if (score >= 8.2) return ['预估 8–9 分区间', '有小瑕疵但整体强势，送评性价比不错。'];
+  if (score >= 7.0) return ['预估 7–8 分区间', '瑕疵开始影响上限，可先预检同卡其他副本。'];
+  return ['预估 7 分以下', '建议以裸卡收藏为主，或换一张状态更好的副本送评。'];
+}
+function renderApPanel() {
+  const p = $('#apPanel'); if (!p) return;
+  if (!apCard || !apCfg) { p.innerHTML = '<div class="empty">先从左边选一张卡</div>'; return; }
+  const data = DATA[apCfg.key];
+  const priced = data.cards.filter(c => typeof c.p === 'number' && c.p > 0).map(c => c.p).sort((a, b) => a - b);
+  let pctLine = '本弹暂无市场参考价';
+  if (typeof apCard.p === 'number' && priced.length) {
+    const below = priced.filter(v => v < apCard.p).length;
+    pctLine = `参考价 €${apCard.p.toFixed(2)} · 比本弹 ${Math.round(100 * below / priced.length)}% 的卡贵`;
+  }
+  const tierKinds = data.cards.filter(c => dispTier(c) === dispTier(apCard)).length;
+  const score = AP_DIMS.reduce((s2, d) => s2 + d.w * apScores[d.k], 0);
+  const [grade, advice] = apGrade(score);
+  p.innerHTML = `
+    <div class="aphead"><img src="${imgUrl(apCard)}" alt=""><div>
+      <b>${apCard.n}</b><div class="apmeta">No.${apCard.no} · ${dispTierLabel(apCard)} · 本弹同档共 ${tierKinds} 种</div>
+      <div class="apmeta">${pctLine}</div></div></div>
+    <h4>评级预检（演示）</h4>
+    ${AP_DIMS.map(d => `<div class="apdim"><label>${d.name} <b id="apv-${d.k}">${apScores[d.k]}</b></label><input type="range" min="1" max="10" step="0.5" value="${apScores[d.k]}" data-dim="${d.k}">${apScores[d.k] <= 6 ? `<p class="aptip">${d.low}</p>` : ''}</div>`).join('')}
+    <div class="apscore"><span>预检分 <b>${score.toFixed(1)}</b> / 10</span><span class="apgrade">${grade}</span></div>
+    <p class="note">${advice} 本预检为产品概念演示，不构成评级意见；正式评级请走集换社等平台送评。</p>`;
+  p.querySelectorAll('input[type=range]').forEach(r => {
+    r.addEventListener('input', () => {
+      apScores[r.dataset.dim] = parseFloat(r.value);
+      const lbl = $(`#apv-${r.dataset.dim}`); if (lbl) lbl.textContent = r.value;
+      const sc = AP_DIMS.reduce((s2, d) => s2 + d.w * apScores[d.k], 0);
+      const [gr] = apGrade(sc);
+      const box = p.querySelector('.apscore');
+      if (box) box.innerHTML = `<span>预检分 <b>${sc.toFixed(1)}</b> / 10</span><span class="apgrade">${gr}</span>`;
+    });
+    r.addEventListener('change', () => renderApPanel());
+  });
+}
+
 /* ---------------- 战绩 / 概率 ---------------- */
 function renderStats() {
   const s = save.stats;
@@ -703,8 +833,16 @@ function renderStats() {
     <div class="statcard"><div class="v">${s.l4}</div><div class="k">SAR / 金卡次数</div></div>
     <div class="statcard"><div class="v">${s.l3}</div><div class="k">AR / UR 次数</div></div>`;
   $('#bestPulls').innerHTML = best.length ? best.map(x => `<div class="historyitem"><img src="${thumbUrl(x.card)}" alt=""><div class="hmeta"><b>${x.card.n}</b> · ${dispTier(x.card)}<br>${x.setName} · 参考价 <span style="color:var(--gold)">${fmtPrice(x.card)}</span></div></div>`).join('') : '<div class="empty">还没有藏品</div>';
-  $('#historyList').innerHTML = save.history.length ? save.history.map(h => `<div class="historyitem"><img src="${h.bestId && CARDMAP[h.bestId] ? thumbUrl(CARDMAP[h.bestId].card) : ''}" alt=""><div class="hmeta"><b>${h.bestName}</b> · ${h.bestTier}<br>${h.setName} · ${h.n} 张 · ${new Date(h.ts).toLocaleString('zh-CN', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</div></div>`).join('') : '<div class="empty">暂无开包记录</div>';
+  $('#historyList').innerHTML = save.history.length ? save.history.map(h => `<div class="historyitem"><img src="${h.bestId && CARDMAP[h.bestId] ? thumbUrl(CARDMAP[h.bestId].card) : ''}" alt=""><div class="hmeta"><b>${h.bestName}</b> · ${h.bestTier}<br>${h.setName} · ${h.n} 张 · ${new Date(h.ts).toLocaleString('zh-CN', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</div><button class="btn ghost hreport" data-ts="${h.ts}">战报</button></div>`).join('') : '<div class="empty">暂无开包记录</div>';
 }
+$$('#historyList .hreport').forEach(b => b.addEventListener('click', async () => {
+  const h = save.history.find(x => x.ts === +b.dataset.ts); if (!h) return;
+  const m = CARDMAP[h.bestId]; if (!m) return;
+  const cfg = SETS.find(c => c.key === h.setKey);
+  b.textContent = '生成中…'; b.disabled = true;
+  await showReport(await makeReport({ cfg, best: { card: m.card }, n: h.n, total: null, roi: null, ten: false, ts: h.ts }));
+  b.textContent = '战报'; b.disabled = false;
+}));
 $('#resetBtn').addEventListener('click', () => {
   if (!confirm('清空收藏、战绩与历史？此操作不可恢复。')) return;
   localStorage.removeItem(SAVE_KEY); location.reload();
