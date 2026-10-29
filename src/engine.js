@@ -81,8 +81,44 @@ function drawRare(pools, used, forceTop = false) {
   return { card: c, reverse: false };
 }
 
-/** 生成一包。包规格由 setData.pack 决定：10 = 4C+3U+2反+1稀；7 = 3C+2U+1反+1稀；5 = 2C+1U+1反+1稀。forceTop = 首包保底 */
+/** 简中官方口径：setData.spec 存在时按官方构成（平卡槽 + 闪卡槽）抽卡。
+ *  spec.variants = 构成变体（plain/foil 张数 + 权重）；plainTypes = 平卡档位及种类数；
+ *  spec.foilGroups = 闪卡档位组（w 为官方生产配比，组内按种类数比例 roll 档位）。
+ *  BALL / MASTER 为虚拟档位：抽一张平卡种类的卡并标记球纹工艺（数据集无独立球纹印刷条目）。 */
+function openSpecPack(setData, { forceTop = false } = {}) {
+  const spec = setData.spec;
+  const rkPools = {};
+  for (const c of setData.cards) (rkPools[c.rk || tierOf(c)] ||= []).push(c);
+  const used = new Set();
+  const cards = [];
+  const variant = weighted(spec.variants.map(v => [v, v.w]));
+  const drawPlainKind = () => {
+    const t = weighted(spec.plainTypes);
+    return pickUnique(rkPools, [t], used);
+  };
+  for (let i = 0; i < variant.plain; i++) {
+    const c = drawPlainKind();
+    if (c) cards.push({ card: c, reverse: false, slot: 'plain' });
+  }
+  for (let i = 0; i < variant.foil; i++) {
+    const isLast = i === variant.foil - 1;
+    const groups = (forceTop && isLast) ? [spec.foilGroups[spec.foilGroups.length - 1]] : spec.foilGroups;
+    const group = weighted(groups.map(g => [g, g.w]));
+    const type = weighted(group.types);
+    if (type === 'BALL' || type === 'MASTER') {
+      const c = drawPlainKind();
+      if (c) cards.push({ card: c, reverse: true, slot: 'foil', foilPattern: type === 'BALL' ? 'ball' : 'master', lvl: type === 'BALL' ? 1 : 2 });
+    } else {
+      const c = pickUnique(rkPools, [type], used) || drawPlainKind();
+      if (c) cards.push({ card: c, reverse: false, slot: 'foil' });
+    }
+  }
+  return cards;
+}
+
+/** 生成一包。简中弹优先走 setData.spec 官方口径；其余按 setData.pack 张数：10 = 4C+3U+2反+1稀；7 = 3C+2U+1反+1稀；5 = 2C+1U+1反+1稀。forceTop = 首包保底 */
 export function openPack(setData, pools, { forceTop = false } = {}) {
+  if (setData.spec) return openSpecPack(setData, { forceTop });
   const used = new Set();
   const cards = [];
   const size = setData.pack || (setData.lang === 'ja' ? 7 : 10);

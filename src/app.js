@@ -4,11 +4,11 @@ import { sfx, vibrate, VIB, addTilt, setMuted } from './fx.js';
 import { BACKS } from './cardbacks.js';
 
 const SETS = [
-  { key: 'taijing', file: 'data/zh-cn-CSV9.5C.json', theme: 'linear-gradient(150deg,#5e1a6e,#b83fd0 55%,#ff8ad8)', desc: '简体中文版 · 伊布全家太晶盛聚 · 含简中专属异画', chaseNote: '仙子伊布 ex SAR（简中专属异画）', sname: '太晶盛聚', lang: 'zh-cn', total: 259, pack: 10, parts: 5 },
-  { key: 'CSV9C', file: 'data/zh-cn-CSV9C.json', theme: 'linear-gradient(150deg,#40205e,#7a4fd0 55%,#f2a8e0)', desc: '简体中文版 · 晶璃星辉 · 太乐巴戈斯集结', chaseNote: '太乐巴戈斯 ex SAR', sname: '星彩晶璃', lang: 'zh-cn', total: 266, pack: 5, parts: 5 },
-  { key: 'CSV8C', file: 'data/zh-cn-CSV8C.json', theme: 'linear-gradient(150deg,#0d2e3d,#14607a 55%,#4fd8c8)', desc: '简体中文版 · 诡幻璀璨 · 桃歹郎一族', chaseNote: '桃歹郎 ex SAR', sname: '璀璨诡幻', lang: 'zh-cn', total: 264, pack: 5, parts: 5 },
-  { key: 'CSV7C', file: 'data/zh-cn-CSV7C.json', theme: 'linear-gradient(150deg,#27364d,#4a6a96 55%,#ffb37a)', desc: '简体中文版 · 利刃猛醒 · 猛雷鼓咆哮', chaseNote: '猛雷鼓 ex SAR', sname: '利刃猛醒', lang: 'zh-cn', total: 259, pack: 5, parts: 5 },
-  { key: '151C', file: 'data/zh-cn-151C.json', theme: 'linear-gradient(150deg,#7a1620,#d03a2f 55%,#ffd75e)', desc: '简体中文版 · 初代 151 情怀 · 旅望惊聚全集', chaseNote: '喷火龙 ex SAR', sname: '收集啦151', lang: 'zh-cn', total: 192, pack: 5, parts: 7 },
+  { key: 'taijing', file: 'data/zh-cn-CSV9.5C.json', theme: 'linear-gradient(150deg,#5e1a6e,#b83fd0 55%,#ff8ad8)', desc: '简体中文版 · 伊布全家太晶盛聚 · 含简中专属异画', chaseNote: '仙子伊布 ex SAR（简中专属异画）', sname: '太晶盛聚', lang: 'zh-cn', total: 259, pack: 10, parts: 5, official: true },
+  { key: 'CSV9C', file: 'data/zh-cn-CSV9C.json', theme: 'linear-gradient(150deg,#40205e,#7a4fd0 55%,#f2a8e0)', desc: '简体中文版 · 晶璃星辉 · 太乐巴戈斯集结', chaseNote: '太乐巴戈斯 ex SAR', sname: '星彩晶璃', lang: 'zh-cn', total: 266, pack: 5, parts: 5, official: true },
+  { key: 'CSV8C', file: 'data/zh-cn-CSV8C.json', theme: 'linear-gradient(150deg,#0d2e3d,#14607a 55%,#4fd8c8)', desc: '简体中文版 · 诡幻璀璨 · 桃歹郎一族', chaseNote: '桃歹郎 ex SAR', sname: '璀璨诡幻', lang: 'zh-cn', total: 264, pack: 5, parts: 5, official: true },
+  { key: 'CSV7C', file: 'data/zh-cn-CSV7C.json', theme: 'linear-gradient(150deg,#27364d,#4a6a96 55%,#ffb37a)', desc: '简体中文版 · 利刃猛醒 · 猛雷鼓咆哮', chaseNote: '猛雷鼓 ex SAR', sname: '利刃猛醒', lang: 'zh-cn', total: 259, pack: 5, parts: 5, official: true },
+  { key: '151C', file: 'data/zh-cn-151C.json', theme: 'linear-gradient(150deg,#7a1620,#d03a2f 55%,#ffd75e)', desc: '简体中文版 · 初代 151 情怀 · 旅望惊聚全集', chaseNote: '喷火龙 ex SAR', sname: '收集啦151', lang: 'zh-cn', total: 192, pack: 5, parts: 7, official: true },
   { key: '151en', file: 'data/en-sv03.5.json', theme: 'linear-gradient(150deg,#8f1f16,#e2483d 55%,#ff8a5c)', desc: '初代 151 情怀弹 · 喷火龙 SAR 大追', chaseNote: '喷火龙 ex SAR', sname: '151', lang: 'en', total: 207, pack: 10 },
   { key: 'sv08.5', file: 'data/en-sv08.5.json', theme: 'linear-gradient(150deg,#6e1a4d,#d03f8a 55%,#ffb3d9)', desc: '伊布盛宴 · 月亮伊布 ex SAR 天价追卡', chaseNote: '月亮伊布 ex SAR', sname: 'Prismatic Evolutions', lang: 'en', total: 180, pack: 10 },
   { key: 'sv08', file: 'data/en-sv08.json', theme: 'linear-gradient(150deg,#8a6410,#e8a812 55%,#ffd75e)', desc: '电光四射 · 皮卡丘 SAR 天价追卡', chaseNote: '皮卡丘 ex SAR', sname: 'Surging Sparks', lang: 'en', total: 252, pack: 10 },
@@ -113,7 +113,8 @@ function showView(name) {
   window.scrollTo({ top: 0 });
   if (name === 'collection') { renderCollection(); ensureMetaLoaded(renderCollection); }
   if (name === 'stats') { renderStats(); ensureMetaLoaded(renderStats); }
-  if (name === 'open') renderSets();
+  if (name === 'market') renderMarket();
+  if (name === 'open') { renderSets(); updateAsset(); ensureMetaLoaded(updateAsset); }
 }
 let metaLoading = false;
 const IDP = { taijing: ['CSV9.5C'], CSV9C: ['CSV9C'], CSV8C: ['CSV8C'], CSV7C: ['CSV7C'], '151C': ['151C-惊', '151C-旅', '151C-望', '151C-聚'], '151en': ['sv03.5'], 'sv08.5': ['sv08.5'], sv08: ['sv08'], sv09: ['sv09'], sv10: ['sv10'], me01: ['me01'], sv05: ['sv05'], 'sv10.5b': ['sv10.5b'], 'sv10.5w': ['sv10.5w'], me02: ['me02'], 'me02.5': ['me02.5'], 'sv04.5': ['sv04.5'], 'sv06.5': ['sv06.5'], sv06: ['sv06'], sv07: ['sv07'], sv04: ['sv04'], sv01: ['sv01'], sv02: ['sv02'], sv03: ['sv03'], '151ja': ['SV2a'], SV9a: ['SV9a'], SV9tw: ['SV9'], SV10tw: ['SV10'] };
@@ -167,7 +168,7 @@ function renderSets() {
       </div>
       <div class="setbody">
         <h3>${cfg.sname} <span style="color:var(--dim2);font-size:12px">${LANG_LABEL[cfg.lang] || cfg.lang} · ${cfg.total} 张</span></h3>
-        <p class="setmeta">${cfg.desc}<br><span data-fill="chase">大追：<span class="chase-name">${cfg.chaseNote}</span></span> · 每包 ${cfg.pack} 张</p>
+        <p class="setmeta">${cfg.desc}<br><span data-fill="chase">大追：<span class="chase-name">${cfg.chaseNote}</span></span> · 每包 ${cfg.pack} 张${cfg.official ? ' · <b style="color:var(--gold)">官方封入率</b>' : ''}</p>
         <div class="progressline"><i data-fill="bar" style="width:0%"></i></div>
         <p class="setmeta" data-fill="prog">图鉴收集 … / ${cfg.total}</p>
         <div class="setbtns">
@@ -313,7 +314,7 @@ async function startPack(cfg, isRetry) {
   const forceTop = !save.firstPackDone;
   const pack = openPack(data, POOLS[cfg.key], { forceTop });
   if (forceTop) save.firstPackDone = true;
-  pack.forEach(e => { e.isNew = collect(e); e.tier = tierOf(e.card); e.level = TIERS[e.tier].level; });
+  pack.forEach(e => { e.isNew = collect(e); e.tier = tierOf(e.card); e.level = e.lvl != null ? e.lvl : TIERS[e.tier].level; });
   finishPackToHistory(cfg, pack);
   session = { cfg, pack, idx: 0, revealed: false, phase: 'tear' };
   showStage();
@@ -331,7 +332,7 @@ async function startTen(cfg) {
     const forceTop = i === 0 && !save.firstPackDone; // 首包保底也适用于人生第一次十连
     const pack = openPack(data, POOLS[cfg.key], { forceTop });
     if (forceTop) save.firstPackDone = true;
-    pack.forEach(e => { e.isNew = collect(e); e.tier = tierOf(e.card); e.level = TIERS[e.tier].level; });
+    pack.forEach(e => { e.isNew = collect(e); e.tier = tierOf(e.card); e.level = e.lvl != null ? e.lvl : TIERS[e.tier].level; });
     finishPackToHistory(cfg, pack); packs.push(pack);
   }
   session = { cfg, pack: packs[0], idx: 0, revealed: false, phase: 'tear', tenPacks: packs, packNo: 1 };
@@ -524,7 +525,7 @@ function flipCurrent() {
   }, entry.level >= 4 ? 520 : 330);
   const t = TIERS[entry.tier];
   $('#cardInfo').innerHTML = `
-    <div class="cname">${entry.card.n}<span class="tierbadge" style="background:${t.color}">${dispTier(entry.card)}</span>${entry.reverse ? '<span class="revtag">反闪</span>' : ''}${entry.isNew ? '<span class="newtag">NEW</span>' : ''}</div>
+    <div class="cname">${entry.card.n}<span class="tierbadge" style="background:${t.color}">${dispTier(entry.card)}</span>${entry.foilPattern === 'ball' ? '<span class="revtag">精灵球纹样</span>' : entry.foilPattern === 'master' ? '<span class="revtag">大师球纹样</span>' : entry.reverse ? '<span class="revtag">反闪</span>' : ''}${entry.isNew ? '<span class="newtag">NEW</span>' : ''}</div>
     <div class="cmeta">No.${entry.card.no} · ${dispTierLabel(entry.card)} · 参考价 <b style="color:var(--gold)">${fmtPrice(entry.card)}</b>${entry.card.ill ? ` · 画师 ${entry.card.ill}` : ''} · 点卡片看大图，点「下一张」继续</div>`;
   $('#cardInfo').addEventListener('click', () => openDetail(entry.card));
   renderTray();
@@ -547,7 +548,7 @@ function renderSummary() {
   st.innerHTML = `
     <div class="summaryhead">
       <h2>${ten ? '十连开 · 总结算' : best.level >= 4 ? '🎉 神抽！' : best.level === 3 ? '✨ 出货了！' : '本包结算'}</h2>
-      <p>${ten ? `共 ${pack.length} 张` : `${data.name}`} · 参考价合计 <b>${pack.some(e => e.card.p != null) ? `€${total.toFixed(2)}` : '—'}</b> · 新卡 <b>${news}</b> 张${ten && sorted.some(e => e.level >= 4) ? ' · <b>含 SAR/HR！</b>' : ''}</p>
+      <p>${ten ? `共 ${pack.length} 张` : `${data.name}`} · 参考价合计 <b>${pack.some(e => e.card.p != null) ? `€${total.toFixed(2)}` : '—'}</b> · 新卡 <b>${news}</b> 张${ten && sorted.some(e => e.level >= 4) ? ' · <b>含 SAR/HR！</b>' : ''}${roiText(cfg, total, ten)}</p>
     </div>
     <div class="bestpull" style="--bc:${TIERS[best.tier].color}"><span class="besttag">最佳 · ${dispTier(best.card)} · ${fmtPrice(best.card)}</span><img src="${imgUrl(best.card, true)}" alt="${best.card.n}"></div>
     <p style="text-align:center;color:var(--dim);font-size:13px">${best.card.n}</p>
@@ -584,11 +585,111 @@ function renderCollection() {
     <div class="statcard"><div class="v">${owned.length}<span style="font-size:13px;color:var(--dim)"> / ${totalCards}</span></div><div class="k">已收集图鉴</div></div>
     <div class="statcard"><div class="v">${save.stats.cards}</div><div class="k">累计开出（含重复）</div></div>
     <div class="statcard"><div class="v">${owned.filter(x => TIERS[tierOf(x.card)].level >= 3).length}</div><div class="k">AR 以上藏品</div></div>`;
+  $('#collSummary').insertAdjacentHTML('beforeend', `<div class="statcard"><div class="v">€${collectionValue().v.toFixed(2)}</div><div class="k">收藏估值（参考价）</div></div>`);
   $('#collGrid').innerHTML = filtered.length ? filtered.map(x => {
     const t = tierOf(x.card);
     return `<figure data-id="${x.card.id}"><span class="countbadge">×${x.n}</span><img src="${imgUrl(x.card)}" alt="${x.card.n}" loading="lazy" decoding="async"><figcaption><span class="rdot" style="background:${TIERS[t].color}"></span><b>${x.card.n}</b><br>${dispTier(x.card)} · ${fmtPrice(x.card)}</figcaption></figure>`;
   }).join('') : `<div class="empty" style="grid-column:1/-1">这里还没有卡<br>去撕一包，把第一张 SAR 带回来</div>`;
   $$('#collGrid figure').forEach(f => f.addEventListener('click', () => openDetail(CARDMAP[f.dataset.id].card)));
+}
+
+/* ---------------- 行情 / 期望值 ---------------- */
+const PP_KEY = 'ripjoy.packprice.v1';
+const packPrices = { en: 5.49, ja: 2.50, 'zh-tw': 4.00 };
+try { Object.assign(packPrices, JSON.parse(localStorage.getItem(PP_KEY) || '{}')); } catch {}
+const evCache = {};
+const LANGNAME = { 'zh-cn': '简中', en: 'EN', ja: '日版', 'zh-tw': '繁中' };
+function priceCoverage(data) {
+  const priced = data.cards.filter(c => typeof c.p === 'number' && c.p > 0).length;
+  const topOk = data.cards.filter(c => ['SAR', 'HR', 'BWR'].includes(tierOf(c))).every(c => typeof c.p === 'number' && c.p > 0);
+  return { share: priced / data.cards.length, topOk };
+}
+async function computeEV(cfg, sims = 4000) {
+  if (evCache[cfg.key]) return evCache[cfg.key];
+  const data = await loadSet(cfg);
+  const cov = priceCoverage(data);
+  if (cov.share < 0.9 || !cov.topOk) { evCache[cfg.key] = { ineligible: true, share: cov.share }; return evCache[cfg.key]; }
+  const pools = buildPools(data);
+  const vals = []; let topPacks = 0;
+  for (let i = 0; i < sims; i++) {
+    const p = openPack(data, pools, {});
+    let v = 0, top = false;
+    for (const e of p) { if (typeof e.card.p === 'number') v += e.card.p; if (['SAR', 'HR', 'BWR'].includes(tierOf(e.card))) top = true; }
+    vals.push(v); if (top) topPacks++;
+  }
+  vals.sort((a, b) => a - b);
+  const res = { vals, ev: vals.reduce((a, b) => a + b, 0) / sims, median: vals[sims >> 1], pTop: topPacks / sims };
+  res.expPacks = res.pTop > 0 ? 1 / res.pTop : null;
+  evCache[cfg.key] = res; return res;
+}
+const pReturn = (r, pp) => (pp && r.vals) ? r.vals.filter(v => v >= pp).length / r.vals.length : null;
+function roiText(cfg, total, ten) {
+  const pp = packPrices[cfg.lang];
+  if (!pp || !DATA[cfg.key] || !DATA[cfg.key].cards.some(c => typeof c.p === 'number')) return '';
+  return ` · 回报率 <b>${Math.round(100 * total / (pp * (ten ? 10 : 1)))}%</b>（参考包价 €${pp}）`;
+}
+function fillMarketRow(cfg, r) {
+  const body = $(`#mrow-${cfg.key} [data-body]`); if (!body) return;
+  if (r.ineligible) { body.innerHTML = `<span class="mna">价格覆盖不足（${Math.round(r.share * 100)}%），不计算</span>`; return; }
+  const pp = packPrices[cfg.lang];
+  const pr = pReturn(r, pp);
+  body.innerHTML = `<div class="mstats">
+    <div><b>€${r.ev.toFixed(2)}</b><span>期望卡值 / 包</span></div>
+    <div><b>€${r.median.toFixed(2)}</b><span>中位卡值</span></div>
+    <div><b>${pr != null ? Math.round(pr * 100) + '%' : '—'}</b><span>回本概率（包价 €${pp}）</span></div>
+    <div><b>${r.expPacks ? '约 ' + r.expPacks.toFixed(0) + ' 包' : '—'}</b><span>出一张 SAR / 金卡</span></div>
+  </div>`;
+  const meta = $(`.setcard[data-key="${cfg.key}"] .setmeta`); if (meta && !meta.dataset.ev) { meta.dataset.ev = '1'; meta.insertAdjacentHTML('beforeend', ` · 期望 <b style="color:var(--gold)">€${r.ev.toFixed(2)}</b>/包`); }
+}
+function renderMarket() {
+  for (const lang of ['en', 'ja', 'zh-tw']) { const inp = $('#pp-' + lang); if (inp && document.activeElement !== inp) inp.value = packPrices[lang]; }
+  const rows = $('#marketRows');
+  rows.innerHTML = SETS.map(cfg => `<div class="mrow" id="mrow-${cfg.key}">
+    <div class="mhead"><b>${cfg.sname || cfg.key}</b><span class="mtag">${LANGNAME[cfg.lang] || cfg.lang}</span>${cfg.official ? '<span class="mtag gold">官方封入率</span>' : ''}</div>
+    <div class="mbody" data-body>${cfg.lang === 'zh-cn' ? '<span class="mna">暂无行情数据 · 简中卡暂无市场参考价</span>' : '<button class="btn ghost mcalc">计算期望值（模拟 4,000 包）</button>'}</div>
+  </div>`).join('');
+  rows.querySelectorAll('.mrow').forEach(row => {
+    const btn = row.querySelector('.mcalc'); if (!btn) return;
+    const cfg = SETS.find(c => 'mrow-' + c.key === row.id);
+    if (evCache[cfg.key]) fillMarketRow(cfg, evCache[cfg.key]);
+    btn.addEventListener('click', async () => { btn.textContent = '模拟中…'; btn.disabled = true; fillMarketRow(cfg, await computeEV(cfg)); });
+  });
+}
+for (const lang of ['en', 'ja', 'zh-tw']) {
+  const inp = $('#pp-' + lang); if (!inp) continue;
+  inp.addEventListener('change', () => {
+    const v = parseFloat(inp.value); if (!(v >= 0)) return;
+    packPrices[lang] = v; try { localStorage.setItem(PP_KEY, JSON.stringify(packPrices)); } catch {}
+    for (const cfg of SETS) if (evCache[cfg.key] && !evCache[cfg.key].ineligible) fillMarketRow(cfg, evCache[cfg.key]);
+  });
+}
+
+/* ---------------- 收藏资产卡 ---------------- */
+function collectionValue() {
+  let v = 0, kinds = 0;
+  for (const [id, rec] of Object.entries(save.collection)) {
+    const m = CARDMAP[id]; if (!m) continue;
+    kinds++; if (typeof m.card.p === 'number') v += m.card.p * rec.n;
+  }
+  return { v, kinds };
+}
+function updateAsset() {
+  const el = $('#assetCard'); if (!el) return;
+  const { v, kinds } = collectionValue();
+  if (!kinds) { el.hidden = true; return; }
+  el.hidden = false;
+  $('#assetValue').textContent = '€' + v.toFixed(2);
+  $('#assetNote').textContent = ` · ${kinds} 种藏品 · 已开 ${save.stats.packs} 包`;
+  const today = new Date().toISOString().slice(0, 10);
+  save.snaps = save.snaps || [];
+  const last = save.snaps[save.snaps.length - 1];
+  if (!last || last.d !== today) save.snaps.push({ d: today, v: +v.toFixed(2) }); else last.v = +v.toFixed(2);
+  save.snaps = save.snaps.slice(-30); persist();
+  const svg = $('#assetSpark'); const sn = save.snaps;
+  if (sn.length < 2) { svg.innerHTML = ''; return; }
+  const vs = sn.map(x => x.v); const mn = Math.min(...vs), mx = Math.max(...vs), rg = (mx - mn) || 1;
+  const pts = vs.map((x, i) => `${(i / (vs.length - 1)) * 116 + 2},${33 - ((x - mn) / rg) * 30}`).join(' ');
+  svg.innerHTML = `<polyline points="${pts}" fill="none" stroke="var(--gold)" stroke-width="2" stroke-linejoin="round"/>`;
 }
 
 /* ---------------- 战绩 / 概率 ---------------- */
