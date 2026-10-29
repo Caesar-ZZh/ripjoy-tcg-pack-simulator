@@ -103,7 +103,10 @@ main{max-width:1060px;margin:0 auto;padding:18px 16px calc(28px + var(--safe-b))
 .face.front{transform:rotateY(180deg)}
 .face img{width:100%;height:100%;object-fit:cover}
 .face.backface{background:linear-gradient(155deg,#1d3f8f,#12275e 55%,#0b1a42);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;border:1px solid rgba(140,180,255,.4)}
-.face.backface .backimg{position:absolute;inset:0;z-index:2}
+.face.backface.hasback{background-size:cover;background-position:center}
+.face.backface.hasback .ring,.face.backface.hasback .backword,.face.backface.hasback .backsub{display:none}
+.card3d.flipped .face.backface{visibility:hidden}
+.card3d.flipped .face.front{visibility:visible}
 .face.backface .ring{width:104px;height:104px;border-radius:50%;border:9px solid rgba(255,255,255,.88);position:relative;box-shadow:0 0 0 4px rgba(0,0,0,.25),inset 0 0 0 4px rgba(0,0,0,.2)}
 .face.backface .ring::before{content:"";position:absolute;left:-9px;right:-9px;top:50%;height:9px;transform:translateY(-50%);background:rgba(255,255,255,.88)}
 .face.backface .ring::after{content:"";position:absolute;left:50%;top:50%;width:30px;height:30px;transform:translate(-50%,-50%);border-radius:50%;background:#dfe9ff;border:6px solid #12275e}

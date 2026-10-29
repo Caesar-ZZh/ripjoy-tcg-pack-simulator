@@ -464,7 +464,7 @@ function renderReveal() {
       ${entry.level >= 4 ? '<div class="rays" id="raysEl"></div>' : ''}
       <div class="glowrap"></div>
       <div class="card3d" id="card3d" style="--flip:0deg">
-        <div class="face backface"><img class="backimg" src="${BACKS[session.cfg.lang === 'ja' ? 'ja' : 'intl']}" alt="" onerror="this.remove()"><div class="ring"></div><div class="backword">POKÉMON</div><div class="backsub">TRADING CARD GAME</div></div>
+        <div class="face backface hasback" style="background-image:url(${BACKS[session.cfg.lang === 'ja' ? 'ja' : 'intl']})"><div class="ring"></div><div class="backword">POKÉMON</div><div class="backsub">TRADING CARD GAME</div></div>
         <div class="face front"><img src="${imgUrl(entry.card, true)}" alt="${entry.card.n}" draggable="false">
           <div class="foil ${entry.tier === 'HR' ? 'gold' : entry.reverse ? 'reverse' : entry.level >= 1 ? 'holo' : ''}"></div>
         </div>
@@ -501,6 +501,7 @@ function flipCurrent() {
   stage.classList.add('pop'); setTimeout(() => stage.classList.remove('pop'), 860);
   card3d.classList.add(entry.level >= 4 ? 'slowflip' : 'flipping');
   card3d.style.setProperty('--flip', '180deg');
+  setTimeout(() => card3d.classList.add('flipped'), entry.level >= 4 ? 480 : 360); // 翻到侧面时切掉背面可见性，绕开 iOS Safari 的 backface 失效
   card3d.classList.add(`glow-${entry.level}`);
   sfx.flip(); vibrate(VIB.flip);
   const rect = card3d.getBoundingClientRect(); const cx = rect.left + rect.width / 2, cy = rect.top + rect.height / 2;
@@ -613,7 +614,7 @@ function openDetail(card) {
   const t = TIERS[tierOf(card)]; const info = CARDMAP[card.id];
   const cnt = save.collection[card.id]?.n || 0;
   $('#modalBody').innerHTML = `
-    <div class="card3d glow-${t.level}" id="modalCard" style="--flip:180deg">
+    <div class="card3d flipped glow-${t.level}" id="modalCard" style="--flip:180deg">
       <div class="face backface"></div>
       <div class="face front"><img src="${imgUrl(card, true)}" alt="${card.n}">
       <div class="foil ${tierOf(card) === 'HR' ? 'gold' : t.level >= 1 ? 'holo' : ''}"></div></div>
