@@ -330,3 +330,9 @@ footer{border-top-color:rgba(255,255,255,.06)}
   .setcard:hover{border-color:rgba(242,205,114,.32);box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 20px 44px rgba(0,0,0,.5)}
   .btn:hover{filter:brightness(1.05)}
 }
+@media (max-width:560px){
+  .hwrap{flex-wrap:wrap;row-gap:8px}
+  nav{order:3;width:100%;margin-left:0;justify-content:space-between}
+  nav button{flex:1;padding:7px 4px;text-align:center}
+  .iconbtn{margin-left:auto}
+}
