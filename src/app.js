@@ -115,7 +115,7 @@ function showView(name) {
   if (name === 'stats') { renderStats(); ensureMetaLoaded(renderStats); }
   if (name === 'market') renderMarket();
   if (name === 'appraise') renderAppraise();
-  if (name === 'open') { renderSets(); updateAsset(); ensureMetaLoaded(updateAsset); }
+  if (name === 'open') { renderSets(); updateAsset(); ensureMetaLoaded(updateAsset, true); }
 }
 let metaLoading = false;
 const IDP = { taijing: ['CSV9.5C'], CSV9C: ['CSV9C'], CSV8C: ['CSV8C'], CSV7C: ['CSV7C'], '151C': ['151C-惊', '151C-旅', '151C-望', '151C-聚'], '151en': ['sv03.5'], 'sv08.5': ['sv08.5'], sv08: ['sv08'], sv09: ['sv09'], sv10: ['sv10'], me01: ['me01'], sv05: ['sv05'], 'sv10.5b': ['sv10.5b'], 'sv10.5w': ['sv10.5w'], me02: ['me02'], 'me02.5': ['me02.5'], 'sv04.5': ['sv04.5'], 'sv06.5': ['sv06.5'], sv06: ['sv06'], sv07: ['sv07'], sv04: ['sv04'], sv01: ['sv01'], sv02: ['sv02'], sv03: ['sv03'], '151ja': ['SV2a'], SV9a: ['SV9a'], SV9tw: ['SV9'], SV10tw: ['SV10'] };
@@ -124,14 +124,14 @@ function setOfCardId(id) {
   for (const cfg of SETS) for (const p of (IDP[cfg.key] || [])) if (id.startsWith(p + '-') && p.length > bestLen) { best = cfg; bestLen = p.length; }
   return best;
 }
-function ensureMetaLoaded(again) {
+function ensureMetaLoaded(again, pricedOnly = false) {
   // 收藏册/战绩依赖 CARDMAP：按卡号前缀只补载真正缺的弹系，不再全量加载
   if (metaLoading) return;
   const need = new Map();
   for (const id of Object.keys(save.collection)) {
     if (CARDMAP[id]) continue;
     const cfg = setOfCardId(id);
-    if (cfg && !DATA[cfg.key]) need.set(cfg.key, cfg);
+    if (cfg && !DATA[cfg.key] && (!pricedOnly || cfg.lang !== 'zh-cn')) need.set(cfg.key, cfg);
   }
   if (!need.size) return;
   metaLoading = true;
@@ -186,11 +186,40 @@ function renderSets() {
     if (DATA[cfg.key]) fillSetCard(el, cfg);
   }
   applyLangFilter();
+  loadMeta().then(() => { $$('#setgrid .setcard').forEach(el => { const cfg = SETS.find(c => c.key === el.dataset.key); if (cfg && !DATA[cfg.key]) fillSetCardMeta(el, cfg); }); });
   const s = save.stats;
   $('#heroStats').innerHTML = s.packs
     ? `已开 <b>${s.packs}</b> 包 · 累计 <b>${s.cards}</b> 张 · 高稀有演出 <b>${s.l3 + s.l4}</b> 次 · 最佳战绩在「战绩」页`
     : `首包保底 <b>AR 以上</b> · 先撕一包，30 秒看到高稀有演出`;
   prefetchSets();
+}
+let META = null;
+async function loadMeta() {
+  if (META) return META;
+  const emb = (typeof window !== 'undefined' && window.__RIPJOY_EMBED__) ? window.__RIPJOY_EMBED__['data/meta.json'] : null;
+  if (emb) { META = emb; return META; }
+  try { META = await (await fetch('data/meta.json')).json(); } catch { META = {}; }
+  return META;
+}
+function ownedCountFor(cfg) {
+  let n = 0;
+  for (const id of Object.keys(save.collection)) if (setOfCardId(id) === cfg.key) n++;
+  return n;
+}
+function fillSetCardMeta(el, cfg) {
+  const m = META && META[cfg.key]; if (!el.isConnected) return;
+  const bload = el.querySelector('[data-fill="bload"]'); if (bload) bload.remove();
+  if (!m) return;
+  const banner = el.querySelector('.setbanner');
+  if (banner && !banner.querySelector('img.chase')) {
+    const ci = document.createElement('img'); ci.className = 'chase'; ci.src = m.chaseThumb; ci.alt = m.chaseName; ci.loading = 'lazy'; ci.onerror = () => { ci.style.opacity = 0; };
+    banner.appendChild(ci);
+  }
+  const chaseEl = el.querySelector('[data-fill="chase"]');
+  if (chaseEl) chaseEl.innerHTML = `大追：<span class="chase-name">${m.chaseName}</span>${m.chasePrice != null ? ` 参考价 <b style="color:var(--gold)">€${m.chasePrice.toFixed(2)}</b>` : ''}`;
+  const owned = ownedCountFor(cfg);
+  const bar = el.querySelector('[data-fill="bar"]'); if (bar) bar.style.width = `${(owned / cfg.total) * 100}%`;
+  const prog = el.querySelector('[data-fill="prog"]'); if (prog) prog.textContent = `图鉴收集 ${owned} / ${cfg.total}`;
 }
 function fillSetCard(el, cfg) {
   const data = DATA[cfg.key]; if (!data || !el.isConnected) return;
@@ -212,7 +241,7 @@ function fillSetCard(el, cfg) {
 let prefetching = false;
 async function prefetchSets() {
   if (prefetching) return; prefetching = true;
-  const queue = [...SETS.filter(c => !c.file.includes('zh-cn')), ...SETS.filter(c => c.file.includes('zh-cn'))];
+  const queue = SETS.filter(c => !c.file.includes('zh-cn')); // 简中弹数据为内嵌 base64 大文件，不做后台预取（曾致渲染进程内存爆涨崩溃），改为按需加载 + meta 轻量填充
   let qi = 0;
   const worker = async () => {
     while (qi < queue.length) {
