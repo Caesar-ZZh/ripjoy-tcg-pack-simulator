@@ -4,6 +4,9 @@ import { sfx, vibrate, VIB, addTilt, setMuted } from './fx.js';
 import { BACKS } from './cardbacks.js';
 
 const SETS = [
+  { key: 'CSV10.5C', file: 'data/zh-cn-CSV10.5C.json', theme: 'linear-gradient(150deg,#101014,#2a2f45 55%,#8fb8ff)', desc: '简体中文版 · 黑白交汇 · 合众 156 宝可梦集结 · 卡图暂用繁中版，4 张训练家卡暂用英文版', chaseNote: '捷克罗姆 ex BWR', sname: '黑雷奔流', lang: 'zh-cn', total: 174, pack: 5, parts: 14, official: true },
+  { key: 'CSV10.6C', file: 'data/zh-cn-CSV10.6C.json', theme: 'linear-gradient(150deg,#3d0d0d,#8a2a1a 55%,#ffc46b)', desc: '简体中文版 · 黑白交汇 · 合众 156 宝可梦集结 · 卡图暂用繁中版，1 张训练家卡暂用英文版', chaseNote: '莱希拉姆 ex BWR', sname: '白焰迸涌', lang: 'zh-cn', total: 174, pack: 5, parts: 14, official: true },
+  { key: '30thC', file: 'data/zh-cn-30thC.json', theme: 'linear-gradient(150deg,#6e5410,#c29a1f 55%,#ffe98a)', desc: '简体中文版 · 30 周年纪念 · 全闪包 · 每包必出 1 张皮卡丘 + 1 张能量 · 2 张 SAR 与能量卡暂用日版图', chaseNote: 'RGB 梦幻 · 梦幻 ex FUR', sname: '30周年庆典', lang: 'zh-cn', total: 176, pack: 6, parts: 15, official: true },
   { key: 'taijing', file: 'data/zh-cn-CSV9.5C.json', theme: 'linear-gradient(150deg,#5e1a6e,#b83fd0 55%,#ff8ad8)', desc: '简体中文版 · 伊布全家太晶盛聚 · 含简中专属异画', chaseNote: '仙子伊布 ex SAR（简中专属异画）', sname: '太晶盛聚', lang: 'zh-cn', total: 259, pack: 10, parts: 5, official: true },
   { key: 'CSV9C', file: 'data/zh-cn-CSV9C.json', theme: 'linear-gradient(150deg,#40205e,#7a4fd0 55%,#f2a8e0)', desc: '简体中文版 · 晶璃星辉 · 太乐巴戈斯集结', chaseNote: '太乐巴戈斯 ex SAR', sname: '星彩晶璃', lang: 'zh-cn', total: 266, pack: 5, parts: 5, official: true },
   { key: 'CSV8C', file: 'data/zh-cn-CSV8C.json', theme: 'linear-gradient(150deg,#0d2e3d,#14607a 55%,#4fd8c8)', desc: '简体中文版 · 诡幻璀璨 · 桃歹郎一族', chaseNote: '桃歹郎 ex SAR', sname: '璀璨诡幻', lang: 'zh-cn', total: 264, pack: 5, parts: 5, official: true },
@@ -48,7 +51,7 @@ function ensurePackart(key) {
   return _paLoading[part];
 }
 // 带 rk 的卡（简中弹）按其原始稀有度字母展示：SR 就是 SR，不套用英文 UR 口径
-const CN_RARITY_CN = { C: '普通', U: '非普通', R: '稀有闪', RR: '双重稀有', ACE: 'ACE SPEC', SR: '超级稀有', SAR: '特别插画稀有', UR: '金卡', S: '闪色', SSR: '闪色超级稀有' };
+const CN_RARITY_CN = { C: '普通', U: '非普通', R: '稀有闪', RR: '双重稀有', ACE: 'ACE SPEC', SR: '超级稀有', SAR: '特别插画稀有', UR: '金卡', S: '闪色', SSR: '闪色超级稀有', BWR: '黑白稀有', FUR: '未来稀有', RGB: 'RGB稀有', CLS: '经典复刻', PIKA: '皮卡丘闪卡', NRG: '基本能量' };
 const dispTier = (c) => c.rk || tierOf(c);
 const dispTierLabel = (c) => c.rk ? `${c.rk} · ${CN_RARITY_CN[c.rk] || ''}` : TIERS[tierOf(c)].label;
 const packOf = (data) => data.pack || (data.lang === 'ja' ? 7 : 10);
@@ -101,7 +104,7 @@ function loadHi(cfg) {
     if (galKey === cfg.key && $('#view-gallery').classList.contains('active')) renderGallery();
   }).catch(() => { delete HIDONE[cfg.key]; });
 }
-const chaseOf = (data) => [...data.cards].filter(c => ['SAR', 'HR', 'BWR'].includes(tierOf(c))).sort((a, b) => (b.p || 0) - (a.p || 0))[0]
+const chaseOf = (data) => [...data.cards].filter(c => ['SAR', 'HR', 'BWR', 'FUR', 'RGB'].includes(tierOf(c))).sort((a, b) => (b.p || 0) - (a.p || 0))[0]
   || [...data.cards].sort((a, b) => (b.p || 0) - (a.p || 0))[0];
 const ownedInSet = (data) => data.cards.filter(c => save.collection[c.id]).length;
 
@@ -118,7 +121,7 @@ function showView(name) {
   if (name === 'open') { renderSets(); updateAsset(); ensureMetaLoaded(updateAsset, true); }
 }
 let metaLoading = false;
-const IDP = { taijing: ['CSV9.5C'], CSV9C: ['CSV9C'], CSV8C: ['CSV8C'], CSV7C: ['CSV7C'], '151C': ['151C-惊', '151C-旅', '151C-望', '151C-聚'], '151en': ['sv03.5'], 'sv08.5': ['sv08.5'], sv08: ['sv08'], sv09: ['sv09'], sv10: ['sv10'], me01: ['me01'], sv05: ['sv05'], 'sv10.5b': ['sv10.5b'], 'sv10.5w': ['sv10.5w'], me02: ['me02'], 'me02.5': ['me02.5'], 'sv04.5': ['sv04.5'], 'sv06.5': ['sv06.5'], sv06: ['sv06'], sv07: ['sv07'], sv04: ['sv04'], sv01: ['sv01'], sv02: ['sv02'], sv03: ['sv03'], '151ja': ['SV2a'], SV9a: ['SV9a'], SV9tw: ['SV9'], SV10tw: ['SV10'] };
+const IDP = { 'CSV10.5C': ['CSV10.5C'], 'CSV10.6C': ['CSV10.6C'], '30thC': ['30thC'], taijing: ['CSV9.5C'], CSV9C: ['CSV9C'], CSV8C: ['CSV8C'], CSV7C: ['CSV7C'], '151C': ['151C-惊', '151C-旅', '151C-望', '151C-聚'], '151en': ['sv03.5'], 'sv08.5': ['sv08.5'], sv08: ['sv08'], sv09: ['sv09'], sv10: ['sv10'], me01: ['me01'], sv05: ['sv05'], 'sv10.5b': ['sv10.5b'], 'sv10.5w': ['sv10.5w'], me02: ['me02'], 'me02.5': ['me02.5'], 'sv04.5': ['sv04.5'], 'sv06.5': ['sv06.5'], sv06: ['sv06'], sv07: ['sv07'], sv04: ['sv04'], sv01: ['sv01'], sv02: ['sv02'], sv03: ['sv03'], '151ja': ['SV2a'], SV9a: ['SV9a'], SV9tw: ['SV9'], SV10tw: ['SV10'] };
 function setOfCardId(id) {
   let best = null, bestLen = -1;
   for (const cfg of SETS) for (const p of (IDP[cfg.key] || [])) if (id.startsWith(p + '-') && p.length > bestLen) { best = cfg; bestLen = p.length; }
@@ -289,7 +292,7 @@ function renderGallery() {
   const lv = c => TIERS[tierOf(c)].level;
   let cards = [...data.cards].sort((a, b) => lv(b) - lv(a) || (b.p || 0) - (a.p || 0) || String(a.no).localeCompare(String(b.no), undefined, { numeric: true }));
   if (galTier === 'TOP') cards = cards.filter(c => lv(c) >= 3);
-  else if (galTier === 'SAR') cards = cards.filter(c => ['SAR', 'HR', 'BWR'].includes(tierOf(c)));
+  else if (galTier === 'SAR') cards = cards.filter(c => ['SAR', 'HR', 'BWR', 'FUR', 'RGB'].includes(tierOf(c)));
   else if (galTier === 'UR') cards = cards.filter(c => ['UR', 'ACE'].includes(tierOf(c)));
   else if (galTier === 'RR') cards = cards.filter(c => tierOf(c) === 'RR');
   else if (galTier === 'R') cards = cards.filter(c => lv(c) <= 1);

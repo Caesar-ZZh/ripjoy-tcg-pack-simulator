@@ -10,10 +10,20 @@ export const TIERS = {
   SAR: { key: 'SAR', label: 'Special Illustration Rare', cn: '特别插画稀有', color: '#ff5c8a', level: 4 },
   HR:  { key: 'HR',  label: 'Hyper Rare', cn: '金卡',  color: '#ffe98a', level: 4 },
   BWR: { key: 'BWR', label: 'Black White Rare', cn: '黑白稀有', color: '#e8e8f2', level: 4 },
+  FUR: { key: 'FUR', label: 'Futuristic Rare', cn: '未来稀有', color: '#7af2e8', level: 4 },
+  RGB: { key: 'RGB', label: 'RGB Rare', cn: 'RGB稀有', color: '#ff5c5c', level: 4 },
+  CLS: { key: 'CLS', label: 'Classic Rare', cn: '经典复刻', color: '#d8b4fe', level: 2 },
+  PIKA:{ key: 'PIKA',label: 'Pikachu Foil', cn: '皮卡丘闪卡', color: '#ffd75e', level: 1 },
+  NRG: { key: 'NRG', label: 'Basic Energy', cn: '基本能量', color: '#9aa7bd', level: 0 },
 };
 
 export function tierOf(card) {
   const r = (card.r || '').toLowerCase();
+  if (r.includes('futuristic')) return 'FUR';
+  if (r.includes('rgb')) return 'RGB';
+  if (r.includes('classic')) return 'CLS';
+  if (r.includes('pikachu')) return 'PIKA';
+  if (r.includes('basic energy')) return 'NRG';
   if (r.includes('black white')) return 'BWR';
   if (r.includes('shiny')) return r.includes('ultra') ? 'UR' : 'AR';
   if (r.includes('special')) return 'SAR';
@@ -84,7 +94,8 @@ function drawRare(pools, used, forceTop = false) {
 /** 简中官方口径：setData.spec 存在时按官方构成（平卡槽 + 闪卡槽）抽卡。
  *  spec.variants = 构成变体（plain/foil 张数 + 权重）；plainTypes = 平卡档位及种类数；
  *  spec.foilGroups = 闪卡档位组（w 为官方生产配比，组内按种类数比例 roll 档位）。
- *  BALL / MASTER 为虚拟档位：抽一张平卡种类的卡并标记球纹工艺（数据集无独立球纹印刷条目）。 */
+ *  BALL / MASTER 为虚拟档位：抽一张平卡种类的卡并标记球纹工艺（数据集无独立球纹印刷条目）。
+ *  spec.fixedFoil = 前 N 个闪卡位固定抽取的 rk（如 30 周年：皮卡丘、基本能量）。 */
 function openSpecPack(setData, { forceTop = false } = {}) {
   const spec = setData.spec;
   const rkPools = {};
@@ -102,6 +113,12 @@ function openSpecPack(setData, { forceTop = false } = {}) {
   }
   for (let i = 0; i < variant.foil; i++) {
     const isLast = i === variant.foil - 1;
+    // 固定闪卡位（如 30 周年：前两张固定为皮卡丘、基本能量），不参与组别抽取
+    if (spec.fixedFoil && i < spec.fixedFoil.length) {
+      const c = pickUnique(rkPools, [spec.fixedFoil[i]], used);
+      if (c) cards.push({ card: c, reverse: false, slot: 'foil' });
+      continue;
+    }
     const groups = (forceTop && isLast) ? [spec.foilGroups[spec.foilGroups.length - 1]] : spec.foilGroups;
     const group = weighted(groups.map(g => [g, g.w]));
     const type = weighted(group.types);
