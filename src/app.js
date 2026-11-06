@@ -86,6 +86,25 @@ function loadSet(cfg) {
   })().catch(e => { delete LOADP[cfg.key]; throw e; });
   return LOADP[cfg.key];
 }
+
+/* ---------------- 内存回收：简中弹数据 15–33MB/弹，只留最近一弹 ---------------- */
+// 简中弹单弹数据 15–33MB（含 base64 卡图），DATA/POOLS/CARDMAP 三处同引同一批卡对象；
+// 以前打开过的弹永不释放，同一标签页多开几弹即堆涨至渲染进程上限崩溃（STATUS_BREAKPOINT，
+// 与 2026-10-30 首页预取崩溃同根，只是这次是手动开弹累积而非自动预取）。回选弹页时只留
+// 当前弹，其余简中弹整弹释放；收藏册/战绩/图鉴在打开时按需补载（ensureMetaLoaded / loadSet
+// 已有此机制），首页资产卡的 kinds 改为直接数 save.collection，不再依赖 CARDMAP。
+function evictCnSets(keepKey) {
+  for (const cfg of SETS) {
+    if (cfg.key === keepKey || !cfg.file.includes('zh-cn')) continue;
+    const data = DATA[cfg.key];
+    if (!data) continue;
+    for (const c of data.cards) delete CARDMAP[c.id];
+    delete DATA[cfg.key];
+    delete POOLS[cfg.key];
+    delete LOADP[cfg.key];
+    delete HIDONE[cfg.key];
+  }
+}
 const logoSrc = (data) => !data.logo ? null : (data.logo.startsWith('data:') ? data.logo : `${data.logo}.png`);
 const HIDONE = {};
 function loadHi(cfg) {
@@ -307,7 +326,7 @@ function renderGallery() {
   }).join('') : '<p class="empty">这个筛选下还没有卡<br>换个筛选，或先去开几包</p>';
   $$('#galGrid figure').forEach(f => f.addEventListener('click', () => openDetail(CARDMAP[f.dataset.id].card)));
 }
-$('#galBack').addEventListener('click', () => showView('open'));
+$('#galBack').addEventListener('click', () => { evictCnSets(galKey); showView('open'); });
 $$('#galSeg button').forEach(b => b.addEventListener('click', () => { $$('#galSeg button').forEach(x => x.classList.remove('active')); b.classList.add('active'); galTier = b.dataset.tier; renderGallery(); }));
 $('#galOwnedOnly').addEventListener('change', (e) => { galOwnedOnly = e.target.checked; renderGallery(); });
 
@@ -436,6 +455,7 @@ function showStage() {
 }
 function exitStage() {
   particles.ambientOff();
+  evictCnSets(session?.cfg?.key);
   $('#stage').style.display = 'none'; $('#setgridWrap').style.display = 'block';
   session = null; renderSets();
 }
@@ -608,7 +628,7 @@ function renderSummary() {
   });
   $('#toBinderBtn').addEventListener('click', () => { exitStageSilent(); showView('collection'); });
 }
-function exitStageSilent() { particles.ambientOff(); $('#stage').style.display = 'none'; $('#setgridWrap').style.display = 'block'; session = null; }
+function exitStageSilent() { particles.ambientOff(); evictCnSets(session?.cfg?.key); $('#stage').style.display = 'none'; $('#setgridWrap').style.display = 'block'; session = null; }
 
 /* ---------------- 收藏册 ---------------- */
 let collSet = 'all', collTier = 'all';
@@ -622,7 +642,7 @@ function renderCollection() {
   const owned = Object.entries(save.collection).map(([id, v]) => ({ ...CARDMAP[id], n: v.n })).filter(x => x.card);
   const filtered = owned.filter(x => (collSet === 'all' || x.setKey === collSet) && (collTier === 'all' || tierOf(x.card) === collTier || (collTier === 'TOP' && TIERS[tierOf(x.card)].level >= 3)));
   filtered.sort((a, b) => TIERS[tierOf(b.card)].level - TIERS[tierOf(a.card)].level || (b.card.p || 0) - (a.card.p || 0));
-  const totalCards = SETS.reduce((s, c) => s + (DATA[c.key]?.cards.length || 0), 0);
+  const totalCards = SETS.reduce((s, c) => s + (c.total || 0), 0); // 用申报总数，不依赖已加载的 DATA（简中弹释放后 DATA 不全）
   $('#collSummary').innerHTML = `
     <div class="statcard"><div class="v">${owned.length}<span style="font-size:13px;color:var(--dim)"> / ${totalCards}</span></div><div class="k">已收集图鉴</div></div>
     <div class="statcard"><div class="v">${save.stats.cards}</div><div class="k">累计开出（含重复）</div></div>
@@ -708,10 +728,11 @@ for (const lang of ['en', 'ja', 'zh-tw']) {
 
 /* ---------------- 收藏资产卡 ---------------- */
 function collectionValue() {
-  let v = 0, kinds = 0;
+  let v = 0;
+  const kinds = Object.keys(save.collection).length; // 藏品种类直接数存档，不依赖 CARDMAP（简中弹释放后 CARDMAP 不全）
   for (const [id, rec] of Object.entries(save.collection)) {
     const m = CARDMAP[id]; if (!m) continue;
-    kinds++; if (typeof m.card.p === 'number') v += m.card.p * rec.n;
+    if (typeof m.card.p === 'number') v += m.card.p * rec.n;
   }
   return { v, kinds };
 }
