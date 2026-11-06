@@ -4,14 +4,14 @@ import { sfx, vibrate, VIB, addTilt, setMuted } from './fx.js';
 import { BACKS } from './cardbacks.js';
 
 const SETS = [
-  { key: 'CSV10.5C', file: 'data/zh-cn-CSV10.5C.json', theme: 'linear-gradient(150deg,#292220,#332A25 55%,#3D322B)', desc: '简体中文版 · 黑白交汇 · 合众 156 宝可梦集结 · 卡图暂用繁中版，4 张训练家卡暂用英文版', chaseNote: '捷克罗姆 ex BWR', sname: '黑雷奔流', lang: 'zh-cn', total: 174, pack: 5, parts: 14, official: true },
-  { key: 'CSV10.6C', file: 'data/zh-cn-CSV10.6C.json', theme: 'linear-gradient(150deg,#292220,#332A25 55%,#3D322B)', desc: '简体中文版 · 黑白交汇 · 合众 156 宝可梦集结 · 卡图暂用繁中版，1 张训练家卡暂用英文版', chaseNote: '莱希拉姆 ex BWR', sname: '白焰迸涌', lang: 'zh-cn', total: 174, pack: 5, parts: 14, official: true },
-  { key: '30thC', file: 'data/zh-cn-30thC.json', theme: 'linear-gradient(150deg,#292220,#332A25 55%,#3D322B)', desc: '简体中文版 · 30 周年纪念 · 全闪包 · 每包必出 1 张皮卡丘 + 1 张能量 · 2 张 SAR 与能量卡暂用日版图', chaseNote: 'RGB 梦幻 · 梦幻 ex FUR', sname: '30周年庆典', lang: 'zh-cn', total: 176, pack: 6, parts: 15, official: true },
-  { key: 'taijing', file: 'data/zh-cn-CSV9.5C.json', theme: 'linear-gradient(150deg,#292220,#332A25 55%,#3D322B)', desc: '简体中文版 · 伊布全家太晶盛聚 · 含简中专属异画', chaseNote: '仙子伊布 ex SAR（简中专属异画）', sname: '太晶盛聚', lang: 'zh-cn', total: 259, pack: 10, parts: 5, official: true },
-  { key: 'CSV9C', file: 'data/zh-cn-CSV9C.json', theme: 'linear-gradient(150deg,#292220,#332A25 55%,#3D322B)', desc: '简体中文版 · 晶璃星辉 · 太乐巴戈斯集结', chaseNote: '太乐巴戈斯 ex SAR', sname: '星彩晶璃', lang: 'zh-cn', total: 266, pack: 5, parts: 5, official: true },
-  { key: 'CSV8C', file: 'data/zh-cn-CSV8C.json', theme: 'linear-gradient(150deg,#292220,#332A25 55%,#3D322B)', desc: '简体中文版 · 诡幻璀璨 · 桃歹郎一族', chaseNote: '桃歹郎 ex SAR', sname: '璀璨诡幻', lang: 'zh-cn', total: 264, pack: 5, parts: 5, official: true },
-  { key: 'CSV7C', file: 'data/zh-cn-CSV7C.json', theme: 'linear-gradient(150deg,#292220,#332A25 55%,#3D322B)', desc: '简体中文版 · 利刃猛醒 · 猛雷鼓咆哮', chaseNote: '猛雷鼓 ex SAR', sname: '利刃猛醒', lang: 'zh-cn', total: 259, pack: 5, parts: 5, official: true },
-  { key: '151C', file: 'data/zh-cn-151C.json', theme: 'linear-gradient(150deg,#292220,#332A25 55%,#3D322B)', desc: '简体中文版 · 初代 151 情怀 · 旅望惊聚全集', chaseNote: '喷火龙 ex SAR', sname: '收集啦151', lang: 'zh-cn', total: 192, pack: 5, parts: 7, official: true },
+  { key: 'CSV10.5C', file: 'data/zh-cn-CSV10.5C-slim.json', theme: 'linear-gradient(150deg,#292220,#332A25 55%,#3D322B)', desc: '简体中文版 · 黑白交汇 · 合众 156 宝可梦集结 · 卡图暂用繁中版，4 张训练家卡暂用英文版', chaseNote: '捷克罗姆 ex BWR', sname: '黑雷奔流', lang: 'zh-cn', total: 174, pack: 5, parts: 3, official: true },
+  { key: 'CSV10.6C', file: 'data/zh-cn-CSV10.6C-slim.json', theme: 'linear-gradient(150deg,#292220,#332A25 55%,#3D322B)', desc: '简体中文版 · 黑白交汇 · 合众 156 宝可梦集结 · 卡图暂用繁中版，1 张训练家卡暂用英文版', chaseNote: '莱希拉姆 ex BWR', sname: '白焰迸涌', lang: 'zh-cn', total: 174, pack: 5, parts: 3, official: true },
+  { key: '30thC', file: 'data/zh-cn-30thC-slim.json', theme: 'linear-gradient(150deg,#292220,#332A25 55%,#3D322B)', desc: '简体中文版 · 30 周年纪念 · 全闪包 · 每包必出 1 张皮卡丘 + 1 张能量 · 2 张 SAR 与能量卡暂用日版图', chaseNote: 'RGB 梦幻 · 梦幻 ex FUR', sname: '30周年庆典', lang: 'zh-cn', total: 176, pack: 6, parts: 3, official: true },
+  { key: 'taijing', file: 'data/zh-cn-CSV9.5C-slim.json', theme: 'linear-gradient(150deg,#292220,#332A25 55%,#3D322B)', desc: '简体中文版 · 伊布全家太晶盛聚 · 含简中专属异画', chaseNote: '仙子伊布 ex SAR（简中专属异画）', sname: '太晶盛聚', lang: 'zh-cn', total: 259, pack: 10, parts: 4, official: true },
+  { key: 'CSV9C', file: 'data/zh-cn-CSV9C-slim.json', theme: 'linear-gradient(150deg,#292220,#332A25 55%,#3D322B)', desc: '简体中文版 · 晶璃星辉 · 太乐巴戈斯集结', chaseNote: '太乐巴戈斯 ex SAR', sname: '星彩晶璃', lang: 'zh-cn', total: 266, pack: 5, parts: 4, official: true },
+  { key: 'CSV8C', file: 'data/zh-cn-CSV8C-slim.json', theme: 'linear-gradient(150deg,#292220,#332A25 55%,#3D322B)', desc: '简体中文版 · 诡幻璀璨 · 桃歹郎一族', chaseNote: '桃歹郎 ex SAR', sname: '璀璨诡幻', lang: 'zh-cn', total: 264, pack: 5, parts: 4, official: true },
+  { key: 'CSV7C', file: 'data/zh-cn-CSV7C-slim.json', theme: 'linear-gradient(150deg,#292220,#332A25 55%,#3D322B)', desc: '简体中文版 · 利刃猛醒 · 猛雷鼓咆哮', chaseNote: '猛雷鼓 ex SAR', sname: '利刃猛醒', lang: 'zh-cn', total: 259, pack: 5, parts: 4, official: true },
+  { key: '151C', file: 'data/zh-cn-151C-slim.json', theme: 'linear-gradient(150deg,#292220,#332A25 55%,#3D322B)', desc: '简体中文版 · 初代 151 情怀 · 旅望惊聚全集', chaseNote: '喷火龙 ex SAR', sname: '收集啦151', lang: 'zh-cn', total: 192, pack: 5, parts: 3, official: true },
   { key: '151en', file: 'data/en-sv03.5.json', theme: 'linear-gradient(150deg,#292220,#332A25 55%,#3D322B)', desc: '初代 151 情怀弹 · 喷火龙 SAR 大追', chaseNote: '喷火龙 ex SAR', sname: '151', lang: 'en', total: 207, pack: 10 },
   { key: 'sv08.5', file: 'data/en-sv08.5.json', theme: 'linear-gradient(150deg,#292220,#332A25 55%,#3D322B)', desc: '伊布盛宴 · 月亮伊布 ex SAR 天价追卡', chaseNote: '月亮伊布 ex SAR', sname: 'Prismatic Evolutions', lang: 'en', total: 180, pack: 10 },
   { key: 'sv08', file: 'data/en-sv08.json', theme: 'linear-gradient(150deg,#292220,#332A25 55%,#3D322B)', desc: '电光四射 · 皮卡丘 SAR 天价追卡', chaseNote: '皮卡丘 ex SAR', sname: 'Surging Sparks', lang: 'en', total: 252, pack: 10 },
@@ -91,6 +91,15 @@ async function fetchJsonRetry(url, attempts = CHUNK_MAX_RETRY) {
   }
   throw lastErr;
 }
+const CDN_BASE = 'https://cdn.jsdelivr.net/gh/Caesar-ZZh/ripjoy-tcg-pack-simulator@main/';
+async function fetchDataJson(rel) {
+  // 数据文件走 jsDelivr（中国大陆不开梯子也可达，远好于 github.io），失败自动回落原站；
+  // CDN 先试 2 次、原站再试 3 次（每次 20 秒超时），都走 fetchJsonRetry 的重试与退避。
+  // jsDelivr 按 @main 分支缓存：瘦身文件用 -slim 新文件名、无旧缓存；万一缓存滞后，
+  // 可用 https://purge.jsdelivr.net/gh/Caesar-ZZh/ripjoy-tcg-pack-simulator@main/<path> 清除。
+  try { return await fetchJsonRetry(CDN_BASE + rel, 2); }
+  catch (e) { return await fetchJsonRetry(rel); }
+}
 async function fetchChunksLimited(urls, cache, onProgress) {
   // 限流拉取：失败的分片不阻塞其余分片，全部跑完后才统一抛错（以便重试复用已成功分片）
   const total = urls.length;
@@ -103,7 +112,7 @@ async function fetchChunksLimited(urls, cache, onProgress) {
       const idx = next++;
       if (idx >= total) return;
       if (cache[idx]) continue;
-      try { cache[idx] = await fetchJsonRetry(urls[idx]); }
+      try { cache[idx] = await fetchDataJson(urls[idx]); }
       catch (e) { failedErr = failedErr || e; cache[idx] = null; }
       done++;
       if (onProgress) onProgress(done, total);
@@ -120,14 +129,14 @@ function loadSet(cfg, onProgress) {
     const embedded = (typeof window !== 'undefined' && window.__RIPJOY_EMBED__) ? window.__RIPJOY_EMBED__[cfg.file] : null;
     let data = embedded;
     if (!data && cfg.parts) {
-      // 简中弹高清数据分片（单片 <5MB）：限流 3 路并发，每片失败自动重试
+      // 简中弹瘦身数据分片（320px 图，单弹约 5.5–8.1MB，单片 <2.4MB）：限流 3 路并发，每片失败自动重试；经 jsDelivr 拉取
       const urls = [cfg.file, ...Array.from({ length: cfg.parts - 1 }, (_, i) => cfg.file.replace('.json', `.p${i + 2}.json`))];
       const cache = CHUNKCACHE[cfg.key] || (CHUNKCACHE[cfg.key] = []);
       const chunks = await fetchChunksLimited(urls, cache, onProgress);
       data = { ...chunks[0], cards: chunks.flatMap(c => c.cards) };
       delete CHUNKCACHE[cfg.key];
     }
-    if (!data) data = await fetchJsonRetry(cfg.file);
+    if (!data) data = await fetchDataJson(cfg.file);
     DATA[cfg.key] = data; POOLS[cfg.key] = buildPools(data);
     for (const c of data.cards) CARDMAP[c.id] = { card: c, setKey: cfg.key, setName: data.name };
     return data;
@@ -135,7 +144,7 @@ function loadSet(cfg, onProgress) {
   return LOADP[cfg.key];
 }
 
-/* ---------------- 内存回收：简中弹数据 15–33MB/弹，只留最近一弹 ---------------- */
+/* ---------------- 内存回收：简中弹数据约 5.5–8.1MB/弹（瘦身后），只留最近一弹 ---------------- */
 // 简中弹单弹数据 15–33MB（含 base64 卡图），DATA/POOLS/CARDMAP 三处同引同一批卡对象；
 // 以前打开过的弹永不释放，同一标签页多开几弹即堆涨至渲染进程上限崩溃（STATUS_BREAKPOINT，
 // 与 2026-10-30 首页预取崩溃同根，只是这次是手动开弹累积而非自动预取）。回选弹页时只留
@@ -206,7 +215,7 @@ function ensureMetaLoaded(again, pricedOnly = false) {
   }
   if (!need.size) return;
   metaLoading = true;
-  // 逐弹串行补载：简中弹 15–33MB/弹，并行解析会瞬间堆涨至渲染进程上限崩溃
+  // 逐弹串行补载：简中弹约 5.5–8.1MB/弹，并行解析会瞬间堆涨至渲染进程上限崩溃
   // （释放后首次进收藏册需补载多弹时尤其危险）；串行只留一弹的解析峰值
   (async () => {
     for (const c of need.values()) { try { await loadSet(c); } catch {} }
@@ -274,7 +283,7 @@ async function loadMeta() {
   if (META) return META;
   const emb = (typeof window !== 'undefined' && window.__RIPJOY_EMBED__) ? window.__RIPJOY_EMBED__['data/meta.json'] : null;
   if (emb) { META = emb; return META; }
-  try { META = await fetchJsonRetry('data/meta.json'); } catch { META = {}; }
+  try { META = await fetchDataJson('data/meta.json'); } catch { META = {}; }
   return META;
 }
 function ownedCountFor(cfg) {
