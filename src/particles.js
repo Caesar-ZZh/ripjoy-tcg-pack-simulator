@@ -30,7 +30,7 @@ export class Particles {
     }
     this.start();
   }
-  rain({ count = 60, colors = ['#ff5c8a', '#ffd75e', '#5eb1ff', '#7fd08c'], shapes = ['circle'] } = {}) {
+  rain({ count = 60, colors = ['#F8E6E8', '#E8DDE0', '#A89B9D', '#ffffff'], shapes = ['circle'] } = {}) {
     if (this.reduced) count = Math.ceil(count / 3);
     for (let i = 0; i < count; i++) {
       this.spawn({
@@ -43,7 +43,7 @@ export class Particles {
     this.start();
   }
   // 撕包碎片：从撕口向外飞溅的纸屑/箔片
-  shards(x, y, colors = ['#ffffff', '#ffd75e', '#dfe6ee']) {
+  shards(x, y, colors = ['#ffffff', '#F8E6E8', '#dfe6ee']) {
     let count = this.reduced ? 10 : 30;
     for (let i = 0; i < count; i++) {
       const a = -Math.PI / 2 + (Math.random() - 0.5) * 2.4;
@@ -59,7 +59,7 @@ export class Particles {
     this.start();
   }
   // 扇形光轨：沿速度方向拉长的流光线条
-  streakFan(x, y, { count = 14, colors = ['#ffd75e', '#ffffff'] } = {}) {
+  streakFan(x, y, { count = 14, colors = ['#F8E6E8', '#ffffff'] } = {}) {
     if (this.reduced) count = Math.ceil(count / 2);
     for (let i = 0; i < count; i++) {
       const a = Math.random() * Math.PI * 2;
@@ -72,8 +72,8 @@ export class Particles {
     }
     this.start();
   }
-  // 金色喷泉：从卡片底部向上喷再回落的余烬
-  fountain(x, y, colors = ['#ffe98a', '#ffd700', '#fff6c8']) {
+  // 白色喷泉：从卡片底部向上喷再回落的余烬
+  fountain(x, y, colors = ['#F8E6E8', '#E8DDE0', '#ffffff']) {
     let count = this.reduced ? 16 : 44;
     for (let i = 0; i < count; i++) {
       const a = -Math.PI / 2 + (Math.random() - 0.5) * 0.9;
@@ -95,7 +95,7 @@ export class Particles {
     this.start();
   }
   ambientOff() { this.ambEl = null; this.list = this.list.filter(p => p.shape !== 'mote'); }
-  ring(x, y, color = '#ffd75e') {
+  ring(x, y, color = '#F8E6E8') {
     this.spawn({ ring: true, x, y, r: 10, vr2: 620, life: 0.7, t: 0, color, alpha: 0.9, size: 3 });
     this.start();
   }
@@ -114,7 +114,7 @@ export class Particles {
           this.spawn({
             x: r.left + Math.random() * r.width, y: r.top + r.height * (0.25 + Math.random() * 0.75),
             vx: (Math.random() - 0.5) * 8, vy: -5 - Math.random() * 11,
-            size: 1.1 + Math.random() * 2.3, color: Math.random() < 0.4 ? '#ffd75e' : '#cfe0ff',
+            size: 1.1 + Math.random() * 2.3, color: Math.random() < 0.4 ? '#F8E6E8' : '#E8DDE0',
             life: 4.5 + Math.random() * 3, t: 0, gravity: 0, drag: 1, shape: 'mote',
             rot: 0, vr: 0, alpha: 0.2 + Math.random() * 0.26, sway: 0.6 + Math.random() * 0.9, phase: Math.random() * 6.28,
           });
@@ -178,23 +178,23 @@ export class Particles {
 // 按演出级别触发的组合特效
 export function fxForLevel(particles, level, cx, cy) {
   if (level === 1) {
-    particles.burst(cx, cy, { count: 12, colors: ['#ffffff', '#ffe9a8', '#bfe3ff'], shapes: ['star', 'circle'], speed: [50, 170], size: [1.4, 3.2], gravity: 130, life: [0.4, 0.8] });
+    particles.burst(cx, cy, { count: 12, colors: ['#ffffff', '#F8E6E8', '#E8DDE0'], shapes: ['star', 'circle'], speed: [50, 170], size: [1.4, 3.2], gravity: 130, life: [0.4, 0.8] });
   } else if (level === 2) {
-    particles.burst(cx, cy, { count: 30, colors: ['#b78cff', '#ff7fd0', '#ffffff'], shapes: ['star', 'circle', 'ember'], speed: [80, 310], gravity: 240 });
-    particles.streakFan(cx, cy, { count: 10, colors: ['#d9baff', '#ffffff'] });
-    particles.ring(cx, cy, '#c9a2ff');
+    particles.burst(cx, cy, { count: 30, colors: ['#F8E6E8', '#E8DDE0', '#ffffff'], shapes: ['star', 'circle', 'ember'], speed: [80, 310], gravity: 240 });
+    particles.streakFan(cx, cy, { count: 10, colors: ['#E8DDE0', '#ffffff'] });
+    particles.ring(cx, cy, '#F8E6E8');
   } else if (level === 3) {
-    particles.burst(cx, cy, { count: 76, colors: ['#ff9d5c', '#ffd75e', '#ff5c8a', '#5eb1ff', '#7fd08c'], shapes: ['circle', 'star', 'ember'], speed: [120, 470] });
-    particles.burst(cx, cy, { count: 26, colors: ['#ffd75e', '#ff9d5c', '#ffffff'], shapes: ['ribbon'], speed: [90, 300], gravity: 260, life: [0.8, 1.4] });
-    particles.streakFan(cx, cy, { count: 16, colors: ['#ffd75e', '#ffb35c', '#ffffff'] });
-    particles.ring(cx, cy, '#ffb35c'); setTimeout(() => particles.ring(cx, cy, '#ffd75e'), 200);
+    particles.burst(cx, cy, { count: 76, colors: ['#ffffff', '#F8E6E8', '#E8DDE0', '#A89B9D'], shapes: ['circle', 'star', 'ember'], speed: [120, 470] });
+    particles.burst(cx, cy, { count: 26, colors: ['#F8E6E8', '#E8DDE0', '#ffffff'], shapes: ['ribbon'], speed: [90, 300], gravity: 260, life: [0.8, 1.4] });
+    particles.streakFan(cx, cy, { count: 16, colors: ['#F8E6E8', '#E8DDE0', '#ffffff'] });
+    particles.ring(cx, cy, '#F8E6E8'); setTimeout(() => particles.ring(cx, cy, '#F8E6E8'), 200);
     particles.rain({ count: 44 });
   } else if (level >= 4) {
-    particles.burst(cx, cy, { count: 130, colors: ['#ffe98a', '#ffd700', '#ffffff', '#ff5c8a'], shapes: ['circle', 'star', 'ember'], speed: [160, 640], life: [0.7, 1.5] });
-    particles.burst(cx, cy, { count: 54, colors: ['#ff5c8a', '#5eb1ff', '#7fd08c', '#b78cff'], shapes: ['ribbon', 'rect'], speed: [100, 390], gravity: 300, life: [0.9, 1.6] });
-    particles.streakFan(cx, cy, { count: 26, colors: ['#ffe98a', '#ffd700', '#ffffff'] });
+    particles.burst(cx, cy, { count: 130, colors: ['#ffffff', '#F8E6E8', '#E8DDE0'], shapes: ['circle', 'star', 'ember'], speed: [160, 640], life: [0.7, 1.5] });
+    particles.burst(cx, cy, { count: 54, colors: ['#F8E6E8', '#E8DDE0', '#A89B9D', '#ffffff'], shapes: ['ribbon', 'rect'], speed: [100, 390], gravity: 300, life: [0.9, 1.6] });
+    particles.streakFan(cx, cy, { count: 26, colors: ['#F8E6E8', '#E8DDE0', '#ffffff'] });
     particles.fountain(cx, cy + 90);
-    particles.ring(cx, cy, '#ffe98a'); setTimeout(() => particles.ring(cx, cy, '#ff5c8a'), 170); setTimeout(() => particles.ring(cx, cy, '#ffd700'), 360);
-    particles.rain({ count: 80, colors: ['#ffd700', '#ffe98a', '#fff6c8', '#ffdf6b'], shapes: ['streak', 'star', 'circle'] });
+    particles.ring(cx, cy, '#F8E6E8'); setTimeout(() => particles.ring(cx, cy, '#F8E6E8'), 170); setTimeout(() => particles.ring(cx, cy, '#F8E6E8'), 360);
+    particles.rain({ count: 80, colors: ['#F8E6E8', '#E8DDE0', '#ffffff'], shapes: ['streak', 'star', 'circle'] });
   }
 }
