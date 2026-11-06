@@ -8,8 +8,8 @@
   --radius:20px; --safe-b:env(safe-area-inset-bottom,0px);
 }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html{scrollbar-color:#C9BBAF transparent}
-body{background:radial-gradient(1200px 560px at 85% -10%,rgba(255,255,255,.35) 0%,transparent 60%),var(--shell);color:var(--ink);font-family:"Manrope","Noto Sans SC",-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",system-ui,sans-serif;min-height:100dvh;overflow-x:hidden}
+html{scrollbar-color:#C9BBAF transparent;overflow-x:clip}
+body{background:radial-gradient(1200px 560px at 85% -10%,rgba(255,255,255,.35) 0%,transparent 60%),var(--shell);color:var(--ink);font-family:"Manrope","Noto Sans SC",-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",system-ui,sans-serif;min-height:100dvh;overflow-x:hidden;overflow-x:clip}
 button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
 img{display:block;max-width:100%}
 #particles{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:130}
@@ -248,7 +248,7 @@ footer{max-width:1060px;margin:0 auto;padding:8px 16px calc(26px + var(--safe-b)
 .langseg{margin-top:14px}
 .langseg button{padding:7px 14px;font-size:13px}
 #stage{position:relative}
-#stage::before{content:"";position:absolute;left:50%;top:-30px;transform:translateX(-50%);width:min(680px,120vw);height:480px;background:var(--amb,none);opacity:.12;filter:blur(64px);border-radius:50%;pointer-events:none}
+#stage::before{content:"";position:absolute;left:50%;top:-30px;transform:translateX(-50%);width:min(680px,100%);height:480px;background:var(--amb,none);opacity:.12;filter:blur(64px);border-radius:50%;pointer-events:none}
 #stageBody{position:relative;z-index:1}
 .face img,.resultgrid img,.bestpull img,.pack .packart,.tray img{animation:imgIn .5s ease both}
 @keyframes imgIn{from{opacity:0;filter:blur(6px) saturate(.5)}to{opacity:1;filter:none}}
