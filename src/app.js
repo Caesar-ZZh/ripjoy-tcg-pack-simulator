@@ -157,7 +157,12 @@ function ensureMetaLoaded(again, pricedOnly = false) {
   }
   if (!need.size) return;
   metaLoading = true;
-  Promise.all([...need.values()].map(c => loadSet(c).catch(() => {}))).then(() => { metaLoading = false; again(); });
+  // 逐弹串行补载：简中弹 15–33MB/弹，并行解析会瞬间堆涨至渲染进程上限崩溃
+  // （释放后首次进收藏册需补载多弹时尤其危险）；串行只留一弹的解析峰值
+  (async () => {
+    for (const c of need.values()) { try { await loadSet(c); } catch {} }
+    metaLoading = false; again();
+  })();
 }
 $$('nav button').forEach(b => b.addEventListener('click', () => { sfx.click(); showView(b.dataset.view); }));
 $('#muteBtn').addEventListener('click', () => {

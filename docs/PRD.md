@@ -84,7 +84,7 @@ TCGdex 原始稀有度 → 游戏内等级（决定演出与配色）：
 >
 > **2026-11-06 新增**：简中 6 弹补齐真实卡包包装图（52poke 简体中文版单包正面，700w webp q86，`src/packart-5.js` 1.2MB）：黑雷奔流/白焰迸涌取 5 张装单包，星彩晶璃/璀璨诡幻/利刃猛醒取常规版 5 张装（plain「补充包.png」是 20 张装，勿用），30 周年取简体中文版补充包（6 张全闪）；至此 31 弹全部有真包装图，无图弹回退追卡封面的逻辑保留。构建脚本 `scripts/build-packart-cn.py`（media.52poke.com 须用 Chrome UA + Referer，否则 Cloudflare 拦截）。
 >
-> **2026-11-06 修正**：桌面 Chrome 反复 STATUS_BREAKPOINT 崩溃——根因是简中弹数据 15–33MB/弹，DATA/POOLS/CARDMAP 三处同引同一批卡对象且打开过的弹永不释放，同一标签页多开几弹即堆涨至渲染进程上限（与 2026-10-30 首页预取崩溃同根，只是这次是手动开弹累积）。修法：回选弹页时只留当前弹（`evictCnSets`，接在 exitStage / exitStageSilent / 图鉴返回），其余简中弹整弹释放；收藏册/战绩打开时按需补载（ensureMetaLoaded 已有此机制）；资产卡 kinds 改为直接数 save.collection、收藏册总数改用 SETS 申报 total，不再依赖已加载的 DATA/CARDMAP。附带：撕包图 alt 文本与画面一致（有包装图时标弹名+卡包）。
+> **2026-11-06 修正**：桌面 Chrome 反复 STATUS_BREAKPOINT 崩溃——根因是简中弹数据 15–33MB/弹，DATA/POOLS/CARDMAP 三处同引同一批卡对象且打开过的弹永不释放，同一标签页多开几弹即堆涨至渲染进程上限（与 2026-10-30 首页预取崩溃同根，只是这次是手动开弹累积）。修法：回选弹页时只留当前弹（`evictCnSets`，接在 exitStage / exitStageSilent / 图鉴返回），其余简中弹整弹释放；收藏册/战绩打开时按需补载（ensureMetaLoaded 已有此机制）；资产卡 kinds 改为直接数 save.collection、收藏册总数改用 SETS 申报 total，不再依赖已加载的 DATA/CARDMAP。补载本身也改串行：释放后首次进收藏册需补载多弹时，并行解析同样会堆涨崩溃，改为逐弹 await。附带：撕包图 alt 文本与画面一致（有包装图时标弹名+卡包）。
 >
 > **2026-11-06 教训**：app.js 未加版本号、Pages max-age=600 缓存下硬刷新也绕不过旧版（实测两轮复验都跑在旧版上）；index.html 里 app.js 已加 ?v=（现 evict1，与 styles.css ?v=premium2 同款做法），以后改 app.js 必须同步 bump 版本号再推，否则线上验活会验到旧版；验活前先 curl 线上 index.html 确认 ?v= 已是新值。另：2026-11-06 一次 Pages 构建（763be76f，仅改 app.js 两行 + index.html 一行）卡住 11 分钟后 failure，原因未明（疑似 GitHub 侧超时），当次改动未上线、随下一推重推。
 > 日版 7 张包（sv2a）：3C + 2U + 1 反闪槽 + 1 稀有槽，权重同构。
