@@ -67,19 +67,62 @@ setMuted(!!save.muted);
 
 /* ---------------- 数据 ---------------- */
 const DATA = {}; const POOLS = {}; const CARDMAP = {}; const LOADP = {};
-function loadSet(cfg) {
+const CHUNKCACHE = {}; // key -> Array(分片数据|null)：整弹加载失败后重试复用已成功分片，不用全部重下
+const CHUNK_MAX_RETRY = 3; // 每片最多尝试次数（含首次）
+const CHUNK_CONCURRENCY = 3; // 分片并发上限：15 片并行在手机弱网下极易整弹失败
+const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+async function fetchJsonRetry(url, attempts = CHUNK_MAX_RETRY) {
+  // 单片拉取失败自动重试（600ms、1200ms 退避），多次失败才抛错
+  let lastErr;
+  for (let i = 0; i < attempts; i++) {
+    try {
+      const r = await fetch(url);
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      return await r.json();
+    } catch (e) {
+      lastErr = e;
+      if (i < attempts - 1) await sleep(600 * (i + 1));
+    }
+  }
+  throw lastErr;
+}
+async function fetchChunksLimited(urls, cache, onProgress) {
+  // 限流拉取：失败的分片不阻塞其余分片，全部跑完后才统一抛错（以便重试复用已成功分片）
+  const total = urls.length;
+  let done = 0, failedErr = null;
+  for (let i = 0; i < total; i++) if (cache[i]) done++;
+  if (onProgress) onProgress(done, total);
+  let next = 0;
+  const worker = async () => {
+    while (true) {
+      const idx = next++;
+      if (idx >= total) return;
+      if (cache[idx]) continue;
+      try { cache[idx] = await fetchJsonRetry(urls[idx]); }
+      catch (e) { failedErr = failedErr || e; cache[idx] = null; }
+      done++;
+      if (onProgress) onProgress(done, total);
+    }
+  };
+  await Promise.all(Array.from({ length: Math.min(CHUNK_CONCURRENCY, total) }, () => worker()));
+  if (failedErr) throw failedErr;
+  return cache;
+}
+function loadSet(cfg, onProgress) {
   if (DATA[cfg.key]) return Promise.resolve(DATA[cfg.key]);
   if (LOADP[cfg.key]) return LOADP[cfg.key];
   LOADP[cfg.key] = (async () => {
     const embedded = (typeof window !== 'undefined' && window.__RIPJOY_EMBED__) ? window.__RIPJOY_EMBED__[cfg.file] : null;
     let data = embedded;
     if (!data && cfg.parts) {
-      // 简中弹高清数据分片（单片 <5MB），并行拉取后合并
+      // 简中弹高清数据分片（单片 <5MB）：限流 3 路并发，每片失败自动重试
       const urls = [cfg.file, ...Array.from({ length: cfg.parts - 1 }, (_, i) => cfg.file.replace('.json', `.p${i + 2}.json`))];
-      const chunks = await Promise.all(urls.map(u => fetch(u).then(r => r.json())));
+      const cache = CHUNKCACHE[cfg.key] || (CHUNKCACHE[cfg.key] = []);
+      const chunks = await fetchChunksLimited(urls, cache, onProgress);
       data = { ...chunks[0], cards: chunks.flatMap(c => c.cards) };
+      delete CHUNKCACHE[cfg.key];
     }
-    if (!data) data = await (await fetch(cfg.file)).json();
+    if (!data) data = await fetchJsonRetry(cfg.file);
     DATA[cfg.key] = data; POOLS[cfg.key] = buildPools(data);
     for (const c of data.cards) CARDMAP[c.id] = { card: c, setKey: cfg.key, setName: data.name };
     return data;
@@ -102,6 +145,7 @@ function evictCnSets(keepKey) {
     delete DATA[cfg.key];
     delete POOLS[cfg.key];
     delete LOADP[cfg.key];
+    delete CHUNKCACHE[cfg.key]; // 分片缓存同样释放，否则换弹后仍占着已加载分片的内存
     delete HIDONE[cfg.key];
   }
 }
@@ -351,21 +395,27 @@ function finishPackToHistory(cfg, pack) {
   save.history = save.history.slice(0, 30); persist();
 }
 
-async function ensureStageData(cfg) {
+async function ensureStageData(cfg, retryFn) {
   if (DATA[cfg.key]) return true;
   session = { cfg, phase: 'loading' };
   showStage();
   $('#stageTitle').textContent = cfg.sname;
-  $('#stageBody').innerHTML = `<div class="empty" style="padding-top:70px">正在加载「${cfg.sname}」卡池…<br><span style="font-size:12.5px">首次打开需下载该弹数据，之后秒开</span></div>`;
-  try { await loadSet(cfg); } catch {
-    if (session?.phase === 'loading') $('#stageBody').innerHTML = `<div class="empty" style="padding-top:70px">卡池加载失败，网络不太稳<br><span style="font-size:12.5px">点左上角「← 选弹」返回，稍后再试</span></div>`;
+  const total = cfg.parts || 1;
+  const renderLoading = (done) => {
+    $('#stageBody').innerHTML = `<div class="empty" style="padding-top:70px">正在加载「${cfg.sname}」卡池${total > 1 ? ` ${done}/${total}` : ''}…<br><span style="font-size:12.5px">首次打开需下载该弹数据，之后秒开</span></div>`;
+  };
+  renderLoading(0);
+  try { await loadSet(cfg, (done) => { if (session?.phase === 'loading') renderLoading(done); }); } catch {
+    if (session?.phase === 'loading') $('#stageBody').innerHTML = `<div class="empty" style="padding-top:70px">卡池加载失败，网络不太稳<br><span style="font-size:12.5px">已加载的分片会保留，重试不用全部重下</span><br><button class="btn" id="loadRetryBtn" style="margin-top:18px;flex:none;padding:12px 28px">重试加载</button><br><span style="font-size:12.5px">点左上角「← 选弹」返回，稍后再试</span></div>`;
+    const rb = $('#loadRetryBtn');
+    if (rb && retryFn) rb.addEventListener('click', () => { sfx.click(); retryFn(); });
     return false;
   }
   return !!session && session.phase === 'loading';
 }
 async function startPack(cfg, isRetry) {
   closeSvOverlay();
-  if (!DATA[cfg.key] && !(await ensureStageData(cfg))) return;
+  if (!DATA[cfg.key] && !(await ensureStageData(cfg, () => startPack(cfg, true)))) return;
   await ensurePackart(cfg.key);
   await ensureSmoke();
   loadHi(cfg);
@@ -383,7 +433,7 @@ async function startPack(cfg, isRetry) {
 
 async function startTen(cfg) {
   closeSvOverlay();
-  if (!DATA[cfg.key] && !(await ensureStageData(cfg))) return;
+  if (!DATA[cfg.key] && !(await ensureStageData(cfg, () => startTen(cfg)))) return;
   await ensurePackart(cfg.key);
   await ensureSmoke();
   loadHi(cfg);
