@@ -38,9 +38,9 @@ const SETS = [
 ];
 const LANG_LABEL = { en: '英文版', ja: '日版', 'zh-cn': '简体中文版', 'zh-tw': '繁体中文版' };
 // 真实卡包包装图（Bulbagarden Archives 官方图）：有图的弹撕包时随机用一种包装；无图的弹用追卡卡面设计
-const PACKART = { '151C': ['151C-2.webp'], '151en': ['151en-1.webp'], '151ja': ['151ja-1.webp', '151ja-2.webp'], SV10tw: ['SV10tw-1.webp'], SV9a: ['SV9a-1.webp'], SV9tw: ['SV9tw-1.webp'], me01: ['me01-1.webp', 'me01-2.webp', 'me01-3.webp'], me02: ['me02-1.webp', 'me02-2.webp', 'me02-3.webp'], 'me02.5': ['me02.5-1.webp'], sv01: ['sv01-1.webp', 'sv01-2.webp', 'sv01-3.webp'], sv02: ['sv02-1.webp', 'sv02-2.webp', 'sv02-3.webp'], sv03: ['sv03-1.webp', 'sv03-2.webp', 'sv03-3.webp'], sv04: ['sv04-1.webp', 'sv04-2.webp', 'sv04-3.webp'], 'sv04.5': ['sv04.5-1.webp', 'sv04.5-2.webp', 'sv04.5-3.webp'], sv05: ['sv05-1.webp', 'sv05-2.webp', 'sv05-3.webp'], sv06: ['sv06-1.webp', 'sv06-2.webp'], 'sv06.5': ['sv06.5-1.webp', 'sv06.5-2.webp', 'sv06.5-3.webp'], sv07: ['sv07-1.webp', 'sv07-2.webp', 'sv07-3.webp'], sv08: ['sv08-1.webp', 'sv08-2.webp', 'sv08-3.webp'], 'sv08.5': ['sv08.5-1.webp', 'sv08.5-2.webp', 'sv08.5-3.webp'], sv09: ['sv09-1.webp', 'sv09-2.webp', 'sv09-3.webp'], sv10: ['sv10-1.webp', 'sv10-2.webp', 'sv10-3.webp'], 'sv10.5b': ['sv10.5b-1.webp'], 'sv10.5w': ['sv10.5w-1.webp'], taijing: ['taijing-1.webp'] };
+const PACKART = { '151C': ['151C-2.webp'], '151en': ['151en-1.webp'], '151ja': ['151ja-1.webp', '151ja-2.webp'], SV10tw: ['SV10tw-1.webp'], SV9a: ['SV9a-1.webp'], SV9tw: ['SV9tw-1.webp'], me01: ['me01-1.webp', 'me01-2.webp', 'me01-3.webp'], me02: ['me02-1.webp', 'me02-2.webp', 'me02-3.webp'], 'me02.5': ['me02.5-1.webp'], sv01: ['sv01-1.webp', 'sv01-2.webp', 'sv01-3.webp'], sv02: ['sv02-1.webp', 'sv02-2.webp', 'sv02-3.webp'], sv03: ['sv03-1.webp', 'sv03-2.webp', 'sv03-3.webp'], sv04: ['sv04-1.webp', 'sv04-2.webp', 'sv04-3.webp'], 'sv04.5': ['sv04.5-1.webp', 'sv04.5-2.webp', 'sv04.5-3.webp'], sv05: ['sv05-1.webp', 'sv05-2.webp', 'sv05-3.webp'], sv06: ['sv06-1.webp', 'sv06-2.webp'], 'sv06.5': ['sv06.5-1.webp', 'sv06.5-2.webp', 'sv06.5-3.webp'], sv07: ['sv07-1.webp', 'sv07-2.webp', 'sv07-3.webp'], sv08: ['sv08-1.webp', 'sv08-2.webp', 'sv08-3.webp'], 'sv08.5': ['sv08.5-1.webp', 'sv08.5-2.webp', 'sv08.5-3.webp'], sv09: ['sv09-1.webp', 'sv09-2.webp', 'sv09-3.webp'], sv10: ['sv10-1.webp', 'sv10-2.webp', 'sv10-3.webp'], 'sv10.5b': ['sv10.5b-1.webp'], 'sv10.5w': ['sv10.5w-1.webp'], taijing: ['taijing-1.webp'], 'CSV7C': ['CSV7C-1.webp'], 'CSV8C': ['CSV8C-1.webp'], 'CSV9C': ['CSV9C-1.webp'], 'CSV10.5C': ['CSV10.5C-1.webp'], 'CSV10.6C': ['CSV10.6C-1.webp'], '30thC': ['30thC-1.webp'] };
 // 包装图分片懒加载：进撕包页前才拉对应分片，首页零负担；单文件版已全内嵌则直接跳过
-const PACKART_SRC = { taijing: 1, '151C': 1, '151ja': 1, SV9a: 1, SV9tw: 1, SV10tw: 1, sv01: 1, sv02: 1, sv03: 2, sv04: 2, 'sv04.5': 2, sv05: 2, sv06: 2, 'sv06.5': 3, sv07: 3, sv08: 3, 'sv08.5': 3, sv09: 3, sv10: 4, 'sv10.5b': 4, 'sv10.5w': 4, me01: 4, me02: 4, 'me02.5': 4, '151en': 4 };
+const PACKART_SRC = { taijing: 1, '151C': 1, '151ja': 1, SV9a: 1, SV9tw: 1, SV10tw: 1, sv01: 1, sv02: 1, sv03: 2, sv04: 2, 'sv04.5': 2, sv05: 2, sv06: 2, 'sv06.5': 3, sv07: 3, sv08: 3, 'sv08.5': 3, sv09: 3, sv10: 4, 'sv10.5b': 4, 'sv10.5w': 4, me01: 4, me02: 4, 'me02.5': 4, '151en': 4, 'CSV7C': 5, 'CSV8C': 5, 'CSV9C': 5, 'CSV10.5C': 5, 'CSV10.6C': 5, '30thC': 5 };
 const _paLoading = {};
 function ensurePackart(key) {
   const files = PACKART[key]; if (!files) return Promise.resolve();
@@ -577,11 +577,12 @@ function renderSummary() {
   const best = sorted[0];
   const total = pack.reduce((s, e) => s + (e.card.p || 0), 0);
   const news = pack.filter(e => e.isNew).length;
+  const topHits = [...new Set(sorted.filter(e => e.level >= 4).map(e => dispTier(e.card)))];
   const st = $('#stageBody');
   st.innerHTML = `
     <div class="summaryhead">
       <h2>${ten ? '十连开 · 总结算' : best.level >= 4 ? '🎉 神抽！' : best.level === 3 ? '✨ 出货了！' : '本包结算'}</h2>
-      <p>${ten ? `共 ${pack.length} 张` : `${data.name}`} · 参考价合计 <b>${pack.some(e => e.card.p != null) ? `€${total.toFixed(2)}` : '—'}</b> · 新卡 <b>${news}</b> 张${ten && sorted.some(e => e.level >= 4) ? ' · <b>含 SAR/HR！</b>' : ''}${roiText(cfg, total, ten)}</p>
+      <p>${ten ? `共 ${pack.length} 张` : `${data.name}`} · 参考价合计 <b>${pack.some(e => e.card.p != null) ? `€${total.toFixed(2)}` : '—'}</b> · 新卡 <b>${news}</b> 张${ten && topHits.length ? ` · <b>含 ${topHits.join('/')}！</b>` : ''}${roiText(cfg, total, ten)}</p>
     </div>
     <div class="bestpull" style="--bc:${TIERS[best.tier].color}"><span class="besttag">最佳 · ${dispTier(best.card)} · ${fmtPrice(best.card)}</span><img src="${imgUrl(best.card, true)}" alt="${best.card.n}"></div>
     <p style="text-align:center;color:var(--dim);font-size:13px">${best.card.n}</p>
