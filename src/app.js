@@ -1,40 +1,40 @@
 import { TIERS, tierOf, buildPools, openPack, fmtPrice, imgUrl, thumbUrl, bestCmp } from './engine.js';
-import { Particles, fxForLevel } from './particles.js';
+import { Particles, fxForLevel } from './particles.js?v=selvedge2';
 import { sfx, vibrate, VIB, addTilt, setMuted } from './fx.js';
 import { BACKS } from './cardbacks.js';
 
 const SETS = [
-  { key: 'CSV10.5C', file: 'data/zh-cn-CSV10.5C.json', theme: 'linear-gradient(150deg,#0E0809,#191415 55%,#2e2425)', desc: '简体中文版 · 黑白交汇 · 合众 156 宝可梦集结 · 卡图暂用繁中版，4 张训练家卡暂用英文版', chaseNote: '捷克罗姆 ex BWR', sname: '黑雷奔流', lang: 'zh-cn', total: 174, pack: 5, parts: 14, official: true },
-  { key: 'CSV10.6C', file: 'data/zh-cn-CSV10.6C.json', theme: 'linear-gradient(150deg,#0E0809,#191415 55%,#2e2425)', desc: '简体中文版 · 黑白交汇 · 合众 156 宝可梦集结 · 卡图暂用繁中版，1 张训练家卡暂用英文版', chaseNote: '莱希拉姆 ex BWR', sname: '白焰迸涌', lang: 'zh-cn', total: 174, pack: 5, parts: 14, official: true },
-  { key: '30thC', file: 'data/zh-cn-30thC.json', theme: 'linear-gradient(150deg,#0E0809,#191415 55%,#2e2425)', desc: '简体中文版 · 30 周年纪念 · 全闪包 · 每包必出 1 张皮卡丘 + 1 张能量 · 2 张 SAR 与能量卡暂用日版图', chaseNote: 'RGB 梦幻 · 梦幻 ex FUR', sname: '30周年庆典', lang: 'zh-cn', total: 176, pack: 6, parts: 15, official: true },
-  { key: 'taijing', file: 'data/zh-cn-CSV9.5C.json', theme: 'linear-gradient(150deg,#0E0809,#191415 55%,#2e2425)', desc: '简体中文版 · 伊布全家太晶盛聚 · 含简中专属异画', chaseNote: '仙子伊布 ex SAR（简中专属异画）', sname: '太晶盛聚', lang: 'zh-cn', total: 259, pack: 10, parts: 5, official: true },
-  { key: 'CSV9C', file: 'data/zh-cn-CSV9C.json', theme: 'linear-gradient(150deg,#0E0809,#191415 55%,#2e2425)', desc: '简体中文版 · 晶璃星辉 · 太乐巴戈斯集结', chaseNote: '太乐巴戈斯 ex SAR', sname: '星彩晶璃', lang: 'zh-cn', total: 266, pack: 5, parts: 5, official: true },
-  { key: 'CSV8C', file: 'data/zh-cn-CSV8C.json', theme: 'linear-gradient(150deg,#0E0809,#191415 55%,#2e2425)', desc: '简体中文版 · 诡幻璀璨 · 桃歹郎一族', chaseNote: '桃歹郎 ex SAR', sname: '璀璨诡幻', lang: 'zh-cn', total: 264, pack: 5, parts: 5, official: true },
-  { key: 'CSV7C', file: 'data/zh-cn-CSV7C.json', theme: 'linear-gradient(150deg,#0E0809,#191415 55%,#2e2425)', desc: '简体中文版 · 利刃猛醒 · 猛雷鼓咆哮', chaseNote: '猛雷鼓 ex SAR', sname: '利刃猛醒', lang: 'zh-cn', total: 259, pack: 5, parts: 5, official: true },
-  { key: '151C', file: 'data/zh-cn-151C.json', theme: 'linear-gradient(150deg,#0E0809,#191415 55%,#2e2425)', desc: '简体中文版 · 初代 151 情怀 · 旅望惊聚全集', chaseNote: '喷火龙 ex SAR', sname: '收集啦151', lang: 'zh-cn', total: 192, pack: 5, parts: 7, official: true },
-  { key: '151en', file: 'data/en-sv03.5.json', theme: 'linear-gradient(150deg,#0E0809,#191415 55%,#2e2425)', desc: '初代 151 情怀弹 · 喷火龙 SAR 大追', chaseNote: '喷火龙 ex SAR', sname: '151', lang: 'en', total: 207, pack: 10 },
-  { key: 'sv08.5', file: 'data/en-sv08.5.json', theme: 'linear-gradient(150deg,#0E0809,#191415 55%,#2e2425)', desc: '伊布盛宴 · 月亮伊布 ex SAR 天价追卡', chaseNote: '月亮伊布 ex SAR', sname: 'Prismatic Evolutions', lang: 'en', total: 180, pack: 10 },
-  { key: 'sv08', file: 'data/en-sv08.json', theme: 'linear-gradient(150deg,#0E0809,#191415 55%,#2e2425)', desc: '电光四射 · 皮卡丘 SAR 天价追卡', chaseNote: '皮卡丘 ex SAR', sname: 'Surging Sparks', lang: 'en', total: 252, pack: 10 },
-  { key: 'sv09', file: 'data/en-sv09.json', theme: 'linear-gradient(150deg,#0E0809,#191415 55%,#2e2425)', desc: '旅途伙伴 · 训练家的宝可梦集结', chaseNote: '莉莉艾的皮皮 ex SAR', sname: 'Journey Together', lang: 'en', total: 190, pack: 10 },
-  { key: 'sv10', file: 'data/en-sv10.json', theme: 'linear-gradient(150deg,#0E0809,#191415 55%,#2e2425)', desc: '火箭队归来 · 坂木的超梦 ex SAR', chaseNote: '火箭队的超梦 ex SAR', sname: 'Destined Rivals', lang: 'en', total: 244, pack: 10 },
-  { key: 'me01', file: 'data/en-me01.json', theme: 'linear-gradient(150deg,#0E0809,#191415 55%,#2e2425)', desc: 'MEGA 新时代开启 · 超级进化归来', chaseNote: '超级路卡利欧 ex 金卡', sname: 'Mega Evolution', lang: 'en', total: 188, pack: 10 },
-  { key: 'sv05', file: 'data/en-sv05.json', theme: 'linear-gradient(150deg,#0E0809,#191415 55%,#2e2425)', desc: '时空之力 · 古代与未来悖谬集结', chaseNote: '铁斑叶 ex SAR', sname: 'Temporal Forces', lang: 'en', total: 218, pack: 10 },
-  { key: 'sv10.5b', file: 'data/en-sv10.5b.json', theme: 'linear-gradient(150deg,#0E0809,#191415 55%,#2e2425)', desc: '合众黑雷 · BWR 黑白稀有登场', chaseNote: '捷克罗姆 ex BWR', sname: 'Black Bolt', lang: 'en', total: 172, pack: 10 },
-  { key: 'sv10.5w', file: 'data/en-sv10.5w.json', theme: 'linear-gradient(150deg,#0E0809,#191415 55%,#2e2425)', desc: '合众白焰 · BWR 黑白稀有登场', chaseNote: '莱希拉姆 ex BWR', sname: 'White Flare', lang: 'en', total: 173, pack: 10 },
-  { key: 'me02', file: 'data/en-me02.json', theme: 'linear-gradient(150deg,#0E0809,#191415 55%,#2e2425)', desc: 'MEGA 第二弹 · 幻影火焰', chaseNote: '超级喷火龙X ex 金卡', sname: 'Phantasmal Flames', lang: 'en', total: 130, pack: 10 },
-  { key: 'me02.5', file: 'data/en-me02.5.json', theme: 'linear-gradient(150deg,#0E0809,#191415 55%,#2e2425)', desc: 'MEGA 大弹 295 张 · 群雄昇腾', chaseNote: '超级快龙 ex 金卡', sname: 'Ascended Heroes', lang: 'en', total: 295, pack: 10 },
-  { key: 'sv04.5', file: 'data/en-sv04.5.json', theme: 'linear-gradient(150deg,#0E0809,#191415 55%,#2e2425)', desc: '帕底亚之光 · 闪色宝可梦大集合', chaseNote: '闪色超梦 ex', sname: 'Paldean Fates', lang: 'en', total: 245, pack: 10 },
-  { key: 'sv06.5', file: 'data/en-sv06.5.json', theme: 'linear-gradient(150deg,#0E0809,#191415 55%,#2e2425)', desc: '黑夜漫游者 · 桃歹郎 ex SAR', chaseNote: '桃歹郎 ex SAR', sname: 'Shrouded Fable', lang: 'en', total: 99, pack: 10 },
-  { key: 'sv06', file: 'data/en-sv06.json', theme: 'linear-gradient(150deg,#0E0809,#191415 55%,#2e2425)', desc: '变幻假面 · 厄诡椪与忍蛙', chaseNote: '甲贺忍蛙 ex SAR', sname: 'Twilight Masquerade', lang: 'en', total: 226, pack: 10 },
-  { key: 'sv07', file: 'data/en-sv07.json', theme: 'linear-gradient(150deg,#0E0809,#191415 55%,#2e2425)', desc: '星晶奇迹 · 太乐巴戈斯 ex', chaseNote: '太乐巴戈斯 ex SAR', sname: 'Stellar Crown', lang: 'en', total: 175, pack: 10 },
-  { key: 'sv04', file: 'data/en-sv04.json', theme: 'linear-gradient(150deg,#0E0809,#191415 55%,#2e2425)', desc: '悖论裂缝 · 古代未来交锋', chaseNote: '铁武者 ex SAR', sname: 'Paradox Rift', lang: 'en', total: 266, pack: 10 },
-  { key: 'sv01', file: 'data/en-sv01.json', theme: 'linear-gradient(150deg,#0E0809,#191415 55%,#2e2425)', desc: '朱紫起点 · 帕底亚启程', chaseNote: '沙奈朵 ex SAR', sname: 'Scarlet & Violet', lang: 'en', total: 258, pack: 10 },
-  { key: 'sv02', file: 'data/en-sv02.json', theme: 'linear-gradient(150deg,#0E0809,#191415 55%,#2e2425)', desc: '帕底亚进化 · 奇树 SAR 大追', chaseNote: '奇树 SAR', sname: 'Paldea Evolved', lang: 'en', total: 279, pack: 10 },
-  { key: 'sv03', file: 'data/en-sv03.json', theme: 'linear-gradient(150deg,#0E0809,#191415 55%,#2e2425)', desc: '黯焰支配者 · 喷火龙 ex', chaseNote: '喷火龙 ex 金卡', sname: 'Obsidian Flames', lang: 'en', total: 230, pack: 10 },
-  { key: '151ja', file: 'data/ja-sv2a.json', theme: 'linear-gradient(150deg,#0E0809,#191415 55%,#2e2425)', desc: '日版原版 151 · 7 张包 · 镜面闪', chaseNote: 'リザードンex SAR', sname: 'ポケモンカード151', lang: 'ja', total: 210, pack: 7 },
-  { key: 'SV9a', file: 'data/ja-SV9a.json', theme: 'linear-gradient(150deg,#0E0809,#191415 55%,#2e2425)', desc: '日版热风竞技场 · 5 张包', chaseNote: 'シロナのガブリアスex SAR', sname: '熱風のアリーナ', lang: 'ja', total: 92, pack: 5 },
-  { key: 'SV9tw', file: 'data/zh-tw-SV9.json', theme: 'linear-gradient(150deg,#0E0809,#191415 55%,#2e2425)', desc: '繁体中文版（台版）· 5 张包 · 数据暂缺 AR/SAR', chaseNote: '莉莉艾的皮皮 ex RR', sname: '對戰搭檔', lang: 'zh-tw', total: 100, pack: 5 },
-  { key: 'SV10tw', file: 'data/zh-tw-SV10.json', theme: 'linear-gradient(150deg,#0E0809,#191415 55%,#2e2425)', desc: '繁体中文版（台版）· 5 张包 · 数据暂缺 AR/SAR', chaseNote: '火箭队的超梦 ex RR', sname: '火箭隊的榮耀', lang: 'zh-tw', total: 98, pack: 5 },
+  { key: 'CSV10.5C', file: 'data/zh-cn-CSV10.5C.json', theme: 'linear-gradient(150deg,#292220,#332A25 55%,#3D322B)', desc: '简体中文版 · 黑白交汇 · 合众 156 宝可梦集结 · 卡图暂用繁中版，4 张训练家卡暂用英文版', chaseNote: '捷克罗姆 ex BWR', sname: '黑雷奔流', lang: 'zh-cn', total: 174, pack: 5, parts: 14, official: true },
+  { key: 'CSV10.6C', file: 'data/zh-cn-CSV10.6C.json', theme: 'linear-gradient(150deg,#292220,#332A25 55%,#3D322B)', desc: '简体中文版 · 黑白交汇 · 合众 156 宝可梦集结 · 卡图暂用繁中版，1 张训练家卡暂用英文版', chaseNote: '莱希拉姆 ex BWR', sname: '白焰迸涌', lang: 'zh-cn', total: 174, pack: 5, parts: 14, official: true },
+  { key: '30thC', file: 'data/zh-cn-30thC.json', theme: 'linear-gradient(150deg,#292220,#332A25 55%,#3D322B)', desc: '简体中文版 · 30 周年纪念 · 全闪包 · 每包必出 1 张皮卡丘 + 1 张能量 · 2 张 SAR 与能量卡暂用日版图', chaseNote: 'RGB 梦幻 · 梦幻 ex FUR', sname: '30周年庆典', lang: 'zh-cn', total: 176, pack: 6, parts: 15, official: true },
+  { key: 'taijing', file: 'data/zh-cn-CSV9.5C.json', theme: 'linear-gradient(150deg,#292220,#332A25 55%,#3D322B)', desc: '简体中文版 · 伊布全家太晶盛聚 · 含简中专属异画', chaseNote: '仙子伊布 ex SAR（简中专属异画）', sname: '太晶盛聚', lang: 'zh-cn', total: 259, pack: 10, parts: 5, official: true },
+  { key: 'CSV9C', file: 'data/zh-cn-CSV9C.json', theme: 'linear-gradient(150deg,#292220,#332A25 55%,#3D322B)', desc: '简体中文版 · 晶璃星辉 · 太乐巴戈斯集结', chaseNote: '太乐巴戈斯 ex SAR', sname: '星彩晶璃', lang: 'zh-cn', total: 266, pack: 5, parts: 5, official: true },
+  { key: 'CSV8C', file: 'data/zh-cn-CSV8C.json', theme: 'linear-gradient(150deg,#292220,#332A25 55%,#3D322B)', desc: '简体中文版 · 诡幻璀璨 · 桃歹郎一族', chaseNote: '桃歹郎 ex SAR', sname: '璀璨诡幻', lang: 'zh-cn', total: 264, pack: 5, parts: 5, official: true },
+  { key: 'CSV7C', file: 'data/zh-cn-CSV7C.json', theme: 'linear-gradient(150deg,#292220,#332A25 55%,#3D322B)', desc: '简体中文版 · 利刃猛醒 · 猛雷鼓咆哮', chaseNote: '猛雷鼓 ex SAR', sname: '利刃猛醒', lang: 'zh-cn', total: 259, pack: 5, parts: 5, official: true },
+  { key: '151C', file: 'data/zh-cn-151C.json', theme: 'linear-gradient(150deg,#292220,#332A25 55%,#3D322B)', desc: '简体中文版 · 初代 151 情怀 · 旅望惊聚全集', chaseNote: '喷火龙 ex SAR', sname: '收集啦151', lang: 'zh-cn', total: 192, pack: 5, parts: 7, official: true },
+  { key: '151en', file: 'data/en-sv03.5.json', theme: 'linear-gradient(150deg,#292220,#332A25 55%,#3D322B)', desc: '初代 151 情怀弹 · 喷火龙 SAR 大追', chaseNote: '喷火龙 ex SAR', sname: '151', lang: 'en', total: 207, pack: 10 },
+  { key: 'sv08.5', file: 'data/en-sv08.5.json', theme: 'linear-gradient(150deg,#292220,#332A25 55%,#3D322B)', desc: '伊布盛宴 · 月亮伊布 ex SAR 天价追卡', chaseNote: '月亮伊布 ex SAR', sname: 'Prismatic Evolutions', lang: 'en', total: 180, pack: 10 },
+  { key: 'sv08', file: 'data/en-sv08.json', theme: 'linear-gradient(150deg,#292220,#332A25 55%,#3D322B)', desc: '电光四射 · 皮卡丘 SAR 天价追卡', chaseNote: '皮卡丘 ex SAR', sname: 'Surging Sparks', lang: 'en', total: 252, pack: 10 },
+  { key: 'sv09', file: 'data/en-sv09.json', theme: 'linear-gradient(150deg,#292220,#332A25 55%,#3D322B)', desc: '旅途伙伴 · 训练家的宝可梦集结', chaseNote: '莉莉艾的皮皮 ex SAR', sname: 'Journey Together', lang: 'en', total: 190, pack: 10 },
+  { key: 'sv10', file: 'data/en-sv10.json', theme: 'linear-gradient(150deg,#292220,#332A25 55%,#3D322B)', desc: '火箭队归来 · 坂木的超梦 ex SAR', chaseNote: '火箭队的超梦 ex SAR', sname: 'Destined Rivals', lang: 'en', total: 244, pack: 10 },
+  { key: 'me01', file: 'data/en-me01.json', theme: 'linear-gradient(150deg,#292220,#332A25 55%,#3D322B)', desc: 'MEGA 新时代开启 · 超级进化归来', chaseNote: '超级路卡利欧 ex 金卡', sname: 'Mega Evolution', lang: 'en', total: 188, pack: 10 },
+  { key: 'sv05', file: 'data/en-sv05.json', theme: 'linear-gradient(150deg,#292220,#332A25 55%,#3D322B)', desc: '时空之力 · 古代与未来悖谬集结', chaseNote: '铁斑叶 ex SAR', sname: 'Temporal Forces', lang: 'en', total: 218, pack: 10 },
+  { key: 'sv10.5b', file: 'data/en-sv10.5b.json', theme: 'linear-gradient(150deg,#292220,#332A25 55%,#3D322B)', desc: '合众黑雷 · BWR 黑白稀有登场', chaseNote: '捷克罗姆 ex BWR', sname: 'Black Bolt', lang: 'en', total: 172, pack: 10 },
+  { key: 'sv10.5w', file: 'data/en-sv10.5w.json', theme: 'linear-gradient(150deg,#292220,#332A25 55%,#3D322B)', desc: '合众白焰 · BWR 黑白稀有登场', chaseNote: '莱希拉姆 ex BWR', sname: 'White Flare', lang: 'en', total: 173, pack: 10 },
+  { key: 'me02', file: 'data/en-me02.json', theme: 'linear-gradient(150deg,#292220,#332A25 55%,#3D322B)', desc: 'MEGA 第二弹 · 幻影火焰', chaseNote: '超级喷火龙X ex 金卡', sname: 'Phantasmal Flames', lang: 'en', total: 130, pack: 10 },
+  { key: 'me02.5', file: 'data/en-me02.5.json', theme: 'linear-gradient(150deg,#292220,#332A25 55%,#3D322B)', desc: 'MEGA 大弹 295 张 · 群雄昇腾', chaseNote: '超级快龙 ex 金卡', sname: 'Ascended Heroes', lang: 'en', total: 295, pack: 10 },
+  { key: 'sv04.5', file: 'data/en-sv04.5.json', theme: 'linear-gradient(150deg,#292220,#332A25 55%,#3D322B)', desc: '帕底亚之光 · 闪色宝可梦大集合', chaseNote: '闪色超梦 ex', sname: 'Paldean Fates', lang: 'en', total: 245, pack: 10 },
+  { key: 'sv06.5', file: 'data/en-sv06.5.json', theme: 'linear-gradient(150deg,#292220,#332A25 55%,#3D322B)', desc: '黑夜漫游者 · 桃歹郎 ex SAR', chaseNote: '桃歹郎 ex SAR', sname: 'Shrouded Fable', lang: 'en', total: 99, pack: 10 },
+  { key: 'sv06', file: 'data/en-sv06.json', theme: 'linear-gradient(150deg,#292220,#332A25 55%,#3D322B)', desc: '变幻假面 · 厄诡椪与忍蛙', chaseNote: '甲贺忍蛙 ex SAR', sname: 'Twilight Masquerade', lang: 'en', total: 226, pack: 10 },
+  { key: 'sv07', file: 'data/en-sv07.json', theme: 'linear-gradient(150deg,#292220,#332A25 55%,#3D322B)', desc: '星晶奇迹 · 太乐巴戈斯 ex', chaseNote: '太乐巴戈斯 ex SAR', sname: 'Stellar Crown', lang: 'en', total: 175, pack: 10 },
+  { key: 'sv04', file: 'data/en-sv04.json', theme: 'linear-gradient(150deg,#292220,#332A25 55%,#3D322B)', desc: '悖论裂缝 · 古代未来交锋', chaseNote: '铁武者 ex SAR', sname: 'Paradox Rift', lang: 'en', total: 266, pack: 10 },
+  { key: 'sv01', file: 'data/en-sv01.json', theme: 'linear-gradient(150deg,#292220,#332A25 55%,#3D322B)', desc: '朱紫起点 · 帕底亚启程', chaseNote: '沙奈朵 ex SAR', sname: 'Scarlet & Violet', lang: 'en', total: 258, pack: 10 },
+  { key: 'sv02', file: 'data/en-sv02.json', theme: 'linear-gradient(150deg,#292220,#332A25 55%,#3D322B)', desc: '帕底亚进化 · 奇树 SAR 大追', chaseNote: '奇树 SAR', sname: 'Paldea Evolved', lang: 'en', total: 279, pack: 10 },
+  { key: 'sv03', file: 'data/en-sv03.json', theme: 'linear-gradient(150deg,#292220,#332A25 55%,#3D322B)', desc: '黯焰支配者 · 喷火龙 ex', chaseNote: '喷火龙 ex 金卡', sname: 'Obsidian Flames', lang: 'en', total: 230, pack: 10 },
+  { key: '151ja', file: 'data/ja-sv2a.json', theme: 'linear-gradient(150deg,#292220,#332A25 55%,#3D322B)', desc: '日版原版 151 · 7 张包 · 镜面闪', chaseNote: 'リザードンex SAR', sname: 'ポケモンカード151', lang: 'ja', total: 210, pack: 7 },
+  { key: 'SV9a', file: 'data/ja-SV9a.json', theme: 'linear-gradient(150deg,#292220,#332A25 55%,#3D322B)', desc: '日版热风竞技场 · 5 张包', chaseNote: 'シロナのガブリアスex SAR', sname: '熱風のアリーナ', lang: 'ja', total: 92, pack: 5 },
+  { key: 'SV9tw', file: 'data/zh-tw-SV9.json', theme: 'linear-gradient(150deg,#292220,#332A25 55%,#3D322B)', desc: '繁体中文版（台版）· 5 张包 · 数据暂缺 AR/SAR', chaseNote: '莉莉艾的皮皮 ex RR', sname: '對戰搭檔', lang: 'zh-tw', total: 100, pack: 5 },
+  { key: 'SV10tw', file: 'data/zh-tw-SV10.json', theme: 'linear-gradient(150deg,#292220,#332A25 55%,#3D322B)', desc: '繁体中文版（台版）· 5 张包 · 数据暂缺 AR/SAR', chaseNote: '火箭队的超梦 ex RR', sname: '火箭隊的榮耀', lang: 'zh-tw', total: 98, pack: 5 },
 ];
 const LANG_LABEL = { en: '英文版', ja: '日版', 'zh-cn': '简体中文版', 'zh-tw': '繁体中文版' };
 // 真实卡包包装图（Bulbagarden Archives 官方图）：有图的弹撕包时随机用一种包装；无图的弹用追卡卡面设计
@@ -609,8 +609,8 @@ function flipCurrent() {
       const banner = $('#banner');
       if (banner) {
         banner.textContent = entry.card.rk === 'UR' ? '✦ UR · 金卡 ✦' : entry.tier === 'HR' ? '✦ HYPER RARE · 金卡 ✦' : entry.tier === 'SAR' ? '✦ SAR · 特别插画稀有 ✦' : `${dispTier(entry.card)} · ${entry.card.rk ? (CN_RARITY_CN[entry.card.rk] || '') : TIERS[entry.tier].cn}`;
-        banner.style.background = '#F8E6E8';
-        banner.style.color = '#0E0809';
+        banner.style.background = '#F2E7E0';
+        banner.style.color = '#292220';
         banner.classList.add('pop');
       }
     } else if (entry.level === 1) { fxForLevel(particles, 1, cx, cy); sfx.reveal(1); sfx.sparkle(); }
@@ -797,12 +797,12 @@ async function makeReport({ cfg, best, n, total, roi, ten, ts }) {
   const W = 1080, H = 1440;
   const cv = document.createElement('canvas'); cv.width = W; cv.height = H;
   const x = cv.getContext('2d');
-  const g = x.createLinearGradient(0, 0, 0, H); g.addColorStop(0, '#F0DDDF'); g.addColorStop(1, '#EDD8DA');
+  const g = x.createLinearGradient(0, 0, 0, H); g.addColorStop(0, '#F5F0EA'); g.addColorStop(1, '#EFE9E2');
   x.fillStyle = g; x.fillRect(0, 0, W, H);
   const rg = x.createRadialGradient(W / 2, 300, 40, W / 2, 300, 620);
   rg.addColorStop(0, 'rgba(255,255,255,.65)'); rg.addColorStop(1, 'rgba(255,255,255,0)');
   x.fillStyle = rg; x.fillRect(0, 0, W, H);
-  x.textAlign = 'center'; x.fillStyle = '#0E0809';
+  x.textAlign = 'center'; x.fillStyle = '#292220';
   x.font = '800 66px system-ui, -apple-system, sans-serif';
   x.fillText(ten ? '十连开战报' : '开包战报', W / 2, 128);
   x.font = '500 33px system-ui, -apple-system, sans-serif'; x.fillStyle = '#6f5d60';
@@ -815,14 +815,14 @@ async function makeReport({ cfg, best, n, total, roi, ten, ts }) {
   x.save();
   x.beginPath(); x.roundRect(ix, iy, iw, ih, 26); x.clip();
   if (img) x.drawImage(img, ix, iy, iw, ih);
-  else { x.fillStyle = '#191415'; x.fillRect(ix, iy, iw, ih); x.fillStyle = '#F8E6E8'; x.font = '700 44px system-ui'; x.fillText(best.card.n, W / 2, iy + ih / 2); }
+  else { x.fillStyle = '#332A25'; x.fillRect(ix, iy, iw, ih); x.fillStyle = '#F2E7E0'; x.font = '700 44px system-ui'; x.fillText(best.card.n, W / 2, iy + ih / 2); }
   x.restore();
-  x.strokeStyle = 'rgba(14,8,9,.8)'; x.lineWidth = 3;
+  x.strokeStyle = 'rgba(42,35,32,.8)'; x.lineWidth = 3;
   x.beginPath(); x.roundRect(ix, iy, iw, ih, 26); x.stroke();
   let yy = iy + ih + 84;
-  x.fillStyle = '#0E0809'; x.font = '800 46px system-ui, -apple-system, sans-serif';
+  x.fillStyle = '#292220'; x.font = '800 46px system-ui, -apple-system, sans-serif';
   x.fillText(`最佳 · ${best.card.n}`, W / 2, yy); yy += 58;
-  x.fillStyle = '#0E0809'; x.font = '600 36px system-ui, -apple-system, sans-serif';
+  x.fillStyle = '#292220'; x.font = '600 36px system-ui, -apple-system, sans-serif';
   const parts = [`${dispTier(best.card)} · ${fmtPrice(best.card)}`, `共 ${n} 张`];
   if (total != null) parts.push(`总值 €${total.toFixed(2)}`);
   if (roi != null) parts.push(`回报率 ${roi}%`);

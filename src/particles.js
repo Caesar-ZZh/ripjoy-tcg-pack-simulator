@@ -30,7 +30,7 @@ export class Particles {
     }
     this.start();
   }
-  rain({ count = 60, colors = ['#F8E6E8', '#E8DDE0', '#A89B9D', '#ffffff'], shapes = ['circle'] } = {}) {
+  rain({ count = 60, colors = ['#F2E7E0', '#EADFD6', '#A89B9D', '#ffffff'], shapes = ['circle'] } = {}) {
     if (this.reduced) count = Math.ceil(count / 3);
     for (let i = 0; i < count; i++) {
       this.spawn({
@@ -43,7 +43,7 @@ export class Particles {
     this.start();
   }
   // 撕包碎片：从撕口向外飞溅的纸屑/箔片
-  shards(x, y, colors = ['#ffffff', '#F8E6E8', '#dfe6ee']) {
+  shards(x, y, colors = ['#ffffff', '#F2E7E0', '#dfe6ee']) {
     let count = this.reduced ? 10 : 30;
     for (let i = 0; i < count; i++) {
       const a = -Math.PI / 2 + (Math.random() - 0.5) * 2.4;
@@ -59,7 +59,7 @@ export class Particles {
     this.start();
   }
   // 扇形光轨：沿速度方向拉长的流光线条
-  streakFan(x, y, { count = 14, colors = ['#F8E6E8', '#ffffff'] } = {}) {
+  streakFan(x, y, { count = 14, colors = ['#F2E7E0', '#ffffff'] } = {}) {
     if (this.reduced) count = Math.ceil(count / 2);
     for (let i = 0; i < count; i++) {
       const a = Math.random() * Math.PI * 2;
@@ -73,7 +73,7 @@ export class Particles {
     this.start();
   }
   // 白色喷泉：从卡片底部向上喷再回落的余烬
-  fountain(x, y, colors = ['#F8E6E8', '#E8DDE0', '#ffffff']) {
+  fountain(x, y, colors = ['#F2E7E0', '#EADFD6', '#ffffff']) {
     let count = this.reduced ? 16 : 44;
     for (let i = 0; i < count; i++) {
       const a = -Math.PI / 2 + (Math.random() - 0.5) * 0.9;
@@ -95,7 +95,7 @@ export class Particles {
     this.start();
   }
   ambientOff() { this.ambEl = null; this.list = this.list.filter(p => p.shape !== 'mote'); }
-  ring(x, y, color = '#F8E6E8') {
+  ring(x, y, color = '#F2E7E0') {
     this.spawn({ ring: true, x, y, r: 10, vr2: 620, life: 0.7, t: 0, color, alpha: 0.9, size: 3 });
     this.start();
   }
@@ -114,7 +114,7 @@ export class Particles {
           this.spawn({
             x: r.left + Math.random() * r.width, y: r.top + r.height * (0.25 + Math.random() * 0.75),
             vx: (Math.random() - 0.5) * 8, vy: -5 - Math.random() * 11,
-            size: 1.1 + Math.random() * 2.3, color: Math.random() < 0.4 ? '#F8E6E8' : '#E8DDE0',
+            size: 1.1 + Math.random() * 2.3, color: Math.random() < 0.4 ? '#F2E7E0' : '#EADFD6',
             life: 4.5 + Math.random() * 3, t: 0, gravity: 0, drag: 1, shape: 'mote',
             rot: 0, vr: 0, alpha: 0.2 + Math.random() * 0.26, sway: 0.6 + Math.random() * 0.9, phase: Math.random() * 6.28,
           });
@@ -178,23 +178,23 @@ export class Particles {
 // 按演出级别触发的组合特效
 export function fxForLevel(particles, level, cx, cy) {
   if (level === 1) {
-    particles.burst(cx, cy, { count: 12, colors: ['#ffffff', '#F8E6E8', '#E8DDE0'], shapes: ['star', 'circle'], speed: [50, 170], size: [1.4, 3.2], gravity: 130, life: [0.4, 0.8] });
+    particles.burst(cx, cy, { count: 12, colors: ['#ffffff', '#F2E7E0', '#EADFD6'], shapes: ['star', 'circle'], speed: [50, 170], size: [1.4, 3.2], gravity: 130, life: [0.4, 0.8] });
   } else if (level === 2) {
-    particles.burst(cx, cy, { count: 30, colors: ['#F8E6E8', '#E8DDE0', '#ffffff'], shapes: ['star', 'circle', 'ember'], speed: [80, 310], gravity: 240 });
-    particles.streakFan(cx, cy, { count: 10, colors: ['#E8DDE0', '#ffffff'] });
-    particles.ring(cx, cy, '#F8E6E8');
+    particles.burst(cx, cy, { count: 30, colors: ['#F2E7E0', '#EADFD6', '#ffffff'], shapes: ['star', 'circle', 'ember'], speed: [80, 310], gravity: 240 });
+    particles.streakFan(cx, cy, { count: 10, colors: ['#EADFD6', '#ffffff'] });
+    particles.ring(cx, cy, '#F2E7E0');
   } else if (level === 3) {
-    particles.burst(cx, cy, { count: 76, colors: ['#ffffff', '#F8E6E8', '#E8DDE0', '#A89B9D'], shapes: ['circle', 'star', 'ember'], speed: [120, 470] });
-    particles.burst(cx, cy, { count: 26, colors: ['#F8E6E8', '#E8DDE0', '#ffffff'], shapes: ['ribbon'], speed: [90, 300], gravity: 260, life: [0.8, 1.4] });
-    particles.streakFan(cx, cy, { count: 16, colors: ['#F8E6E8', '#E8DDE0', '#ffffff'] });
-    particles.ring(cx, cy, '#F8E6E8'); setTimeout(() => particles.ring(cx, cy, '#F8E6E8'), 200);
+    particles.burst(cx, cy, { count: 76, colors: ['#ffffff', '#F2E7E0', '#EADFD6', '#A89B9D'], shapes: ['circle', 'star', 'ember'], speed: [120, 470] });
+    particles.burst(cx, cy, { count: 26, colors: ['#F2E7E0', '#EADFD6', '#ffffff'], shapes: ['ribbon'], speed: [90, 300], gravity: 260, life: [0.8, 1.4] });
+    particles.streakFan(cx, cy, { count: 16, colors: ['#F2E7E0', '#EADFD6', '#ffffff'] });
+    particles.ring(cx, cy, '#F2E7E0'); setTimeout(() => particles.ring(cx, cy, '#F2E7E0'), 200);
     particles.rain({ count: 44 });
   } else if (level >= 4) {
-    particles.burst(cx, cy, { count: 130, colors: ['#ffffff', '#F8E6E8', '#E8DDE0'], shapes: ['circle', 'star', 'ember'], speed: [160, 640], life: [0.7, 1.5] });
-    particles.burst(cx, cy, { count: 54, colors: ['#F8E6E8', '#E8DDE0', '#A89B9D', '#ffffff'], shapes: ['ribbon', 'rect'], speed: [100, 390], gravity: 300, life: [0.9, 1.6] });
-    particles.streakFan(cx, cy, { count: 26, colors: ['#F8E6E8', '#E8DDE0', '#ffffff'] });
+    particles.burst(cx, cy, { count: 130, colors: ['#ffffff', '#F2E7E0', '#EADFD6'], shapes: ['circle', 'star', 'ember'], speed: [160, 640], life: [0.7, 1.5] });
+    particles.burst(cx, cy, { count: 54, colors: ['#F2E7E0', '#EADFD6', '#A89B9D', '#ffffff'], shapes: ['ribbon', 'rect'], speed: [100, 390], gravity: 300, life: [0.9, 1.6] });
+    particles.streakFan(cx, cy, { count: 26, colors: ['#F2E7E0', '#EADFD6', '#ffffff'] });
     particles.fountain(cx, cy + 90);
-    particles.ring(cx, cy, '#F8E6E8'); setTimeout(() => particles.ring(cx, cy, '#F8E6E8'), 170); setTimeout(() => particles.ring(cx, cy, '#F8E6E8'), 360);
-    particles.rain({ count: 80, colors: ['#F8E6E8', '#E8DDE0', '#ffffff'], shapes: ['streak', 'star', 'circle'] });
+    particles.ring(cx, cy, '#F2E7E0'); setTimeout(() => particles.ring(cx, cy, '#F2E7E0'), 170); setTimeout(() => particles.ring(cx, cy, '#F2E7E0'), 360);
+    particles.rain({ count: 80, colors: ['#F2E7E0', '#EADFD6', '#ffffff'], shapes: ['streak', 'star', 'circle'] });
   }
 }
