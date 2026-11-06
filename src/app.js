@@ -1,4 +1,4 @@
-import { TIERS, tierOf, buildPools, openPack, fmtPrice, imgUrl, thumbUrl } from './engine.js';
+import { TIERS, tierOf, buildPools, openPack, fmtPrice, imgUrl, thumbUrl, bestCmp } from './engine.js';
 import { Particles, fxForLevel } from './particles.js';
 import { sfx, vibrate, VIB, addTilt, setMuted } from './fx.js';
 import { BACKS } from './cardbacks.js';
@@ -293,7 +293,7 @@ function renderGallery() {
   let cards = [...data.cards].sort((a, b) => lv(b) - lv(a) || (b.p || 0) - (a.p || 0) || String(a.no).localeCompare(String(b.no), undefined, { numeric: true }));
   if (galTier === 'TOP') cards = cards.filter(c => lv(c) >= 3);
   else if (galTier === 'SAR') cards = cards.filter(c => ['SAR', 'HR', 'BWR', 'FUR', 'RGB'].includes(tierOf(c)));
-  else if (galTier === 'UR') cards = cards.filter(c => ['UR', 'ACE'].includes(tierOf(c)));
+  else if (galTier === 'UR') cards = cards.filter(c => ['UR', 'ACE', 'SR'].includes(tierOf(c)));
   else if (galTier === 'RR') cards = cards.filter(c => tierOf(c) === 'RR');
   else if (galTier === 'R') cards = cards.filter(c => lv(c) <= 1);
   if (galOwnedOnly) cards = cards.filter(c => save.collection[c.id]);
@@ -321,7 +321,7 @@ function collect(entry) {
   return isNew;
 }
 function finishPackToHistory(cfg, pack) {
-  const best = [...pack].sort((a, b) => (b.level || 0) - (a.level || 0) || (b.card.p || 0) - (a.card.p || 0))[0];
+  const best = [...pack].sort(bestCmp)[0];
   save.stats.packs++;
   save.history.unshift({ ts: Date.now(), setKey: cfg.key, setName: DATA[cfg.key].name, n: pack.length, bestId: best.card.id, bestName: best.card.n, bestPrice: best.card.p, bestTier: dispTier(best.card) });
   save.history = save.history.slice(0, 30); persist();
@@ -399,7 +399,7 @@ function nextPackOrGrand() {
 }
 function renderPackSummary() {
   const { cfg, pack, packNo } = session; const data = DATA[cfg.key];
-  const sorted = [...pack].sort((a, b) => b.level - a.level || (b.card.p || 0) - (a.card.p || 0));
+  const sorted = [...pack].sort(bestCmp);
   const best = sorted[0];
   const total = pack.reduce((s, e) => s + (e.card.p || 0), 0);
   const news = pack.filter(e => e.isNew).length;
@@ -573,7 +573,7 @@ function flash() { const f = $('#flash'); f.classList.add('on'); setTimeout(() =
 /* ---------------- 结算 ---------------- */
 function renderSummary() {
   const { cfg, pack, ten } = session; const data = DATA[cfg.key];
-  const sorted = [...pack].sort((a, b) => b.level - a.level || (b.card.p || 0) - (a.card.p || 0));
+  const sorted = [...pack].sort(bestCmp);
   const best = sorted[0];
   const total = pack.reduce((s, e) => s + (e.card.p || 0), 0);
   const news = pack.filter(e => e.isNew).length;

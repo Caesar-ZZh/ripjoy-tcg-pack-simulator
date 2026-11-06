@@ -6,6 +6,7 @@ export const TIERS = {
   RR:  { key: 'RR',  label: 'Double Rare', cn: '双重稀有', color: '#b78cff', level: 2 },
   ACE: { key: 'ACE', label: 'ACE SPEC',  cn: 'ACE',    color: '#ff7fd0', level: 2 },
   UR:  { key: 'UR',  label: 'Ultra Rare', cn: '超级稀有', color: '#ffd75e', level: 3 },
+  SR:  { key: 'SR',  label: 'Ultra Rare', cn: '超级稀有', color: '#ffd75e', level: 3 },
   AR:  { key: 'AR',  label: 'Illustration Rare', cn: '插画稀有', color: '#ff9d5c', level: 3 },
   SAR: { key: 'SAR', label: 'Special Illustration Rare', cn: '特别插画稀有', color: '#ff5c8a', level: 4 },
   HR:  { key: 'HR',  label: 'Hyper Rare', cn: '金卡',  color: '#ffe98a', level: 4 },
@@ -18,6 +19,8 @@ export const TIERS = {
 };
 
 export function tierOf(card) {
+  // 简中 SR 是独立档位（高于 AR、低于 SAR），不能与英文 Ultra Rare（UR）混为一档
+  if (card.rk === 'SR') return 'SR';
   const r = (card.r || '').toLowerCase();
   if (r.includes('futuristic')) return 'FUR';
   if (r.includes('rgb')) return 'RGB';
@@ -36,6 +39,19 @@ export function tierOf(card) {
   if (r === 'rare' || r.includes('rare')) return 'R';
   if (r.includes('uncommon')) return 'U';
   return 'C';
+}
+
+// 最佳卡顺位（数值越小越优先）：档位 level → 参考价 → 稀有度。
+// 稀有度按 rk（简中）或 tier（其余）：SR 高于 AR，AR 高于英文 UR；
+// 有价格时价格优先（英文弹行为不变），无价格时才按稀有度排。
+const BEST_RANK = { BWR: 0, SAR: 1, RGB: 2, FUR: 3, HR: 4, SR: 5, AR: 6, UR: 7, RR: 8, ACE: 9, CLS: 10, R: 11, PIKA: 12, C: 13, U: 13, NRG: 14 };
+export function bestRank(e) {
+  const rk = e.card && e.card.rk;
+  if (rk && BEST_RANK[rk] != null) return BEST_RANK[rk];
+  return BEST_RANK[e.tier] ?? 99;
+}
+export function bestCmp(a, b) {
+  return (b.level || 0) - (a.level || 0) || (b.card.p || 0) - (a.card.p || 0) || (bestRank(a) - bestRank(b));
 }
 
 export function buildPools(setData) {
