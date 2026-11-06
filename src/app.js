@@ -230,7 +230,7 @@ async function loadMeta() {
 }
 function ownedCountFor(cfg) {
   let n = 0;
-  for (const id of Object.keys(save.collection)) if (setOfCardId(id) === cfg.key) n++;
+  for (const id of Object.keys(save.collection)) if (setOfCardId(id)?.key === cfg.key) n++; // setOfCardId 返回 cfg 对象，不是 key；原写法恒为 false、计数恒为 0
   return n;
 }
 function fillSetCardMeta(el, cfg) {

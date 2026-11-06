@@ -86,6 +86,8 @@ TCGdex 原始稀有度 → 游戏内等级（决定演出与配色）：
 >
 > **2026-11-06 修正**：桌面 Chrome 反复 STATUS_BREAKPOINT 崩溃——根因是简中弹数据 15–33MB/弹，DATA/POOLS/CARDMAP 三处同引同一批卡对象且打开过的弹永不释放，同一标签页多开几弹即堆涨至渲染进程上限（与 2026-10-30 首页预取崩溃同根，只是这次是手动开弹累积）。修法：回选弹页时只留当前弹（`evictCnSets`，接在 exitStage / exitStageSilent / 图鉴返回），其余简中弹整弹释放；收藏册/战绩打开时按需补载（ensureMetaLoaded 已有此机制）；资产卡 kinds 改为直接数 save.collection、收藏册总数改用 SETS 申报 total，不再依赖已加载的 DATA/CARDMAP。补载本身也改串行：释放后首次进收藏册需补载多弹时，并行解析同样会堆涨崩溃，改为逐弹 await。附带：撕包图 alt 文本与画面一致（有包装图时标弹名+卡包）。
 >
+> **2026-11-06 修正**：释放后选弹页按弹计数归零——`ownedCountFor` 把 `setOfCardId()` 返回的 cfg 对象与 key 字符串比较，恒为 false、计数恒为 0；此前因 DATA 常驻、走 `fillSetCard` 的正确计数而被掩盖，释放后回落到 `fillSetCardMeta` 才暴露。改为比较 `?.key`；本地验证各弹计数正确（含 30thC 能量字母码与 151C 四分弹前缀）。
+>
 > **2026-11-06 教训**：app.js 未加版本号、Pages max-age=600 缓存下硬刷新也绕不过旧版（实测两轮复验都跑在旧版上）；index.html 里 app.js 已加 ?v=（现 evict1，与 styles.css ?v=premium2 同款做法），以后改 app.js 必须同步 bump 版本号再推，否则线上验活会验到旧版；验活前先 curl 线上 index.html 确认 ?v= 已是新值。另：2026-11-06 一次 Pages 构建（763be76f，仅改 app.js 两行 + index.html 一行）卡住 11 分钟后 failure，原因未明（疑似 GitHub 侧超时），当次改动未上线、随下一推重推。
 > 日版 7 张包（sv2a）：3C + 2U + 1 反闪槽 + 1 稀有槽，权重同构。
 
