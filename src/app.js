@@ -453,7 +453,7 @@ function renderTear() {
     <div class="packwrap" id="packEl">
       <div class="packtop"><img src="${packImg}" alt=""></div>
       <div class="pack${art ? ' realpack' : ''}">
-        <img class="packart" src="${packImg}" alt="${chase.n}" onerror="this.style.opacity=0">
+        <img class="packart" src="${packImg}" alt="${art ? data.name + '卡包' : chase.n}" onerror="this.style.opacity=0">
         <div class="packshade"></div><div class="packtear"></div>
         ${data.logo ? `<img class="packlogo" src="${logoSrc(data)}" alt="">` : ''}
         <div class="packname">${data.name}</div>
@@ -465,7 +465,7 @@ function renderTear() {
   // 包装图加载失败（如单文件版无附带资源）时回退到追卡卡面设计
   if (art) {
     const pa = st.querySelector('.packart');
-    pa.addEventListener('error', () => { pa.src = imgUrl(chase, true); st.querySelector('.packtop img').src = imgUrl(chase, true); st.querySelector('.pack').classList.remove('realpack'); }, { once: true });
+    pa.addEventListener('error', () => { pa.src = imgUrl(chase, true); pa.alt = chase.n; st.querySelector('.packtop img').src = imgUrl(chase, true); st.querySelector('.pack').classList.remove('realpack'); }, { once: true });
   }
   // 撕包阶段把整包高清图预加载完，翻卡时零等待
   if (session.pack) for (const e of session.pack) { const im = new Image(); im.src = imgUrl(e.card, true); }
