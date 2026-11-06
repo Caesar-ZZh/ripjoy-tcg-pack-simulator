@@ -1,5 +1,5 @@
-import { TIERS, tierOf, buildPools, openPack, fmtPrice, imgUrl, thumbUrl, bestCmp } from './engine.js';
-import { Particles, fxForLevel } from './particles.js?v=selvedge2';
+import { TIERS, tierOf, buildPools, openPack, fmtPrice, imgUrl, thumbUrl, bestCmp } from './engine.js?v=selvedge7';
+import { Particles, fxForLevel } from './particles.js?v=selvedge7';
 import { sfx, vibrate, VIB, addTilt, setMuted } from './fx.js';
 import { BACKS } from './cardbacks.js';
 
@@ -639,7 +639,7 @@ function renderReveal() {
     <div class="tray" id="tray"></div>`;
   session.revealed = false;
   renderTray();
-  const card3d = $('#card3d'); addTilt(card3d, 9);
+  const card3d = $('#card3d'); if (matchMedia('(pointer:fine)').matches) addTilt(card3d, 9);
   const doFlip = () => flipCurrent();
   card3d.addEventListener('click', () => { session.revealed ? advance() : doFlip(); });
   $('#nextBtn').addEventListener('click', () => { session.revealed ? advance() : doFlip(); });
@@ -1021,7 +1021,7 @@ function openDetail(card) {
       <button class="btn modalclose" id="modalClose">关 闭</button>
     </div>`;
   $('#modal').classList.add('open');
-  addTilt($('#modalCard'), 16);
+  if (matchMedia('(pointer:fine)').matches) addTilt($('#modalCard'), 16);
   $('#modalClose').addEventListener('click', closeDetail);
 }
 function closeDetail() { $('#modal').classList.remove('open'); }

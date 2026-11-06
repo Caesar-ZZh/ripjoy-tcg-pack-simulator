@@ -112,7 +112,8 @@ function drawRare(pools, used, forceTop = false) {
  *  spec.foilGroups = 闪卡档位组（w 为官方生产配比，组内按种类数比例 roll 档位）。
  *  BALL / MASTER 为虚拟档位：抽一张平卡种类的卡并标记球纹工艺（数据集无独立球纹印刷条目）。
  *  spec.fixedFoil = 后 N 个闪卡位固定抽取的 rk（如 30 周年：皮卡丘、基本能量），
- *  固定位放最后、随机位在前；首包保底（forceTop）只作用于最后一个随机位。 */
+ *  固定位放最后、随机位在前；首包保底（forceTop）只作用于最后一个随机位；
+ *  随机闪卡位按稀有度升序排列，最高稀有为最后一个随机位（闪卡位）。 */
 function openSpecPack(setData, { forceTop = false } = {}) {
   const spec = setData.spec;
   const rkPools = {};
@@ -129,12 +130,14 @@ function openSpecPack(setData, { forceTop = false } = {}) {
     if (c) cards.push({ card: c, reverse: false, slot: 'plain' });
   }
   const nFixed = (spec.fixedFoil || []).length;
+  const randomFoil = [], fixedFoil = [];
+  const slotLevel = (e) => e.lvl != null ? e.lvl : TIERS[tierOf(e.card)].level;
   for (let i = 0; i < variant.foil; i++) {
     const isLastRandom = i === variant.foil - nFixed - 1;
     // 固定闪卡位（如 30 周年：最后两张固定为皮卡丘、基本能量），不参与组别抽取
     if (spec.fixedFoil && i >= variant.foil - nFixed) {
       const c = pickUnique(rkPools, [spec.fixedFoil[i - (variant.foil - nFixed)]], used);
-      if (c) cards.push({ card: c, reverse: false, slot: 'foil' });
+      if (c) fixedFoil.push({ card: c, reverse: false, slot: 'foil' });
       continue;
     }
     const groups = (forceTop && isLastRandom) ? [spec.foilGroups[spec.foilGroups.length - 1]] : spec.foilGroups;
@@ -142,12 +145,16 @@ function openSpecPack(setData, { forceTop = false } = {}) {
     const type = weighted(group.types);
     if (type === 'BALL' || type === 'MASTER') {
       const c = drawPlainKind();
-      if (c) cards.push({ card: c, reverse: true, slot: 'foil', foilPattern: type === 'BALL' ? 'ball' : 'master', lvl: type === 'BALL' ? 1 : 2 });
+      if (c) randomFoil.push({ card: c, reverse: true, slot: 'foil', foilPattern: type === 'BALL' ? 'ball' : 'master', lvl: type === 'BALL' ? 1 : 2 });
     } else {
       const c = pickUnique(rkPools, [type], used) || drawPlainKind();
-      if (c) cards.push({ card: c, reverse: false, slot: 'foil' });
+      if (c) randomFoil.push({ card: c, reverse: false, slot: 'foil' });
     }
   }
+  // 随机闪卡位按稀有度升序：最高稀有放最后一个随机位（闪卡位），第一张永远是普通卡；
+  // 只改顺序不改抽取概率；首包保底抽出的顶级卡本就是最高稀有，排序后仍在最后。
+  randomFoil.sort((a, b) => slotLevel(a) - slotLevel(b));
+  cards.push(...randomFoil, ...fixedFoil);
   return cards;
 }
 

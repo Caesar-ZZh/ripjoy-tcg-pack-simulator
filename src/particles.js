@@ -4,12 +4,12 @@ export class Particles {
     this.cv = canvas; this.ctx = canvas.getContext('2d');
     this.list = []; this.raf = null; this.reduced = false;
     const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
-    this.reduced = mq.matches || (navigator.deviceMemory && navigator.deviceMemory <= 2);
+    this.reduced = mq.matches || (navigator.deviceMemory && navigator.deviceMemory <= 2) || window.matchMedia('(pointer:coarse)').matches;
     this.resize(); window.addEventListener('resize', () => this.resize());
     document.addEventListener('visibilitychange', () => { if (document.hidden) this.stop(); });
   }
   resize() {
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const dpr = Math.min(window.devicePixelRatio || 1, window.matchMedia('(pointer:coarse)').matches ? 1.5 : 2);
     this.cv.width = innerWidth * dpr; this.cv.height = innerHeight * dpr;
     this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   }
