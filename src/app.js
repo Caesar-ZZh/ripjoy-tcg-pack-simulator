@@ -60,7 +60,7 @@ const $$ = (s, el = document) => [...el.querySelectorAll(s)];
 
 /* ---------------- 存档 ---------------- */
 const SAVE_KEY = 'ripjoy.save.v1';
-let save = { collection: {}, stats: { packs: 0, cards: 0, l3: 0, l4: 0, spent: 0 }, history: [], firstPackDone: false, muted: false };
+let save = { collection: {}, stats: { packs: 0, cards: 0, l3: 0, l4: 0, spent: 0 }, history: [], muted: false };
 try { const raw = localStorage.getItem(SAVE_KEY); if (raw) save = { ...save, ...JSON.parse(raw) }; } catch {}
 const persist = () => { try { localStorage.setItem(SAVE_KEY, JSON.stringify(save)); } catch {} };
 setMuted(!!save.muted);
@@ -275,7 +275,7 @@ function renderSets() {
   const s = save.stats;
   $('#heroStats').innerHTML = s.packs
     ? `已开 <b>${s.packs}</b> 包 · 累计 <b>${s.cards}</b> 张 · 高稀有演出 <b>${s.l3 + s.l4}</b> 次 · 最佳战绩在「战绩」页`
-    : `首包保底 <b>AR 以上</b> · 先撕一包，30 秒看到高稀有演出`;
+    : `还没开过包 · 撕一包试试手气`;
   prefetchSets();
 }
 let META = null;
@@ -434,9 +434,7 @@ async function startPack(cfg, isRetry) {
   await ensureSmoke();
   loadHi(cfg);
   const data = DATA[cfg.key];
-  const forceTop = !save.firstPackDone;
-  const pack = openPack(data, POOLS[cfg.key], { forceTop });
-  if (forceTop) save.firstPackDone = true;
+  const pack = openPack(data, POOLS[cfg.key]);
   pack.forEach(e => { e.isNew = collect(e); e.tier = tierOf(e.card); e.level = e.lvl != null ? e.lvl : TIERS[e.tier].level; });
   finishPackToHistory(cfg, pack);
   session = { cfg, pack, idx: 0, revealed: false, phase: 'tear' };
@@ -454,9 +452,7 @@ async function startTen(cfg) {
   const data = DATA[cfg.key];
   const packs = [];
   for (let i = 0; i < 10; i++) {
-    const forceTop = i === 0 && !save.firstPackDone; // 首包保底也适用于人生第一次十连
-    const pack = openPack(data, POOLS[cfg.key], { forceTop });
-    if (forceTop) save.firstPackDone = true;
+    const pack = openPack(data, POOLS[cfg.key]);
     pack.forEach(e => { e.isNew = collect(e); e.tier = tierOf(e.card); e.level = e.lvl != null ? e.lvl : TIERS[e.tier].level; });
     finishPackToHistory(cfg, pack); packs.push(pack);
   }

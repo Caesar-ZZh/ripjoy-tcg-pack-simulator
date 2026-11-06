@@ -96,11 +96,7 @@ function drawReverse(pools, used) {
   return { card: c, reverse: true };
 }
 
-function drawRare(pools, used, forceTop = false) {
-  if (forceTop) {
-    const c = pickUnique(pools, ['SAR', 'HR', 'BWR', 'AR'], used);
-    if (c) return { card: c, reverse: false };
-  }
+function drawRare(pools, used) {
   const kind = weighted(RARE_TABLE);
   const map = { R: ['R'], RR: ['RR'], ACEUR: ['ACE', 'UR'], AR: ['AR'], SAR: ['SAR', 'BWR'], HR: ['HR', 'BWR'] };
   const c = pickUnique(pools, map[kind] || ['R'], used) || pickUnique(pools, ['R', 'RR'], used);
@@ -112,9 +108,9 @@ function drawRare(pools, used, forceTop = false) {
  *  spec.foilGroups = 闪卡档位组（w 为官方生产配比，组内按种类数比例 roll 档位）。
  *  BALL / MASTER 为虚拟档位：抽一张平卡种类的卡并标记球纹工艺（数据集无独立球纹印刷条目）。
  *  spec.fixedFoil = 后 N 个闪卡位固定抽取的 rk（如 30 周年：皮卡丘、基本能量），
- *  固定位放最后、随机位在前；首包保底（forceTop）只作用于最后一个随机位；
+ *  固定位放最后、随机位在前；
  *  随机闪卡位按稀有度升序排列，最高稀有为最后一个随机位（闪卡位）。 */
-function openSpecPack(setData, { forceTop = false } = {}) {
+function openSpecPack(setData) {
   const spec = setData.spec;
   const rkPools = {};
   for (const c of setData.cards) (rkPools[c.rk || tierOf(c)] ||= []).push(c);
@@ -133,15 +129,13 @@ function openSpecPack(setData, { forceTop = false } = {}) {
   const randomFoil = [], fixedFoil = [];
   const slotLevel = (e) => e.lvl != null ? e.lvl : TIERS[tierOf(e.card)].level;
   for (let i = 0; i < variant.foil; i++) {
-    const isLastRandom = i === variant.foil - nFixed - 1;
     // 固定闪卡位（如 30 周年：最后两张固定为皮卡丘、基本能量），不参与组别抽取
     if (spec.fixedFoil && i >= variant.foil - nFixed) {
       const c = pickUnique(rkPools, [spec.fixedFoil[i - (variant.foil - nFixed)]], used);
       if (c) fixedFoil.push({ card: c, reverse: false, slot: 'foil' });
       continue;
     }
-    const groups = (forceTop && isLastRandom) ? [spec.foilGroups[spec.foilGroups.length - 1]] : spec.foilGroups;
-    const group = weighted(groups.map(g => [g, g.w]));
+    const group = weighted(spec.foilGroups.map(g => [g, g.w]));
     const type = weighted(group.types);
     if (type === 'BALL' || type === 'MASTER') {
       const c = drawPlainKind();
@@ -152,15 +146,15 @@ function openSpecPack(setData, { forceTop = false } = {}) {
     }
   }
   // 随机闪卡位按稀有度升序：最高稀有放最后一个随机位（闪卡位），第一张永远是普通卡；
-  // 只改顺序不改抽取概率；首包保底抽出的顶级卡本就是最高稀有，排序后仍在最后。
+  // 只改顺序不改抽取概率。
   randomFoil.sort((a, b) => slotLevel(a) - slotLevel(b));
   cards.push(...randomFoil, ...fixedFoil);
   return cards;
 }
 
-/** 生成一包。简中弹优先走 setData.spec 官方口径；其余按 setData.pack 张数：10 = 4C+3U+2反+1稀；7 = 3C+2U+1反+1稀；5 = 2C+1U+1反+1稀。forceTop = 首包保底 */
-export function openPack(setData, pools, { forceTop = false } = {}) {
-  if (setData.spec) return openSpecPack(setData, { forceTop });
+/** 生成一包。简中弹优先走 setData.spec 官方口径；其余按 setData.pack 张数：10 = 4C+3U+2反+1稀；7 = 3C+2U+1反+1稀；5 = 2C+1U+1反+1稀。 */
+export function openPack(setData, pools) {
+  if (setData.spec) return openSpecPack(setData);
   const used = new Set();
   const cards = [];
   const size = setData.pack || (setData.lang === 'ja' ? 7 : 10);
@@ -170,7 +164,7 @@ export function openPack(setData, pools, { forceTop = false } = {}) {
   for (let i = 0; i < commons; i++) cards.push({ card: pickUnique(pools, ['C'], used), reverse: false, slot: 'common' });
   for (let i = 0; i < uncommons; i++) cards.push({ card: pickUnique(pools, ['U'], used), reverse: false, slot: 'uncommon' });
   for (let i = 0; i < reverses; i++) { const d = drawReverse(pools, used); cards.push({ ...d, slot: 'reverse' }); }
-  const last = drawRare(pools, used, forceTop);
+  const last = drawRare(pools, used);
   cards.push({ ...last, slot: 'rare' });
   return cards.filter(x => x.card);
 }
