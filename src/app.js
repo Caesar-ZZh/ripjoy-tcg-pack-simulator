@@ -70,18 +70,23 @@ const DATA = {}; const POOLS = {}; const CARDMAP = {}; const LOADP = {};
 const CHUNKCACHE = {}; // key -> Array(分片数据|null)：整弹加载失败后重试复用已成功分片，不用全部重下
 const CHUNK_MAX_RETRY = 3; // 每片最多尝试次数（含首次）
 const CHUNK_CONCURRENCY = 3; // 分片并发上限：15 片并行在手机弱网下极易整弹失败
+const FETCH_TIMEOUT_MS = 20000; // 单次拉取超时：裸 fetch 连接卡住后永远不返回、不报错、不重试，进度永停 0/15；超时算一次失败进重试
 const sleep = (ms) => new Promise(r => setTimeout(r, ms));
 async function fetchJsonRetry(url, attempts = CHUNK_MAX_RETRY) {
-  // 单片拉取失败自动重试（600ms、1200ms 退避），多次失败才抛错
+  // 单片拉取失败自动重试（600ms、1200ms 退避），多次失败才抛错；每次尝试 20 秒超时
   let lastErr;
   for (let i = 0; i < attempts; i++) {
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), FETCH_TIMEOUT_MS);
     try {
-      const r = await fetch(url);
+      const r = await fetch(url, { signal: ctrl.signal });
       if (!r.ok) throw new Error('HTTP ' + r.status);
       return await r.json();
     } catch (e) {
       lastErr = e;
       if (i < attempts - 1) await sleep(600 * (i + 1));
+    } finally {
+      clearTimeout(timer);
     }
   }
   throw lastErr;
@@ -269,7 +274,7 @@ async function loadMeta() {
   if (META) return META;
   const emb = (typeof window !== 'undefined' && window.__RIPJOY_EMBED__) ? window.__RIPJOY_EMBED__['data/meta.json'] : null;
   if (emb) { META = emb; return META; }
-  try { META = await (await fetch('data/meta.json')).json(); } catch { META = {}; }
+  try { META = await fetchJsonRetry('data/meta.json'); } catch { META = {}; }
   return META;
 }
 function ownedCountFor(cfg) {
