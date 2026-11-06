@@ -95,7 +95,8 @@ function drawRare(pools, used, forceTop = false) {
  *  spec.variants = 构成变体（plain/foil 张数 + 权重）；plainTypes = 平卡档位及种类数；
  *  spec.foilGroups = 闪卡档位组（w 为官方生产配比，组内按种类数比例 roll 档位）。
  *  BALL / MASTER 为虚拟档位：抽一张平卡种类的卡并标记球纹工艺（数据集无独立球纹印刷条目）。
- *  spec.fixedFoil = 前 N 个闪卡位固定抽取的 rk（如 30 周年：皮卡丘、基本能量）。 */
+ *  spec.fixedFoil = 后 N 个闪卡位固定抽取的 rk（如 30 周年：皮卡丘、基本能量），
+ *  固定位放最后、随机位在前；首包保底（forceTop）只作用于最后一个随机位。 */
 function openSpecPack(setData, { forceTop = false } = {}) {
   const spec = setData.spec;
   const rkPools = {};
@@ -111,15 +112,16 @@ function openSpecPack(setData, { forceTop = false } = {}) {
     const c = drawPlainKind();
     if (c) cards.push({ card: c, reverse: false, slot: 'plain' });
   }
+  const nFixed = (spec.fixedFoil || []).length;
   for (let i = 0; i < variant.foil; i++) {
-    const isLast = i === variant.foil - 1;
-    // 固定闪卡位（如 30 周年：前两张固定为皮卡丘、基本能量），不参与组别抽取
-    if (spec.fixedFoil && i < spec.fixedFoil.length) {
-      const c = pickUnique(rkPools, [spec.fixedFoil[i]], used);
+    const isLastRandom = i === variant.foil - nFixed - 1;
+    // 固定闪卡位（如 30 周年：最后两张固定为皮卡丘、基本能量），不参与组别抽取
+    if (spec.fixedFoil && i >= variant.foil - nFixed) {
+      const c = pickUnique(rkPools, [spec.fixedFoil[i - (variant.foil - nFixed)]], used);
       if (c) cards.push({ card: c, reverse: false, slot: 'foil' });
       continue;
     }
-    const groups = (forceTop && isLast) ? [spec.foilGroups[spec.foilGroups.length - 1]] : spec.foilGroups;
+    const groups = (forceTop && isLastRandom) ? [spec.foilGroups[spec.foilGroups.length - 1]] : spec.foilGroups;
     const group = weighted(groups.map(g => [g, g.w]));
     const type = weighted(group.types);
     if (type === 'BALL' || type === 'MASTER') {
