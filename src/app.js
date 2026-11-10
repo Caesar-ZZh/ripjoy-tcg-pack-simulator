@@ -579,18 +579,19 @@ function renderTear() {
   const art = artFile ? ((window.__PACKART_IMG || {})[artFile] || `assets/packs/${artFile}`) : null;
   const packImg = art || imgUrl(chase, true);
   const st = $('#stageBody');
+  st.classList.remove('zooming');
   st.innerHTML = `
     <div class="packwrap" id="packEl">
       <div class="packtop"><img src="${packImg}" alt=""></div>
       <div class="pack${art ? ' realpack' : ''}">
-        <img class="packart" src="${packImg}" alt="${art ? data.name + '卡包' : chase.n}" onerror="this.style.opacity=0">
+        <img class="packart" src="${packImg}" alt="${art ? data.name + '卡包' : chase.n}" draggable="false" onerror="this.style.opacity=0">
         <div class="packshade"></div><div class="packtear"></div>
         ${data.logo ? `<img class="packlogo" src="${logoSrc(data)}" alt="">` : ''}
         <div class="packname">${data.name}</div>
         <div class="packsub">${packOf(data)} CARDS PER PACK · RipJoy</div>
       </div>
     </div>
-    <p class="stagehint">${session.tenPacks ? `<b>十连 · 第 ${session.packNo} / 10 包</b><br>` : ''}点一下卡包，<b>撕开它</b><br><span style="font-size:12.5px">翻卡前留意卡背的光晕——光晕越亮，下一张越有货</span></p>
+    <p class="stagehint">${session.tenPacks ? `<b>十连 · 第 ${session.packNo} / 10 包</b><br>` : ''}按住卡包向右下拖，<b>撕开它</b>（也可以直接点）<br><span style="font-size:12.5px">翻卡前留意卡背的光晕——光晕越亮，下一张越有货</span></p>
     <div class="stagebtns"><button class="btn" id="tearBtn">✂️ 撕 开</button>${session.tenPacks ? '<button class="btn ghost" id="skipTearBtn" style="flex:0 0 108px">直接翻卡</button>' : ''}</div>`;
   // 包装图加载失败（如单文件版无附带资源）时回退到追卡卡面设计
   if (art) {
@@ -609,7 +610,43 @@ function renderTear() {
     particles.shards(pr.left + pr.width / 2, pr.top + pr.height * 0.07);
     setTimeout(() => { session.phase = 'reveal'; renderReveal(); }, 980);
   };
-  $('#packEl').addEventListener('click', tear);
+  const packEl = $('#packEl');
+  // 拖拽撕包：按住往右下拖，沿对角线拖过约 80px 即撕开；拖动中盖片随进度掀起、整包微跟随；
+  // 轻点仍按原有 click 撕开，拖过 8px 后松手不触发 click（避免一拖就撕）
+  let drag = null, suppressClick = false;
+  const clearDragVisual = () => {
+    packEl.classList.remove('dragging');
+    const top = packEl.querySelector('.packtop');
+    if (top) { top.style.opacity = ''; top.style.transform = ''; }
+    packEl.style.transform = '';
+  };
+  packEl.addEventListener('pointerdown', (e) => {
+    if (!session || session.phase !== 'tear') return;
+    drag = { id: e.pointerId, x0: e.clientX, y0: e.clientY, moved: false };
+    suppressClick = false;
+    packEl.classList.add('dragging');
+    try { packEl.setPointerCapture(e.pointerId); } catch (_) {}
+  });
+  packEl.addEventListener('pointermove', (e) => {
+    if (!drag || e.pointerId !== drag.id || session?.phase !== 'tear') return;
+    const dx = e.clientX - drag.x0, dy = e.clientY - drag.y0;
+    const proj = (dx + dy) / Math.SQRT2; // 沿右下对角线的拖动距离（像素），反向拖动不计
+    const t = Math.max(0, Math.min(proj / 80, 1));
+    if (Math.abs(dx) + Math.abs(dy) > 8) drag.moved = true;
+    const top = packEl.querySelector('.packtop');
+    if (top) { top.style.opacity = String(0.15 + 0.85 * t); top.style.transform = `rotate(${-20 * t}deg) translate(${12 * t}px, ${-8 * t}px)`; }
+    packEl.style.transform = `translate(${Math.max(0, Math.min(dx, 26))}px, ${Math.max(0, Math.min(dy, 20))}px)`;
+    if (t >= 1) { drag = null; clearDragVisual(); tear(); }
+  });
+  const endDrag = () => {
+    if (!drag) return;
+    if (drag.moved) suppressClick = true;
+    drag = null;
+    clearDragVisual();
+  };
+  packEl.addEventListener('pointerup', endDrag);
+  packEl.addEventListener('pointercancel', () => { drag = null; suppressClick = false; clearDragVisual(); });
+  packEl.addEventListener('click', () => { if (suppressClick) { suppressClick = false; return; } tear(); });
   $('#tearBtn').addEventListener('click', tear);
   const sk = $('#skipTearBtn');
   if (sk) sk.addEventListener('click', () => { if (session?.phase === 'tear') { particles.ambientOff(); session.phase = 'reveal'; renderReveal(); } });
@@ -617,10 +654,23 @@ function renderTear() {
 }
 
 /* ---------------- 逐张揭晓 ---------------- */
+// 点卡放大：已翻开的卡点按后原地放大 + 金晕，其余元素变暗；再点卡片收回，点「下一张」直接进下一张
+function zoomCard() {
+  if (!session?.revealed) return;
+  session.zoomed = true;
+  const st = $('#stageBody'); if (st) st.classList.add('zooming');
+  const cs = $('#cardStage'); if (cs) cs.classList.add('zoomed');
+}
+function closeZoom() {
+  const st = $('#stageBody'); if (st) st.classList.remove('zooming');
+  const cs = $('#cardStage'); if (cs) cs.classList.remove('zoomed');
+  if (session) session.zoomed = false;
+}
 function renderReveal() {
   const { pack, idx } = session;
   const entry = pack[idx]; const next = pack[idx + 1];
   const st = $('#stageBody');
+  st.classList.remove('zooming'); session.zoomed = false;
   const dots = pack.map((e, i) => `<i class="${i < idx ? 'done' : i === idx ? (e.level >= 3 ? 'hot' : 'now') : ''}"></i>`).join('');
   st.innerHTML = `
     <div class="revealmeta">${session.tenPacks ? `<span class="packbadge">第 ${session.packNo} / 10 包</span>` : ''}<div class="dots">${dots}</div><span class="revealcount">${idx + 1} / ${pack.length}</span></div>
@@ -646,8 +696,8 @@ function renderReveal() {
   renderTray();
   const card3d = $('#card3d'); if (matchMedia('(pointer:fine)').matches) addTilt(card3d, 9);
   const doFlip = () => flipCurrent();
-  card3d.addEventListener('click', () => { session.revealed ? advance() : doFlip(); });
-  $('#nextBtn').addEventListener('click', () => { session.revealed ? advance() : doFlip(); });
+  card3d.addEventListener('click', () => { if (session.zoomed) { closeZoom(); return; } session.revealed ? zoomCard() : doFlip(); });
+  $('#nextBtn').addEventListener('click', () => { if (session.zoomed) closeZoom(); session.revealed ? advance() : doFlip(); });
   $('#skipBtn').addEventListener('click', () => { summaryForCurrent(); });
 }
 function renderTray() {
@@ -689,7 +739,7 @@ function flipCurrent() {
   const t = TIERS[entry.tier];
   $('#cardInfo').innerHTML = `
     <div class="cname">${entry.card.n}<span class="tierbadge">${dispTier(entry.card)}</span>${entry.foilPattern === 'ball' ? '<span class="revtag">精灵球纹样</span>' : entry.foilPattern === 'master' ? '<span class="revtag">大师球纹样</span>' : entry.reverse ? '<span class="revtag">反闪</span>' : ''}${entry.isNew ? '<span class="newtag">NEW</span>' : ''}</div>
-    <div class="cmeta">No.${entry.card.no} · ${dispTierLabel(entry.card)} · 参考价 <b style="color:var(--paper)">${fmtPrice(entry.card)}</b>${entry.card.ill ? ` · 画师 ${entry.card.ill}` : ''} · 点卡片看大图，点「下一张」继续</div>`;
+    <div class="cmeta">No.${entry.card.no} · ${dispTierLabel(entry.card)} · 参考价 <b style="color:var(--paper)">${fmtPrice(entry.card)}</b>${entry.card.ill ? ` · 画师 ${entry.card.ill}` : ''} · 点卡片放大看，再点收回 · 点「下一张」继续</div>`;
   $('#cardInfo').addEventListener('click', () => openDetail(entry.card));
   renderTray();
 }
@@ -702,6 +752,7 @@ function flash() { const f = $('#flash'); f.classList.add('on'); setTimeout(() =
 
 /* ---------------- 结算 ---------------- */
 function renderSummary() {
+  const sb = $('#stageBody'); if (sb) sb.classList.remove('zooming');
   const { cfg, pack, ten } = session; const data = DATA[cfg.key];
   const sorted = [...pack].sort(bestCmp);
   const best = sorted[0];

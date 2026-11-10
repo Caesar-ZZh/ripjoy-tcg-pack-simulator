@@ -68,8 +68,9 @@ main{max-width:1060px;margin:0 auto;padding:18px 16px calc(28px + var(--safe-b))
 .stagehead h2{font-size:18px;color:var(--ink)}
 .stagehead .oddslink{margin-left:auto;font-size:12.5px;color:var(--ink);font-weight:600}
 .stage{display:flex;flex-direction:column;align-items:center;padding:18px 16px 22px;min-height:480px;background:var(--panel);border-radius:24px;color:var(--paper);margin-top:8px}
-.packwrap{position:relative;width:min(64vw,248px);aspect-ratio:63/100;margin-top:16px;cursor:pointer;filter:drop-shadow(0 24px 44px rgba(0,0,0,.6));transition:transform .3s;animation:packFloat 3.4s ease-in-out infinite}
+.packwrap{position:relative;width:min(64vw,248px);aspect-ratio:63/100;margin-top:16px;cursor:pointer;filter:drop-shadow(0 24px 44px rgba(0,0,0,.6));transition:transform .3s;animation:packFloat 3.4s ease-in-out infinite;touch-action:none;user-select:none;-webkit-user-select:none}
 .packwrap:hover{transform:translateY(-4px) rotate(-1deg)}
+.packwrap.dragging{animation:none;transition:none;cursor:grabbing}
 .pack{position:absolute;inset:0;border-radius:12px;overflow:hidden;border:1px solid rgba(255,255,255,.22)}
 .pack .packart{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .pack .packshade{position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.34),transparent 26%,transparent 62%,rgba(0,0,0,.5))}
@@ -140,6 +141,13 @@ main{max-width:1060px;margin:0 auto;padding:18px 16px calc(28px + var(--safe-b))
 .cardinfo{margin-top:26px;text-align:center;min-height:64px;width:min(92vw,400px)}
 .cardinfo .cname{font-size:17px;font-weight:800;color:var(--paper)}
 .cardinfo .cmeta{color:var(--dim);font-size:13px;margin-top:4px}
+
+/* ---------- 点卡放大（金晕） ---------- */
+#stageBody .revealmeta,#stageBody .cardinfo,#stageBody .tray{transition:opacity .3s}
+#stageBody.zooming .revealmeta,#stageBody.zooming .cardinfo,#stageBody.zooming .tray{opacity:.15}
+.cardstage.zoomed{z-index:6}
+.cardstage.zoomed .card3d{transform:rotateX(var(--rx,0deg)) rotateY(calc(var(--ry,0deg) + var(--flip,0deg))) scale(1.22);border-radius:14px;box-shadow:0 0 42px 8px rgba(255,205,60,.5),0 0 110px 30px rgba(255,205,60,.22)}
+@media (max-width:560px){.cardstage.zoomed .card3d{transform:rotateX(var(--rx,0deg)) rotateY(calc(var(--ry,0deg) + var(--flip,0deg))) scale(1.14)}}
 .tierbadge{display:inline-block;padding:2.5px 10px;border-radius:99px;font-size:11.5px;font-weight:800;color:var(--ink);background:var(--paper);margin-left:6px;vertical-align:2px}
 .newtag{display:inline-block;padding:2.5px 8px;border-radius:99px;font-size:11px;font-weight:800;background:var(--paper);color:var(--ink);margin-left:6px;vertical-align:2px;animation:pulseGlow 1s infinite}
 .revtag{display:inline-block;padding:2.5px 8px;border-radius:99px;font-size:11px;font-weight:700;background:rgba(242,231,224,.08);color:var(--paper);border:1px solid rgba(242,231,224,.4);margin-left:6px;vertical-align:2px}
