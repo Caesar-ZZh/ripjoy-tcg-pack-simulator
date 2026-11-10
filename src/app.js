@@ -164,6 +164,15 @@ function evictCnSets(keepKey) {
   }
 }
 const logoSrc = (data) => !data.logo ? null : (data.logo.startsWith('data:') ? data.logo : `${data.logo}.png`);
+// 弹系标志图回退：TCGdex 个别弹（如 sv01）没有 .png 版，只有 .webp；加载失败时换 .webp 再试一次，
+// 仍失败则 logoimg 还原为弹系文字名、packlogo 直接隐藏（卡包名另有 .packname 显示）
+if (typeof window !== 'undefined') window.addEventListener('error', (e) => {
+  const t = e.target;
+  if (!t || t.tagName !== 'IMG' || !(t.classList.contains('logoimg') || t.classList.contains('packlogo'))) return;
+  if (!t.dataset.fbk && /\.png$/.test(t.src)) { t.dataset.fbk = '1'; t.src = t.src.replace(/\.png$/, '.webp'); return; }
+  if (t.classList.contains('logoimg') && t.alt) t.replaceWith(document.createTextNode(t.alt));
+  else t.style.display = 'none';
+}, true);
 const HIDONE = {};
 function loadHi(cfg) {
   // 简中弹高清包：主数据只带缩略图，高稀有卡的高清图单独一个文件，进开包/图鉴时按需加载
