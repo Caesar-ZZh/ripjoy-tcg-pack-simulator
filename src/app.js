@@ -4,14 +4,14 @@ import { sfx, vibrate, VIB, addTilt, setMuted } from './fx.js';
 import { BACKS } from './cardbacks.js';
 
 const SETS = [
-  { key: 'CSV10.5C', file: 'data/zh-cn-CSV10.5C-m400.json', theme: 'linear-gradient(150deg,#292220,#332A25 55%,#3D322B)', desc: '简体中文版 · 黑白交汇 · 合众 156 宝可梦集结 · 卡图暂用繁中版，4 张训练家卡暂用英文版', chaseNote: '捷克罗姆 ex BWR', sname: '黑雷奔流', lang: 'zh-cn', total: 174, pack: 5, parts: 4, official: true },
-  { key: 'CSV10.6C', file: 'data/zh-cn-CSV10.6C-m400.json', theme: 'linear-gradient(150deg,#292220,#332A25 55%,#3D322B)', desc: '简体中文版 · 黑白交汇 · 合众 156 宝可梦集结 · 卡图暂用繁中版，1 张训练家卡暂用英文版', chaseNote: '莱希拉姆 ex BWR', sname: '白焰迸涌', lang: 'zh-cn', total: 174, pack: 5, parts: 4, official: true },
-  { key: '30thC', file: 'data/zh-cn-30thC-m400.json', theme: 'linear-gradient(150deg,#292220,#332A25 55%,#3D322B)', desc: '简体中文版 · 30 周年纪念 · 全闪包 · 每包必出 1 张皮卡丘 + 1 张能量 · 2 张 SAR 与能量卡暂用日版图', chaseNote: 'RGB 梦幻 · 梦幻 ex FUR', sname: '30周年庆典', lang: 'zh-cn', total: 176, pack: 6, parts: 4, official: true },
-  { key: 'taijing', file: 'data/zh-cn-CSV9.5C-m400.json', theme: 'linear-gradient(150deg,#292220,#332A25 55%,#3D322B)', desc: '简体中文版 · 伊布全家太晶盛聚 · 含简中专属异画', chaseNote: '仙子伊布 ex SAR（简中专属异画）', sname: '太晶盛聚', lang: 'zh-cn', total: 259, pack: 10, parts: 4, official: true },
-  { key: 'CSV9C', file: 'data/zh-cn-CSV9C-m400.json', theme: 'linear-gradient(150deg,#292220,#332A25 55%,#3D322B)', desc: '简体中文版 · 晶璃星辉 · 太乐巴戈斯集结', chaseNote: '太乐巴戈斯 ex SAR', sname: '星彩晶璃', lang: 'zh-cn', total: 266, pack: 5, parts: 4, official: true },
-  { key: 'CSV8C', file: 'data/zh-cn-CSV8C-m400.json', theme: 'linear-gradient(150deg,#292220,#332A25 55%,#3D322B)', desc: '简体中文版 · 诡幻璀璨 · 桃歹郎一族', chaseNote: '桃歹郎 ex SAR', sname: '璀璨诡幻', lang: 'zh-cn', total: 264, pack: 5, parts: 4, official: true },
-  { key: 'CSV7C', file: 'data/zh-cn-CSV7C-m400.json', theme: 'linear-gradient(150deg,#292220,#332A25 55%,#3D322B)', desc: '简体中文版 · 利刃猛醒 · 猛雷鼓咆哮', chaseNote: '猛雷鼓 ex SAR', sname: '利刃猛醒', lang: 'zh-cn', total: 259, pack: 5, parts: 4, official: true },
-  { key: '151C', file: 'data/zh-cn-151C-m400.json', theme: 'linear-gradient(150deg,#292220,#332A25 55%,#3D322B)', desc: '简体中文版 · 初代 151 情怀 · 旅望惊聚全集', chaseNote: '喷火龙 ex SAR', sname: '收集啦151', lang: 'zh-cn', total: 192, pack: 5, parts: 4, official: true },
+  { key: 'CSV10.5C', file: 'data/zh-cn-CSV10.5C-m400.json', hqFile: 'data/zh-cn-CSV10.5C.json', theme: 'linear-gradient(150deg,#292220,#332A25 55%,#3D322B)', desc: '简体中文版 · 黑白交汇 · 合众 156 宝可梦集结 · 卡图暂用繁中版，4 张训练家卡暂用英文版', chaseNote: '捷克罗姆 ex BWR', sname: '黑雷奔流', lang: 'zh-cn', total: 174, pack: 5, parts: 4, official: true },
+  { key: 'CSV10.6C', file: 'data/zh-cn-CSV10.6C-m400.json', hqFile: 'data/zh-cn-CSV10.6C.json', theme: 'linear-gradient(150deg,#292220,#332A25 55%,#3D322B)', desc: '简体中文版 · 黑白交汇 · 合众 156 宝可梦集结 · 卡图暂用繁中版，1 张训练家卡暂用英文版', chaseNote: '莱希拉姆 ex BWR', sname: '白焰迸涌', lang: 'zh-cn', total: 174, pack: 5, parts: 4, official: true },
+  { key: '30thC', file: 'data/zh-cn-30thC-m400.json', hqFile: 'data/zh-cn-30thC.json', theme: 'linear-gradient(150deg,#292220,#332A25 55%,#3D322B)', desc: '简体中文版 · 30 周年纪念 · 全闪包 · 每包必出 1 张皮卡丘 + 1 张能量 · 2 张 SAR 与能量卡暂用日版图', chaseNote: 'RGB 梦幻 · 梦幻 ex FUR', sname: '30周年庆典', lang: 'zh-cn', total: 176, pack: 6, parts: 4, official: true },
+  { key: 'taijing', file: 'data/zh-cn-CSV9.5C-m400.json', hqFile: 'data/zh-cn-CSV9.5C.json', theme: 'linear-gradient(150deg,#292220,#332A25 55%,#3D322B)', desc: '简体中文版 · 伊布全家太晶盛聚 · 含简中专属异画', chaseNote: '仙子伊布 ex SAR（简中专属异画）', sname: '太晶盛聚', lang: 'zh-cn', total: 259, pack: 10, parts: 4, official: true },
+  { key: 'CSV9C', file: 'data/zh-cn-CSV9C-m400.json', hqFile: 'data/zh-cn-CSV9C.json', theme: 'linear-gradient(150deg,#292220,#332A25 55%,#3D322B)', desc: '简体中文版 · 晶璃星辉 · 太乐巴戈斯集结', chaseNote: '太乐巴戈斯 ex SAR', sname: '星彩晶璃', lang: 'zh-cn', total: 266, pack: 5, parts: 4, official: true },
+  { key: 'CSV8C', file: 'data/zh-cn-CSV8C-m400.json', hqFile: 'data/zh-cn-CSV8C.json', theme: 'linear-gradient(150deg,#292220,#332A25 55%,#3D322B)', desc: '简体中文版 · 诡幻璀璨 · 桃歹郎一族', chaseNote: '桃歹郎 ex SAR', sname: '璀璨诡幻', lang: 'zh-cn', total: 264, pack: 5, parts: 4, official: true },
+  { key: 'CSV7C', file: 'data/zh-cn-CSV7C-m400.json', hqFile: 'data/zh-cn-CSV7C.json', theme: 'linear-gradient(150deg,#292220,#332A25 55%,#3D322B)', desc: '简体中文版 · 利刃猛醒 · 猛雷鼓咆哮', chaseNote: '猛雷鼓 ex SAR', sname: '利刃猛醒', lang: 'zh-cn', total: 259, pack: 5, parts: 4, official: true },
+  { key: '151C', file: 'data/zh-cn-151C-m400.json', hqFile: 'data/zh-cn-151C.json', theme: 'linear-gradient(150deg,#292220,#332A25 55%,#3D322B)', desc: '简体中文版 · 初代 151 情怀 · 旅望惊聚全集', chaseNote: '喷火龙 ex SAR', sname: '收集啦151', lang: 'zh-cn', total: 192, pack: 5, parts: 4, official: true },
   { key: '151en', file: 'data/en-sv03.5.json', theme: 'linear-gradient(150deg,#292220,#332A25 55%,#3D322B)', desc: '初代 151 情怀弹 · 喷火龙 SAR 大追', chaseNote: '喷火龙 ex SAR', sname: '151', lang: 'en', total: 207, pack: 10 },
   { key: 'sv08.5', file: 'data/en-sv08.5.json', theme: 'linear-gradient(150deg,#292220,#332A25 55%,#3D322B)', desc: '伊布盛宴 · 月亮伊布 ex SAR 天价追卡', chaseNote: '月亮伊布 ex SAR', sname: 'Prismatic Evolutions', lang: 'en', total: 180, pack: 10 },
   { key: 'sv08', file: 'data/en-sv08.json', theme: 'linear-gradient(150deg,#292220,#332A25 55%,#3D322B)', desc: '电光四射 · 皮卡丘 SAR 天价追卡', chaseNote: '皮卡丘 ex SAR', sname: 'Surging Sparks', lang: 'en', total: 252, pack: 10 },
@@ -122,21 +122,31 @@ async function fetchChunksLimited(urls, cache, onProgress) {
   if (failedErr) throw failedErr;
   return cache;
 }
+// 画质分流：PC 端（细指针 + 宽屏 ≥1024）简中弹用最高清原图（hqFile 单文件 15–33MB/弹），
+// 手机端保持 400px 分片。原图与分片卡表完全一致（卡 id 与非图字段逐项核对过），只换图。
+const USE_HQ = typeof window !== 'undefined' && typeof matchMedia !== 'undefined'
+  && matchMedia('(pointer:fine)').matches
+  && Math.max(window.innerWidth || 0, window.screen?.width || 0) >= 1024;
+function dataFileOf(cfg) {
+  if (USE_HQ && cfg.hqFile) return { file: cfg.hqFile, parts: 0 };
+  return { file: cfg.file, parts: cfg.parts || 0 };
+}
 function loadSet(cfg, onProgress) {
   if (DATA[cfg.key]) return Promise.resolve(DATA[cfg.key]);
   if (LOADP[cfg.key]) return LOADP[cfg.key];
   LOADP[cfg.key] = (async () => {
     const embedded = (typeof window !== 'undefined' && window.__RIPJOY_EMBED__) ? window.__RIPJOY_EMBED__[cfg.file] : null;
     let data = embedded;
-    if (!data && cfg.parts) {
-      // 简中弹瘦身数据分片（320px 图，单弹约 5.5–8.1MB，单片 <2.4MB）：限流 3 路并发，每片失败自动重试；经 jsDelivr 拉取
-      const urls = [cfg.file, ...Array.from({ length: cfg.parts - 1 }, (_, i) => cfg.file.replace('.json', `.p${i + 2}.json`))];
+    const { file, parts } = dataFileOf(cfg);
+    if (!data && parts) {
+      // 简中弹 400px 数据分片（单弹约 7.7–9.4MB，单片 <2.4MB）：限流 3 路并发，每片失败自动重试；经 jsDelivr 拉取
+      const urls = [file, ...Array.from({ length: parts - 1 }, (_, i) => file.replace('.json', `.p${i + 2}.json`))];
       const cache = CHUNKCACHE[cfg.key] || (CHUNKCACHE[cfg.key] = []);
       const chunks = await fetchChunksLimited(urls, cache, onProgress);
       data = { ...chunks[0], cards: chunks.flatMap(c => c.cards) };
       delete CHUNKCACHE[cfg.key];
     }
-    if (!data) data = await fetchDataJson(cfg.file);
+    if (!data) data = await fetchDataJson(file);
     DATA[cfg.key] = data; POOLS[cfg.key] = buildPools(data);
     for (const c of data.cards) CARDMAP[c.id] = { card: c, setKey: cfg.key, setName: data.name };
     return data;
@@ -176,7 +186,7 @@ if (typeof window !== 'undefined') window.addEventListener('error', (e) => {
 const HIDONE = {};
 function loadHi(cfg) {
   // 简中弹高清包：主数据只带缩略图，高稀有卡的高清图单独一个文件，进开包/图鉴时按需加载
-  if (HIDONE[cfg.key] || !cfg.file.includes('zh-cn') || cfg.parts) return; // 分片弹数据本身即全高清
+  if (HIDONE[cfg.key] || !cfg.file.includes('zh-cn') || cfg.parts) return; // 分片弹（m400）与高清原图都不走 .hi.json 补图（无此文件）
   if (typeof window !== 'undefined' && window.__RIPJOY_EMBED__) return; // 单文件版内嵌的即是高清原图
   HIDONE[cfg.key] = true;
   fetch(cfg.file.replace('.json', '.hi.json')).then(r => r.ok ? r.json() : null).then(m => {
@@ -423,7 +433,7 @@ async function ensureStageData(cfg, retryFn) {
   session = { cfg, phase: 'loading' };
   showStage();
   $('#stageTitle').textContent = cfg.sname;
-  const total = cfg.parts || 1;
+  const total = dataFileOf(cfg).parts || 1;
   const renderLoading = (done) => {
     $('#stageBody').innerHTML = `<div class="empty" style="padding-top:70px">正在加载「${cfg.sname}」卡池${total > 1 ? ` ${done}/${total}` : ''}…<br><span style="font-size:12.5px">首次打开需下载该弹数据，之后秒开</span></div>`;
   };
@@ -510,6 +520,15 @@ function closeSvOverlay() {
 }
 // Selvedge 结算：淡腮红外壳 + 大字标题 + 深色大卡（烟雾渐隐）+ 1 张最佳 + 一行无字配角 + 纯白胶囊主按钮
 // rest 超过 9 张时只取前 9 张进配角行，其余由 allGrid（十连总汇算）在面板下方全量展示
+// 最佳入选理由：按 bestCmp 的三轮判定（等级 → 参考价 → 稀有度排名）拼一句，写在结算页最佳卡下方
+// 等级胜出或同级排名胜出 →“本包最高稀有度”；价格胜出（英文弹有参考价）→“参考价最高”
+function bestWhyLine(best, second) {
+  const t = dispTier(best.card);
+  const cn = TIERS[t] ? TIERS[t].cn : '';
+  const reason = second && best.level === second.level && (best.card.p || 0) > (second.card.p || 0)
+    ? '参考价最高' : '本包最高稀有度';
+  return `<b>最佳</b> · ${t}${cn ? `（${cn}）` : ''} · ${reason}`;
+}
 function renderSelvedgeSummary({ title, sub, best, rest, primaryLabel, onPrimary, secondary = [], allGrid = null }) {
   closeSvOverlay();
   const ov = document.createElement('div');
@@ -522,6 +541,7 @@ function renderSelvedgeSummary({ title, sub, best, rest, primaryLabel, onPrimary
     <div class="sv-panel">
       <div class="sv-smoke">${smoke}<div class="sv-soft"></div></div>
       <div class="sv-best"><img src="${imgUrl(best.card, true)}" alt="${best.card.n}" data-id="${best.card.id}"></div>
+      <div class="sv-bestwhy">${bestWhyLine(best, rest[0])}</div>
       <div class="sv-support">${strip.map(e => `<img src="${thumbUrl(e.card)}" alt="" data-id="${e.card.id}" loading="lazy" decoding="async">`).join('')}</div>
       <button class="sv-pill" id="svPrimary">${primaryLabel}</button>
       <div class="sv-links">${secondary.map((s2, i) => `<button data-i="${i}">${s2.label}</button>`).join('')}</div>
