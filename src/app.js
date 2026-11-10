@@ -618,6 +618,8 @@ function renderTear() {
     packEl.classList.remove('dragging');
     const top = packEl.querySelector('.packtop');
     if (top) { top.style.opacity = ''; top.style.transform = ''; }
+    const tearStrip = packEl.querySelector('.packtear');
+    if (tearStrip) tearStrip.style.opacity = '';
     packEl.style.transform = '';
   };
   packEl.addEventListener('pointerdown', (e) => {
@@ -634,8 +636,10 @@ function renderTear() {
     const t = Math.max(0, Math.min(proj / 80, 1));
     if (Math.abs(dx) + Math.abs(dy) > 8) drag.moved = true;
     const top = packEl.querySelector('.packtop');
-    if (top) { top.style.opacity = String(0.15 + 0.85 * t); top.style.transform = `rotate(${-20 * t}deg) translate(${12 * t}px, ${-8 * t}px)`; }
-    packEl.style.transform = `translate(${Math.max(0, Math.min(dx, 26))}px, ${Math.max(0, Math.min(dy, 20))}px)`;
+    if (top) { top.style.opacity = String(0.15 + 0.85 * t); top.style.transform = `rotate(${-34 * t}deg) translate(${22 * t}px, ${-16 * t}px)`; }
+    packEl.style.transform = `translate(${Math.max(0, Math.min(dx, 34))}px, ${Math.max(0, Math.min(dy, 26))}px)`;
+    const tearStrip = packEl.querySelector('.packtear');
+    if (tearStrip) tearStrip.style.opacity = String(0.5 + 0.5 * t);
     if (t >= 1) { drag = null; clearDragVisual(); tear(); }
   });
   const endDrag = () => {
